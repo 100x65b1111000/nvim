@@ -1,4 +1,4 @@
-local mini_icons = require('mini.icons')
+local mini_icons = require("mini.icons")
 local cache = require("core.statusline.cache")
 local M = {}
 
