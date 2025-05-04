@@ -459,9 +459,6 @@ end
 
 ---Updates the global tabline buffer string.
 local function update_tabline_buffer_string()
-	if states.cache.last_visible_buffers == states.visible_buffers then
-		return states.cache.tabline_buf_string
-	end
 	local str = ""
 	local bufs = states.buffers_list
 	for _, bufnr in ipairs(states.visible_buffers) do
@@ -473,7 +470,6 @@ local function update_tabline_buffer_string()
 		.. "%#TabLineFill#"
 		.. "%="
 		.. overflow_info.right_overflow_str
-	states.cache.last_visible_buffers = states.visible_buffers
 end
 
 M.get_tabline_buffers_list = get_tabline_buffers_list
