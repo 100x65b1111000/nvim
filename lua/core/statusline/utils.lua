@@ -2,6 +2,19 @@ local mini_icons = require("mini.icons")
 local cache = require("core.statusline.cache")
 local M = {}
 
+---Truncates a string.
+---@param string string The string to truncate.
+---@param source_length integer The original string length.
+---@param target_length integer The target string length.
+---@return string The truncated string.
+local function truncate_string(string, source_length, target_length)
+	local ellipsis = "…"
+	if source_length <= target_length then
+		return string
+	end
+	return string.sub(string, 1, target_length - 1) .. ellipsis
+end
+
 ---@param hl_name string The name of the highlight group.
 ---@return vim.api.keyset.get_hl_info The highlight information.
 local function get_highlight(hl_name)
@@ -79,8 +92,8 @@ end
 ---@return string
 local file = function()
 	local buftype = vim.bo[0].buftype
-	local file_name = " " .. process_buffer_name()
-	local filetype = vim.bo[0].filetype
+	local file_name = " " .. process_buffer_name() .. " "
+	local filetype = vim.bo[0].filetype .. " "
 	local file_icon, file_icon_hl = mini_icons.get("file", vim.fn.expand("%t"))
 	file_icon_hl = generate_highlight(file_icon_hl, file_icon_hl, {}, 75).hl_string
 	local file_name_hl =
@@ -110,7 +123,7 @@ local file = function()
 		file_name = " " .. filetype
 		file_icon = ""
 	end
-	return file_icon .. file_name_hl .. file_name .. " "
+	return file_icon .. file_name_hl .. file_name
 end
 
 M.get_buffer_info = file

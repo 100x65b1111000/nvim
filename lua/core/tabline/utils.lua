@@ -147,16 +147,16 @@ local function process_buffer_name(bufnr)
 end
 
 ---Truncates a string.
----@param bufname string The string to truncate.
+---@param string string The string to truncate.
 ---@param source_length integer The original string length.
 ---@param target_length integer The target string length.
 ---@return string The truncated string.
-local function truncate_string(bufname, source_length, target_length)
+local function truncate_string(string, source_length, target_length)
 	local ellipsis = "…"
 	if source_length <= target_length then
-		return bufname
+		return string
 	end
-	return string.sub(bufname, 1, target_length - 1) .. ellipsis
+	return string.sub(string, 1, target_length - 1) .. ellipsis
 end
 
 ---Gets left and right padding.
