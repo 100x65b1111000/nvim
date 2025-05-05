@@ -1,5 +1,5 @@
 local mini_icons = require("mini.icons")
-local cache = require("core.statusline.cache")
+local cache = require("ui.statusline.cache")
 local M = {}
 
 ---Truncates a string.

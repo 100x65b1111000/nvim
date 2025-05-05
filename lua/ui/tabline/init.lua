@@ -1,6 +1,6 @@
 -- init.lua
-local utils = require("core.tabline.utils")
-local states = require("core.tabline.states")
+local utils = require("ui.tabline.utils")
+local states = require("ui.tabline.states")
 
 local M = {}
 

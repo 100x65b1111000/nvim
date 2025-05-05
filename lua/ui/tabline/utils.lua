@@ -1,6 +1,6 @@
 --- Neovim Tabline Utilities
 
-local states = require("core.tabline.states")
+local states = require("ui.tabline.states")
 
 local M = {}
 
@@ -218,7 +218,7 @@ M.buf_is_valid = buf_is_valid
 M.get_buffer_info = get_buffer_info
 
 ---Gets valid buffers.
----@return table<integer, {buf_name: string, icon: string, icon_hl: string, length: integer, state: integer, left_padding: string, right_padding: string}>
+---@return {buf_name: string, icon: string, icon_hl: string, length: integer, state: integer, left_padding: string, right_padding: string}
 local function get_buffers_with_specs(bufs)
 	local valid_bufs = {}
 	for _, i in ipairs(bufs) do

@@ -1,6 +1,6 @@
 local mini_icons = require("mini.icons")
--- require("core.statusline.autocmds")
-local utils = require("core.statusline.utils")
+-- require("ui.statusline.autocmds")
+local utils = require("ui.statusline.utils")
 
 local Modes = {
 	["n"] = "NORMAL",
