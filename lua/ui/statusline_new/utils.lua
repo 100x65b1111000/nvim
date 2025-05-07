@@ -62,9 +62,6 @@ local function generate_highlight(
 		return new_name
 	end
 	opts = opts or {}
-	if extra_opts then
-		vim.notify('extra opts passed')
-	end
 	local source_hl_fg = (extra_opts and extra_opts.use_bg_for_fg and get_highlight(source_fg).bg)
 		or get_highlight(source_fg).fg
 	local source_hl_bg = (extra_opts and extra_opts.use_fg_for_bg and get_highlight(source_bg).fg)
@@ -72,7 +69,7 @@ local function generate_highlight(
 	local fallback_hl = get_highlight("Normal") -- User Normal as default hlgroup if get_highlight return nil
 	local fg = "#" .. string.format("%06x", source_hl_fg or fallback_hl.fg)
 	local bg = "#" .. string.format("%06x", source_hl_bg or fallback_hl.bg)
-	vim.notify(bg .. "")
+	-- vim.notify(bg .. "")
 
 	bg = alter_hex_color(bg, brightness_bg)
 	fg = alter_hex_color(fg, brightness_fg)
@@ -92,7 +89,7 @@ end
 function M.buf_status()
 	local ro_string = vim.bo.readonly and "%r %m " or ""
 	local mo_string = vim.bo.modified and "%m " or ""
-	local hl = generate_highlight("MiniIconsOrange", "StatusLineNormalMode", {}, 0, -65, "", "", "StatusLineBufStatus")
+	local hl = generate_highlight("MiniIconsOrange", "StatusLineNormalMode", {}, -65, 0, "", "", "StatusLineBufStatus", {  use_bg_for_fg = false, use_fg_for_bg = true})
 	return { hl_group = hl, string = ro_string .. mo_string }
 end
 
@@ -134,7 +131,63 @@ function M.statusline_bufinfo()
 	return { string = " %t ", hl_group = buf_hl }
 end
 
-function M.statusline_filetype() end
+function M.statusline_filetype()
+	local filetype = vim.bo.filetype
+end
+
+local git_parent = function(path)
+	return vim.fs.find({ ".git" }, { path = path, upward = true, stop = vim.env.HOME })[1]
+end
+
+local insertions = function(ins)
+	if ins and ins ~= "0" and ins ~= "" then
+		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins
+	end
+	return ""
+end
+
+local deletions = function(del)
+	if del and del ~= "0" and del ~= "" then
+		return " %#StatusLineGitDeletions# %#StatusLineHl#" .. del
+	end
+	return ""
+end
+
+M.statusline_git_file_stat = function(file_path)
+	local parent = git_parent(file_path)
+
+	local git_status = ""
+
+	-- vim.notify("git -C " .. parent .. " diff --numstat " .. file_path)
+	--
+	parent = parent:match("(.*)/[^/]*$")
+	local git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
+	local git_diff_cmd = git_cmd .. parent .. " diff --numstat " .. file_path
+	local diff_output_obj = vim.system({ "bash", "-c", git_diff_cmd }, { text = true }):wait()
+	if diff_output_obj.code ~= 0 then
+		return " " .. git_status
+	end
+	local diff_output = diff_output_obj.stdout
+	if diff_output ~= "" and diff_output then
+		local diff_split = vim.split(diff_output, "\t")
+		git_status = insertions(diff_split[1]) .. deletions(diff_split[2])
+	end
+
+	local git_stat_cmd = git_cmd .. parent .. " status --short --porcelain " .. file_path
+	local stat_output_obj = vim.system({ "bash", "-c", git_stat_cmd }, { text = true }):wait()
+	if stat_output_obj.code ~= 0 then
+		return " " .. git_status
+	end
+	local stat_output = stat_output_obj.stdout or ""
+	local file_status = stat_output:match("[^%s]+")
+	if not file_status then
+		git_status = "%#StatusLineGitUptodate# " .. git_status
+	elseif file_status == "??" then
+		git_status = "%#StatusLineGitUnstaged# " .. git_status
+	end
+
+	return " " .. git_status
+end
 
 function M.initialize_stl(opts)
 	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
