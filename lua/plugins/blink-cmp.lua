@@ -410,7 +410,6 @@ P.config = function()
 			},
 		},
 		cmdline = {
-			---@diagnostic disable-next-line: assign-type-mismatch
 			sources = function()
 				local type = vim.fn.getcmdtype()
 				if type == "/" or type == "?" then
@@ -421,13 +420,13 @@ P.config = function()
 				return {}
 			end,
 			keymap = {
-				preset = nil,
+				preset = 'none',
 				["<tab>"] = { "show_and_insert", "select_next" },
 				["<m-j>"] = { "select_next" },
 				["<s-tab>"] = { "select_prev" },
 				["<m-k>"] = { "select_prev" },
-				["<Left>"] = { "fallback" },
-				["<Right>"] = { "fallback" },
+				["<left>"] = { "fallback" },
+				["<right>"] = { "fallback" },
 			},
 			enabled = true,
 			completion = {
@@ -447,7 +446,9 @@ P.config = function()
 						},
 					},
 				},
-				ghost_text = { enabled = true },
+				ghost_text = {
+					enabled = true
+				}
 			},
 		},
 		term = {

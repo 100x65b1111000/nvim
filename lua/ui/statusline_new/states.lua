@@ -1,17 +1,18 @@
 local M = {}
 
 ---@class StatusLineDefaultConfig
----@field use_mini_icons boolean
----@field modules StatusLineModules
+---@field use_mini_icons boolean | nil
+---@field modules StatusLineModulesConfig | nil
 
----@alias LeftModules "mode"|"modified-status"|"bufinfo"|fun(): { string: string, hl_string: string, icon: string|nil, icon_hl: string|nil }
----@alias MiddleModules "root-dir"|"git-branch"|"git-status"|fun(): { string: string, hl_string: string, icon: string|nil, icon_hl: string|nil }
----@alias RightModules "diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|fun(): { string: string, hl_string: string, icon: string|nil, icon_hl: string|nil }
+---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string }
 
----@class StatusLineModules
----@field left LeftModules[]
----@field middle MiddleModules[]
----@field right RightModules[]
+---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
+---@alias StatusLineModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"git-branch"|"git-status"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|StatusLineModuleFn
+
+---@class StatusLineModulesConfig
+---@field left StatusLineModules[]|nil
+---@field middle StatusLineModules[]|nil
+---@field right StatusLineModules[]|nil
 
 ---@type StatusLineDefaultConfig
 M.default_config = {
@@ -19,8 +20,8 @@ M.default_config = {
 	modules = {
 		left = {
 			"mode",
-			"modified-status",
 			"bufinfo",
+			"buf-status",
 		},
 		middle = {
 			"root-dir",
@@ -36,32 +37,69 @@ M.default_config = {
 	},
 }
 
+---@type StatusLineConfig
+M.current_config = {}
+
 M.cache = {
 	highlights = {},
-	statusline_string = "",
-	mode_string = "",
-	modified_status_string = "",
-	bufname_string = "",
-	root_dir_string = "",
-	git_branch_string = "",
-	git_status_string = "",
-	diagnostic_info_string = "",
-	lsp_info_string = "",
-	cursor_pos_string = "",
-	scroll_pos_string = "",
+	statusline_string = nil,
+	mode_string = nil,
+	buf_status = nil,
+	bufname_string = nil,
+	root_dir_string = nil,
+	git_branch_string = nil,
+	git_status_string = nil,
+	diagnostic_info_string = nil,
+	lsp_info_string = nil,
+	cursor_pos_string = nil,
+	scroll_pos_string = nil,
 }
 
+---@return StatusLineModuleFnTable
+local fallback_fn = function()
+	return { hl_group = "", string = "", icon = "", icon_hl = "" }
+end
+
+---@type StatusLineModuleFn[]
 M.modules_map = {
-	["mode"] = M.cache.mode_string,
-	["modified-status"] = M.cache.modified_status_string,
-	["bufinfo"] = M.cache.bufname_string,
-	["root-dir"] = M.cache.root_dir_string,
-	["git-branch"] = M.cache.git_branch_string,
-	["git-status"] = M.cache.git_status_string,
-	["diagnostic-info"] = M.cache.diagnostic_info_string,
-	["lsp-info"] = M.cache.lsp_info_string,
-	["cursor-pos"] = M.cache.cursor_pos_string,
-	["scroll-pos"] = M.cache.scroll_pos_string,
+	["mode"] = fallback_fn,
+	["buf-status"] = fallback_fn,
+	["bufinfo"] = fallback_fn,
+	["root-dir"] = fallback_fn,
+	["git-branch"] = fallback_fn,
+	["git-status"] = fallback_fn,
+	["diagnostic-info"] = fallback_fn,
+	["lsp-info"] = fallback_fn,
+	["cursor-pos"] = fallback_fn,
+	["scroll-pos"] = fallback_fn,
+}
+
+M.Modes = {
+	["n"] = { name = "  NORMAL ", hl = "StatusLineNormalMode" },
+	["no"] = { name = "  OPERATOR ", hl = "StatusLineMode" },
+	["v"] = { name = "  VISUAL ", hl = "StatusLineVisualMode" },
+	["V"] = { name = "  VISUAL LINE ", hl = "StatusLineVisualMode" },
+	[""] = { name = "  VISUAL BLOCK ", hl = "StatusLineVisualMode" },
+	["s"] = { name = "  [V] SELECT ", hl = "StatusLineSelectMode" },
+	["s"] = { name = "  SELECT ", hl = "StatusLineSelectMode" },
+	["S"] = { name = "  SELECT LINE ", hl = "StatusLineSelectMode" },
+	[""] = { name = "  SELECT BLOCK ", hl = "StatusLineSelectMode" },
+	["i"] = { name = "  INSERT ", hl = "StatusLineInsertMode" },
+	["ic"] = { name = "  INSERT ", hl = "StatusLineInsertMode" },
+	["R"] = { name = "  REPLACE ", hl = "StatusLineReplaceMode" },
+	["Rv"] = { name = "  [V] REPLACE ", hl = "StatusLineReplaceMode" },
+	["c"] = { name = "  COMMAND ", hl = "StatusLineCommandMode" },
+	["cr"] = { name = "  COMMAND ", hl = "StatusLineCommandMode" },
+	["cv"] = { name = "  VIM EX ", hl = "StatusLineCommandMode" },
+	["cvr"] = { name = "  VIM EX ", hl = "StatusLineCommandMode" },
+	["ce"] = { name = "  EX ", hl = "StatusLineCommandMode" },
+	["r"] = { name = "  PROMPT ", hl = "StatusLineMode" },
+	["rm"] = { name = "  MOAR ", hl = "StatusLineMode" },
+	["r?"] = { name = "  CONFIRM ", hl = "StatusLineMode" },
+	["!"] = { name = "  SHELL ", hl = "StatusLineShellMode" },
+	["t"] = { name = "  TERMINAL ", hl = "StatusLineTerminalMode" },
+	["nt"] = { name = "  TERMINAL ", hl = "StatusLineTerminalMode" },
+	["ntT"] = { name = "  TERMINAL ", hl = "StatusLineTerminalMode" },
 }
 
 return M

@@ -1,5 +1,5 @@
-local utils = require('ui.statusline_new.utils')
-local states = require('ui.statusline_new.states')
+-- local states = require('ui.statusline_new.states')
+-- require('ui.statusline_new.autocmds')
 
 local M = {}
 
@@ -7,13 +7,11 @@ local M = {}
 
 ---@param opts StatusLineConfig
 M.setup = function(opts)
-	if opts then
-		opts = vim.tbl_deep_extend('force', states.default_config, opts)
-		utils.set_statusline(opts)
-		return
-	end
-	utils.set_statusline(opts)
-	vim.o.statusline = [[%!v:lua.require('ui.statusline_new.states').cache.statusline_string]]
+	local utils = require("ui.statusline_new.utils")
+	utils.initialize_stl(opts)
+
+	vim.o.statusline = [[%!v:lua.require('ui.statusline_new.utils').set_statusline()]]
+	-- vim.o.statusline = [[%#DiagnosticWarn# statusline :-)]]
 end
 
 return M
