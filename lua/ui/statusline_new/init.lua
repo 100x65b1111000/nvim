@@ -1,5 +1,5 @@
 -- local states = require('ui.statusline_new.states')
--- require('ui.statusline_new.autocmds')
+require('ui.statusline_new.autocmds')
 
 local M = {}
 

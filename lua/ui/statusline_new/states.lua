@@ -20,8 +20,8 @@ M.default_config = {
 	modules = {
 		left = {
 			"mode",
-			"bufinfo",
 			"buf-status",
+			"bufinfo",
 		},
 		middle = {
 			"root-dir",
