@@ -4,7 +4,7 @@ local M = {}
 ---@field use_mini_icons boolean | nil
 ---@field modules StatusLineModulesConfig | nil
 
----@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string }
+---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
 ---@alias StatusLineModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"git-branch"|"git-status"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|StatusLineModuleFn
@@ -66,8 +66,8 @@ M.modules_map = {
 	["buf-status"] = fallback_fn,
 	["bufinfo"] = fallback_fn,
 	["root-dir"] = fallback_fn,
-	["git-branch"] = fallback_fn,
 	["git-status"] = fallback_fn,
+	["git-branch"] = fallback_fn,
 	["diagnostic-info"] = fallback_fn,
 	["lsp-info"] = fallback_fn,
 	["cursor-pos"] = fallback_fn,

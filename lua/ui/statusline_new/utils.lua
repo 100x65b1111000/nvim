@@ -86,7 +86,7 @@ end
 ---@return StatusLineModuleFnTable
 function M.buf_status()
 	local mo_string = vim.bo.modified and " %m " or " "
-	local ro_string = vim.bo.readonly and " %r"  or mo_string
+	local ro_string = vim.bo.readonly and " %r" or mo_string
 	local hl = generate_highlight(
 		"MiniIconsOrange",
 		"StatusLineNormalMode",
@@ -151,32 +151,30 @@ local find_parent = function(path)
 		return vim.fn.fnamemodify(git_parent, ":h")
 	end
 	return nil
-
 end
 
 local insertions = function(ins)
 	if ins and ins ~= "0" and ins ~= "" then
-		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins
+		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
 	end
 	return ""
 end
 
 local deletions = function(del)
 	if del and del ~= "0" and del ~= "" then
-		return " %#StatusLineGitDeletions# %#StatusLineHl#" .. del
+		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
 	end
 	return ""
 end
 
-M.fetch_git_file_stat = function()
-	local debounce_timer = states.git_status_debounce_timer
-	if debounce_timer then
-		debounce_timer:stop()
-		debounce_timer:close()
+M.fetch_git_file_stat = function(timeout, repeat_)
+	if states.git_status_debounce_timer then
+		states.git_status_debounce_timer:stop()
+		states.git_status_debounce_timer:close()
 	end
 
 	states.git_status_debounce_timer = vim.uv.new_timer()
-	states.git_status_debounce_timer:start(50, 0, function()
+	states.git_status_debounce_timer:start(timeout, repeat_, function()
 		vim.schedule(function()
 			local file_path = vim.fn.expand("%:p")
 			local parent = find_parent(file_path)
@@ -197,7 +195,7 @@ M.fetch_git_file_stat = function()
 			vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
 				vim.b.statusline_git_stat_out = out
 			end)
-			vim.cmd('redrawstatus')
+			vim.cmd("redrawstatus")
 		end)
 	end)
 end
@@ -229,7 +227,7 @@ M.statusline_git_file_stat = function()
 	local file_status = stat_output:match("[^%s]+")
 
 	if not file_status then
-		git_status = "%#StatusLineGitUptodate# " .. git_status
+		git_status = "%#StatusLineGitUptodate# " .. git_status
 	elseif file_status == "??" then
 		git_status = "%#StatusLineGitUnstaged# " .. git_status
 	end
@@ -237,20 +235,19 @@ M.statusline_git_file_stat = function()
 	return { hl_group = "", string = git_status }
 end
 
-M.fetch_git_branch = function ()
-	local debounce_timer = states.git_branch_debounce_timer
-	if debounce_timer then
-		debounce_timer:stop()
-		debounce_timer:close()
+M.fetch_git_branch = function()
+	if states.git_branch_debounce_timer then
+		states.git_branch_debounce_timer:stop()
+		states.git_branch_debounce_timer:close()
 	end
 
 	states.git_branch_debounce_timer = vim.uv.new_timer()
-	states.git_branch_debounce_timer:start(50, 0, function()
+	states.git_branch_debounce_timer:start(100, 0, function()
 		vim.schedule(function()
 			local file_path = vim.fn.expand("%:p")
 			local parent = find_parent(file_path)
 			if not parent then
-				vim.b.statusline_git_branch_out = nil
+				vim.b.statusline_git_branch_obj = nil
 				return
 			end
 
@@ -258,21 +255,33 @@ M.fetch_git_branch = function ()
 
 			local git_diff_cmd = git_cmd .. parent .. " branch --show-current "
 			vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-				vim.b.statusline_git_branch_out = out
+				vim.b.statusline_git_branch_obj = out
 			end)
-			vim.cmd('redrawstatus')
+			vim.cmd("redrawstatus")
+
 		end)
 	end)
 end
 
-M.statusline_git_branch = function ()
-	local git_branch_obj = vim.b.statusline_git_branch_out
-	if not git_branch_obj  or git_branch_obj.code ~= 0 then
+M.root_dir = function ()
+	local parent = vim.fn.fnamemodify(find_parent(vim.fn.expand("%:p")) or "", ":~")
+	return { hl_group = "StatusLineCwdIcon",  string = parent}
+end
+
+---@return StatusLineModuleFnTable
+M.statusline_git_branch = function()
+	local git_branch_obj = vim.b.statusline_git_branch_obj
+	if not git_branch_obj or git_branch_obj.code ~= 0 then
 		return {}
 	end
 
-	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1)")
-	return { hl_group = "StatusLine", string = git_branch, icon_hl = "StatusLineGitBranchIcon", icon = " "}
+	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1) ")
+	return {
+		hl_group = "StatusLine",
+		string = git_branch,
+		icon_hl = "StatusLineGitBranchIcon",
+		icon = " ",
+	}
 end
 
 function M.initialize_stl(opts)
@@ -313,13 +322,23 @@ local generate_module_string = function(modules)
 		else
 			local module_fun = states.modules_map[i] or states.modules_map["fallback"]
 			local module_info = module_fun()
-			module_string = string.format(
-				"%s%s%s%s",
-				format_hl_string(module_info.icon_hl or ""),
-				module_info.icon or "",
-				format_hl_string(module_info.hl_group or ""),
-				module_info.string
+			module_string = (
+				module_info.reverse
+				and string.format(
+					"%s%s%s%s",
+					format_hl_string(module_info.hl_group or ""),
+					module_info.string or "",
+					format_hl_string(module_info.icon_hl or ""),
+					module_info.icon or ""
+				)
 			)
+				or string.format(
+					"%s%s%s%s",
+					format_hl_string(module_info.icon_hl or ""),
+					module_info.icon or "",
+					format_hl_string(module_info.hl_group or ""),
+					module_info.string or ""
+				)
 			modules_string = modules_string .. module_string .. "%#StatusLine#"
 		end
 	end
