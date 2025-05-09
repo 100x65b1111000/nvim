@@ -1,5 +1,3 @@
---- Neovim Tabline Utilities
-
 local states = require("ui.tabline.states")
 
 local M = {}

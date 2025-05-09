@@ -4,6 +4,23 @@ local states = require("ui.tabline.states")
 
 local M = {}
 
+---@param timer uv.uv_timer_t|nil
+---@param timeout integer
+---@param callback function
+local timer_fn = function(timer, timeout, callback)
+	if timer then
+		timer:stop()
+		timer:close()
+	end
+
+	timer = vim.uv.new_timer()
+	assert(timer, "Error creating timer")
+	timer:start(timeout, 0, function()
+		vim.schedule(callback)
+	end)
+	return timer
+end
+
 ---Checks if a buffer is valid for display in the tabline.
 ---@param bufnr integer The buffer number to check.
 ---@return boolean True if the buffer is valid, false otherwise.
@@ -84,8 +101,11 @@ end
 ---@param prefix? string The hl_group name's prefix
 ---@param suffix? string The hl_group name's suffix
 ---@param new_name? string The new highlight group name.
----@return table The name of the generated highlight group.
+---@return string The name of the generated highlight group.
 local function generate_highlight(source_fg, source_bg, opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
+	if new_name and vim.tbl_contains(states.cache.highlights) then
+		return new_name
+	end
 	opts = opts or {}
 	local source_hl_fg = get_highlight(source_fg).fg
 	local source_hl_bg = get_highlight(source_bg).bg
@@ -104,21 +124,21 @@ local function generate_highlight(source_fg, source_bg, opts, brightness_bg, bri
 		vim.api.nvim_set_hl(0, hl_string, hl_opts)
 		table.insert(states.cache.highlights, hl_string)
 	end
-	return { hl_string = hl_string, fg = hl_opts.fg, bg = hl_opts.bg }
+	return hl_string
 end
 
 --@param state integer
 local function generate_tabline_highlight(source, state, opts, new_name)
 	if state == states.BufferStates.ACTIVE then
-		return generate_highlight(source, "TabLineFill", opts, 75, 0, "TabLine", "Active", new_name).hl_string
+		return generate_highlight(source, "TabLineFill", opts, 75, 0, "TabLine", "Active", new_name)
 	end
 	if state == states.BufferStates.INACTIVE then
-		return generate_highlight(source, "TabLineFill", opts, 50, -50, "TabLine", "Inactive", new_name).hl_string
+		return generate_highlight(source, "TabLineFill", opts, 50, -50, "TabLine", "Inactive", new_name)
 	end
 	if state == states.BufferStates.NONE then
-		return generate_highlight(source, "Normal", opts, 75, -35, "TabLine", "None", new_name).hl_string
+		return generate_highlight(source, "Normal", opts, 75, -35, "TabLine", "None", new_name)
 	end
-	return generate_highlight(source, "TabLineFill", {}, 0, 0, nil, nil, new_name).hl_string
+	return generate_highlight(source, "TabLineFill", {}, 0, 0, nil, nil, new_name)
 end
 
 ---Gets the buffer state.
@@ -127,7 +147,7 @@ end
 local function get_buffer_state(bufnr, bufs)
 	if bufnr == vim.api.nvim_get_current_buf() then
 		return states.BufferStates.ACTIVE
-	elseif vim.tbl_contains(vim.api.nvim_list_bufs(), bufnr) then
+	elseif vim.tbl_contains(bufs, bufnr) then
 		return states.BufferStates.INACTIVE
 	end
 	return states.BufferStates.NONE
