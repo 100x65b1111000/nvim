@@ -4,7 +4,7 @@
   "bloat.nvim": { "branch": "master", "commit": "f90bef655ac40fecbaae53e10db1cf7894d090b1" },
   "conform.nvim": { "branch": "master", "commit": "372fc521f8421b7830ea6db4d6ea3bae1c77548c" },
   "dashboard-nvim": { "branch": "master", "commit": "591b5b29e2f17b97496ec3179f6ecd08bb8502cc" },
-  "dropbar.nvim": { "branch": "master", "commit": "a945b924d0803e4a24cb178e337bc364cdcd6abd" },
+  "dropbar.nvim": { "branch": "master", "commit": "0b822e1327013a6554b4fe90f7390e5fb01a8e5e" },
   "friendly-snippets": { "branch": "main", "commit": "572f5660cf05f8cd8834e096d7b4c921ba18e175" },
   "gentoo-syntax": { "branch": "master", "commit": "929bbebb5430f9d23032b138a57252d21b7db243" },
   "gitsigns.nvim": { "branch": "main", "commit": "43b0c856ae5f32a195d83f4a27fe21d63e6c966c" },

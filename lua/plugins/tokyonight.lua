@@ -334,11 +334,11 @@ P.opts = {
 			fg = c.orange,
 			bg = c.bg_dark
 		}
-		hl.StatusLineScrollPerc = {
+		hl.StatusLineFilePerc = {
 			fg = c.green,
 			-- bg = c.bg_highlight
 		}
-		hl.StatusLineScrollIcon = {
+		hl.StatusLineFilePercIcon = {
 			fg =c.bg_dark,
 			bg = c.green
 		}

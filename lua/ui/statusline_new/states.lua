@@ -1,13 +1,12 @@
 local M = {}
 
 ---@class StatusLineDefaultConfig
----@field use_mini_icons boolean | nil
 ---@field modules StatusLineModulesConfig | nil
 
 ---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
----@alias StatusLineModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"git-branch"|"git-status"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|StatusLineModuleFn
+---@alias StatusLineModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|StatusLineModuleFn
 
 ---@class StatusLineModulesConfig
 ---@field left StatusLineModules[]|nil
@@ -16,11 +15,12 @@ local M = {}
 
 ---@type StatusLineDefaultConfig
 M.default_config = {
-	use_mini_icons = true,
 	modules = {
 		left = {
 			"mode",
 			"buf-status",
+			"filetype",
+			-- "ts-info",
 			"bufinfo",
 		},
 		middle = {
@@ -32,7 +32,7 @@ M.default_config = {
 			"diagnostic-info",
 			"lsp-info",
 			"cursor-pos",
-			"scroll-pos",
+			"file-percent",
 		},
 	},
 }
@@ -53,8 +53,13 @@ M.cache = {
 	lsp_info_string = nil,
 	cursor_pos_string = nil,
 	scroll_pos_string = nil,
+	filetype_icons = {
+		["terminal"] = { icon = "  " },
+		["prompt"] = { icon = " 󰘎 " },
+		["nofile"] = { icon = " 󱀶 " },
+		["minifiles"] = { icon = " 󰙅 " },
+	}
 }
-
 ---@return StatusLineModuleFnTable
 local fallback_fn = function()
 	return { hl_group = "", string = "", icon = "", icon_hl = "" }
@@ -72,6 +77,7 @@ M.modules_map = {
 	["lsp-info"] = fallback_fn,
 	["cursor-pos"] = fallback_fn,
 	["scroll-pos"] = fallback_fn,
+	["filetype"] = fallback_fn
 }
 
 M.Modes = {
@@ -101,5 +107,7 @@ M.Modes = {
 	["nt"] = { name = "  TERMINAL ", hl = "StatusLineTerminalMode" },
 	["ntT"] = { name = "  TERMINAL ", hl = "StatusLineTerminalMode" },
 }
+
+M.git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
 
 return M

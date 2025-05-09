@@ -85,8 +85,8 @@ end
 
 ---@return StatusLineModuleFnTable
 function M.buf_status()
-	local mo_string = vim.bo.modified and " %m " or " "
-	local ro_string = vim.bo.readonly and " %r" or mo_string
+	local mo_string = vim.bo.modified and "%m " or ""
+	local ro_string = vim.bo.readonly and " %r " or " "
 	local hl = generate_highlight(
 		"MiniIconsOrange",
 		"StatusLineNormalMode",
@@ -98,7 +98,7 @@ function M.buf_status()
 		"StatusLineBufStatus",
 		{ use_bg_for_fg = false, use_fg_for_bg = true }
 	)
-	return { hl_group = hl, string = ro_string }
+	return { hl_group = hl, string = ro_string .. mo_string }
 end
 
 ---@return StatusLineModuleFnTable
@@ -113,7 +113,7 @@ function M.statusline_mode()
 end
 
 local function buf_is_file()
-	return vim.fn.expand("%:p") ~= "" and vim.bo[0].buftype == "" and vim.bo[0].filetype ~= ""
+	return vim.fn.expand("%:p") ~= "" and vim.bo[0].buftype == ""
 end
 
 M.buf_is_file = buf_is_file
@@ -131,7 +131,7 @@ function M.statusline_bufinfo()
 		"StatusLine",
 		"StatusLineNormalMode",
 		{},
-		-65,
+		-75,
 		0,
 		"",
 		"",
@@ -139,10 +139,6 @@ function M.statusline_bufinfo()
 		{ use_bg_for_fg = false, use_fg_for_bg = true }
 	)
 	return { string = " %t ", hl_group = buf_hl }
-end
-
-function M.statusline_filetype()
-	local filetype = vim.bo.filetype
 end
 
 local find_parent = function(path)
@@ -155,58 +151,78 @@ end
 
 local insertions = function(ins)
 	if ins and ins ~= "0" and ins ~= "" then
-		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
+		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
 	end
 	return ""
 end
 
 local deletions = function(del)
 	if del and del ~= "0" and del ~= "" then
-		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
+		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
 	end
 	return ""
 end
 
-M.fetch_git_file_stat = function(timeout, repeat_)
-	if states.git_status_debounce_timer then
-		states.git_status_debounce_timer:stop()
-		states.git_status_debounce_timer:close()
+---@param timer uv.uv_timer_t|nil
+---@param timeout integer
+---@param callback function
+local timer_fn = function(timer, timeout, callback)
+	if timer then
+		timer:stop()
+		timer:close()
 	end
 
-	states.git_status_debounce_timer = vim.uv.new_timer()
-	states.git_status_debounce_timer:start(timeout, repeat_, function()
-		vim.schedule(function()
-			local file_path = vim.fn.expand("%:p")
-			local parent = find_parent(file_path)
-			if not parent then
-				vim.b.statusline_git_stat_out = nil
-				vim.b.statusline_git_diff_out = nil
-				return
-			end
+	timer = vim.uv.new_timer()
+	assert(timer, "Error creating timer")
+	timer:start(timeout, 0, function()
+		vim.schedule(callback)
+	end)
+	return timer
+end
 
-			local git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
+M.fetch_git_file_stat = function()
+	states.stat_debounce_timer = timer_fn(states.stat_debounce_timer, 50, function()
+		local file_path = vim.fn.expand("%:p")
+		local parent = find_parent(file_path)
+		if not parent then
+			return
+		end
 
-			local git_diff_cmd = git_cmd .. parent .. " diff --numstat " .. file_path
-			vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-				vim.b.statusline_git_diff_out = out
+		local git_stat_cmd = states.git_cmd .. parent .. " status --short --porcelain " .. file_path
+		vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
+			vim.schedule(function()
+				vim.b.statusline_git_stat_obj = { code = out.code, stdout = out.stdout, stderr = out.stderr }
+				vim.cmd([[redrawstatus]])
 			end)
-
-			local git_stat_cmd = git_cmd .. parent .. " status --short --porcelain " .. file_path
-			vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
-				vim.b.statusline_git_stat_out = out
-			end)
-			vim.cmd("redrawstatus")
 		end)
 	end)
 end
 
-M.statusline_git_file_stat = function()
+M.fetch_git_file_diff = function()
+	states.diff_debounce_timer = timer_fn(states.diff_debounce_timer, 50, function()
+		local file_path = vim.fn.expand("%:p")
+		local parent = find_parent(file_path)
+		if not parent then
+			return
+		end
+
+		local git_diff_cmd = states.git_cmd .. parent .. " diff --numstat " .. file_path
+		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
+			vim.schedule(function()
+				vim.b.statusline_git_diff_obj = { code = out.code, stdout = out.stdout, stderr = out.stderr }
+				vim.cmd([[redrawstatus]])
+			end)
+		end)
+	end)
+end
+
+M.statusline_git_file_status = function()
 	if not buf_is_file() then
 		return { hl_group = "", string = "" }
 	end
 	local git_status = ""
 
-	local diff_output_obj = vim.b.statusline_git_diff_out
+	local diff_output_obj = vim.b.statusline_git_diff_obj
 	if not diff_output_obj or diff_output_obj.code ~= 0 then
 		return { hl_group = "", string = "" }
 	end
@@ -217,7 +233,7 @@ M.statusline_git_file_stat = function()
 		git_status = insertions(diff_split[1]) .. deletions(diff_split[2])
 	end
 
-	local stat_output_obj = vim.b.statusline_git_stat_out
+	local stat_output_obj = vim.b.statusline_git_stat_obj
 	if not stat_output_obj or stat_output_obj.code ~= 0 then
 		return { hl_group = "", string = "" }
 	end
@@ -227,45 +243,117 @@ M.statusline_git_file_stat = function()
 	local file_status = stat_output:match("[^%s]+")
 
 	if not file_status then
-		git_status = "%#StatusLineGitUptodate# " .. git_status
+		git_status = "%#StatusLineGitUptodate# " .. git_status
 	elseif file_status == "??" then
-		git_status = "%#StatusLineGitUnstaged# " .. git_status
+		git_status = "%#StatusLineGitUnstaged#" .. git_status
 	end
 
 	return { hl_group = "", string = git_status }
 end
 
 M.fetch_git_branch = function()
-	if states.git_branch_debounce_timer then
-		states.git_branch_debounce_timer:stop()
-		states.git_branch_debounce_timer:close()
-	end
+	states.statusline_git_branch = timer_fn(states.statusline_git_branch, 50, function()
+		local file_path = vim.fn.expand("%:p")
+		local parent = find_parent(file_path)
+		if not parent then
+			vim.b.statusline_git_branch_obj = nil
+			return
+		end
 
-	states.git_branch_debounce_timer = vim.uv.new_timer()
-	states.git_branch_debounce_timer:start(100, 0, function()
-		vim.schedule(function()
-			local file_path = vim.fn.expand("%:p")
-			local parent = find_parent(file_path)
-			if not parent then
-				vim.b.statusline_git_branch_obj = nil
-				return
-			end
-
-			local git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
-
-			local git_diff_cmd = git_cmd .. parent .. " branch --show-current "
-			vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
+		local git_diff_cmd = states.git_cmd .. parent .. " branch --show-current "
+		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
+			vim.schedule(function()
 				vim.b.statusline_git_branch_obj = out
+				vim.cmd("redrawstatus")
 			end)
-			vim.cmd("redrawstatus")
-
 		end)
 	end)
 end
 
-M.root_dir = function ()
+M.statusline_root_dir = function()
 	local parent = vim.fn.fnamemodify(find_parent(vim.fn.expand("%:p")) or "", ":~")
-	return { hl_group = "StatusLineCwdIcon",  string = parent}
+	if parent then
+		return { hl_group = "StatusLine", string = parent .. " ", icon_hl = "StatusLineCwdIcon", icon = "  " }
+	end
+	return { hl_group = "StatusLine", string = vim.uv.cwd() .. " ", icon_hl = "StatusLineCwdIcon", icon = "  " }
+end
+
+M.statusline_filetype_info = function()
+	local filetype_ = vim.bo.filetype
+	local filetype = (filetype_ == "" and "") or filetype_ .. " "
+	-- if states.cache.filetype_icons[vim.bo.buftype] and not states.cache.filetype_icons[filetype_] then
+	-- 	filetype_ = vim.bo.buftype
+	-- end
+
+	if not package.loaded["mini.icons"] then
+		return {
+			string = filetype,
+			hl_group = generate_highlight(
+				"StatusLine",
+				"StatusLineNormalMode",
+				{},
+				-65,
+				0,
+				"",
+				"",
+				"StatusLineFiletype",
+				{ use_bg_for_fg = false, use_fg_for_bg = true }
+			),
+			icon = "  ",
+			icon_hl = "StatusLineFiletypeIcon",
+		}
+	end
+	if states.cache.filetype_icons[filetype_] then
+		local icon_hl = states.cache.filetype_icons[filetype_].icon_hl
+			or generate_highlight(
+				"statuslineinsertmode",
+				"statuslinenormalmode",
+				{},
+				-65,
+				0,
+				"",
+				"",
+				"StatusLineFiletypeIcon",
+				{ use_bg_for_fg = false, use_fg_for_bg = true }
+			)
+		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
+		return {
+			string = filetype,
+			hl_group = generate_highlight(
+				"StatusLine",
+				"StatusLineNormalMode",
+				{},
+				-65,
+				0,
+				"",
+				"",
+				"StatusLineFiletype",
+				{ use_bg_for_fg = false, use_fg_for_bg = true }
+			),
+			icon = states.cache.filetype_icons[filetype_].icon,
+			icon_hl = icon_hl,
+		}
+	end
+	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
+	icon = " " .. icon .. " "
+	icon_hl = generate_highlight(
+		icon_hl,
+		"StatusLineNormalMode",
+		{},
+		-65,
+		0,
+		"StatusLine",
+		"",
+		nil,
+		{ use_fg_for_bg = true }
+	)
+	states.cache.filetype_icons[filetype_] = { icon = icon, icon_hl = icon_hl }
+	return {
+		string = filetype,
+		hl_group = "StatusLineFiletype",
+		icon = icon,
+		icon_hl = icon_hl,
+	}
 end
 
 ---@return StatusLineModuleFnTable
@@ -280,7 +368,87 @@ M.statusline_git_branch = function()
 		hl_group = "StatusLine",
 		string = git_branch,
 		icon_hl = "StatusLineGitBranchIcon",
-		icon = " ",
+		icon = "  ",
+	}
+end
+
+M.statusline_ts_info = function()
+	local ts_info = vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()]
+	local hl_group = generate_highlight(
+		"MiniIconsGreen",
+		"StatusLineNormalMode",
+		{ reverse = false },
+		-75,
+		0,
+		"",
+		"",
+		"StatusLineTSInfoActive",
+		{ use_fg_for_bg = true }
+	)
+	if not ts_info then
+		hl_group = generate_highlight(
+			"Comment",
+			"StatusLineNormalMode",
+			{ reverse = false },
+			-75,
+			0,
+			"",
+			"",
+			"StatusLineTSInfoInactive",
+			{ use_fg_for_bg = true }
+		)
+	end
+
+	return {
+		hl_group = hl_group,
+		string = "  ",
+	}
+end
+
+M.fetch_lsp_info = function()
+	states.lsp_debounce_timer = timer_fn(states.lsp_debounce_timer, 200, function()
+		local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) or {}
+		local client_names = {}
+		for _, i in ipairs(clients) do
+			table.insert(client_names, i.name)
+		end
+		vim.schedule(function()
+			vim.b.statusline_lsp_clients = client_names
+			vim.cmd("redrawstatus")
+		end)
+	end)
+end
+
+M.statusline_cursor_pos = function()
+	return {
+		string = " %l:%v ",
+		hl_group = "StatusLineCursorPos",
+		icon = '  ',
+		icon_hl = "StatusLineCursorIcon",
+		reverse = true,
+	}
+end
+
+
+M.statusline_file_percent = function()
+	return {
+		string = " %p ",
+		hl_group = "StatusLineFilePerc",
+		icon = '  ',
+		icon_hl = "StatusLineFilePercIcon",
+		reverse = true,
+	}
+end
+
+M.statusline_lsp_info = function()
+	local clients = table.concat(vim.b.statusline_lsp_clients or {}, ", ")
+	local icon = (clients == "" and "") or "   "
+	return {
+		string = clients .. " ",
+		hl_group = "StatusLineLspInfo",
+		icon = icon,
+		icon_hl = "StatusLineLspIcon",
+		reverse = true,
 	}
 end
 
@@ -290,8 +458,14 @@ function M.initialize_stl(opts)
 	states.modules_map["buf-status"] = M.buf_status
 	states.modules_map["mode"] = M.statusline_mode
 	states.modules_map["bufinfo"] = M.statusline_bufinfo
-	states.modules_map["git-status"] = M.statusline_git_file_stat
+	states.modules_map["git-status"] = M.statusline_git_file_status
 	states.modules_map["git-branch"] = M.statusline_git_branch
+	states.modules_map["root-dir"] = M.statusline_root_dir
+	states.modules_map["filetype"] = M.statusline_filetype_info
+	states.modules_map["ts-info"] = M.statusline_ts_info
+	states.modules_map["lsp-info"] = M.statusline_lsp_info
+	states.modules_map["cursor-pos"] = M.statusline_cursor_pos
+	states.modules_map["file-percent"] = M.statusline_file_percent
 end
 
 local function format_hl_string(hl_group)
@@ -309,7 +483,7 @@ local generate_module_string = function(modules)
 		if type(i) == "function" then
 			local status, module_info = pcall(i)
 			if not status then
-				return
+				error("module fn not callable")
 			end
 			module_string = string.format(
 				"%s%s%s%s",
