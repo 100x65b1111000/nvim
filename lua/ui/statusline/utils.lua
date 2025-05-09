@@ -2,19 +2,6 @@ local states = require("ui.statusline.states")
 
 local M = {}
 
----Truncates a string.
----@param string string The string to truncate.
----@param source_length integer The original string length.
----@param target_length integer The target string length.
----@return string The truncated string.
-local function truncate_string(string, source_length, target_length)
-	local ellipsis = "…"
-	if source_length <= target_length then
-		return string
-	end
-	return string.sub(string, 1, target_length - 1) .. ellipsis
-end
-
 ---Retrieves highlight information for a given highlight group.
 ---@param hl_name string The name of the highlight group.
 ---@return vim.api.keyset.get_hl_info The highlight information.
@@ -144,7 +131,7 @@ function M.statusline_bufinfo()
 		"StatusLine",
 		"StatusLineNormalMode",
 		{},
-		-75,
+		-65,
 		0,
 		"",
 		"",
@@ -229,6 +216,7 @@ M.fetch_git_file_diff = function()
 	end)
 end
 
+---@return StatusLineModuleFnTable
 M.statusline_git_file_status = function()
 	if not buf_is_file() then
 		return { hl_group = "", string = "" }
@@ -264,6 +252,7 @@ M.statusline_git_file_status = function()
 	return { hl_group = "", string = git_status }
 end
 
+---@return StatusLineModuleFnTable
 M.fetch_git_branch = function()
 	states.statusline_git_branch = timer_fn(states.statusline_git_branch, 50, function()
 		local file_path = vim.fn.expand("%:p")
@@ -283,6 +272,7 @@ M.fetch_git_branch = function()
 	end)
 end
 
+---@return StatusLineModuleFnTable
 M.statusline_root_dir = function()
 	local parent = vim.fn.fnamemodify(find_parent(vim.fn.expand("%:p")) or "", ":~")
 	if parent then
@@ -291,6 +281,7 @@ M.statusline_root_dir = function()
 	return { hl_group = "StatusLine", string = vim.uv.cwd() .. " ", icon_hl = "StatusLineCwdIcon", icon = "  " }
 end
 
+---@return StatusLineModuleFnTable
 M.statusline_filetype_info = function()
 	local filetype_ = vim.bo.filetype
 	local filetype = (filetype_ == "" and "") or filetype_ .. " "
@@ -305,7 +296,7 @@ M.statusline_filetype_info = function()
 				"StatusLine",
 				"StatusLineNormalMode",
 				{},
-				-65,
+				-75,
 				0,
 				"",
 				"",
@@ -322,7 +313,7 @@ M.statusline_filetype_info = function()
 				"statuslineinsertmode",
 				"statuslinenormalmode",
 				{},
-				-65,
+				-75,
 				0,
 				"",
 				"",
@@ -336,7 +327,7 @@ M.statusline_filetype_info = function()
 				"StatusLine",
 				"StatusLineNormalMode",
 				{},
-				-65,
+				-75,
 				0,
 				"",
 				"",
@@ -353,7 +344,7 @@ M.statusline_filetype_info = function()
 		icon_hl,
 		"StatusLineNormalMode",
 		{},
-		-65,
+		-75,
 		0,
 		"StatusLine",
 		"",
@@ -379,12 +370,13 @@ M.statusline_git_branch = function()
 	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1) ")
 	return {
 		hl_group = "StatusLine",
-		string = vim.api.nvim_eval_statusline(git_branch, { maxwidth = 15 }).str,
+		string = git_branch,
 		icon_hl = "StatusLineGitBranchIcon",
 		icon = "  ",
 	}
 end
 
+---@return StatusLineModuleFnTable
 M.statusline_ts_info = function()
 	local ts_info = vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()]
 	local hl_group = generate_highlight(
@@ -418,6 +410,7 @@ M.statusline_ts_info = function()
 	}
 end
 
+---@return StatusLineModuleFnTable
 M.fetch_lsp_info = function()
 	states.lsp_debounce_timer = timer_fn(states.lsp_debounce_timer, 200, function()
 		local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) or {}
@@ -432,27 +425,29 @@ M.fetch_lsp_info = function()
 	end)
 end
 
+---@return StatusLineModuleFnTable
 M.statusline_cursor_pos = function()
 	return {
 		string = " %l:%v ",
 		hl_group = "StatusLineCursorPos",
-		icon = '  ',
+		icon = "  ",
 		icon_hl = "StatusLineCursorIcon",
 		reverse = true,
 	}
 end
 
-
+---@return StatusLineModuleFnTable
 M.statusline_file_percent = function()
 	return {
 		string = " %P ",
 		hl_group = "StatusLineFilePerc",
-		icon = '  ',
+		icon = "  ",
 		icon_hl = "StatusLineFilePercIcon",
 		reverse = true,
 	}
 end
 
+---@return StatusLineModuleFnTable
 M.statusline_lsp_info = function()
 	local clients = table.concat(vim.b.statusline_lsp_clients or {}, ", ")
 	local icon = (clients == "" and "") or "   "
@@ -465,7 +460,11 @@ M.statusline_lsp_info = function()
 	}
 end
 
+---@param opts StatusLineModulesConfig
 function M.initialize_stl(opts)
+	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
+	states.current_config = config
+
 	states.modules_map["buf-status"] = M.buf_status
 	states.modules_map["mode"] = M.statusline_mode
 	states.modules_map["bufinfo"] = M.statusline_bufinfo
@@ -486,7 +485,7 @@ local function format_hl_string(hl_group)
 	return "%#" .. hl_group .. "#"
 end
 
----@param modules StatusLineModules[] A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
+---@param modules StatusLineBuiltinModules[]|StatusLineModuleFn[] A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
 local generate_module_string = function(modules)
 	local modules_string = ""
 	for _, i in ipairs(modules) do

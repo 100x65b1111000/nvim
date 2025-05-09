@@ -6,12 +6,12 @@ local M = {}
 ---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
----@alias StatusLineModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|StatusLineModuleFn
+---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"
 
 ---@class StatusLineModulesConfig
----@field left StatusLineModules[]|nil
----@field middle StatusLineModules[]|nil
----@field right StatusLineModules[]|nil
+---@field left StatusLineBuiltinModules[]|nil
+---@field middle StatusLineBuiltinModules[]|nil
+---@field right StatusLineBuiltinModules[]|nil
 
 ---@type StatusLineDefaultConfig
 M.default_config = {
@@ -19,9 +19,9 @@ M.default_config = {
 		left = {
 			"mode",
 			"buf-status",
-			"filetype",
 			-- "ts-info",
 			"bufinfo",
+			"filetype",
 		},
 		middle = {
 			"root-dir",
