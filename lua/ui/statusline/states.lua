@@ -3,7 +3,7 @@ local M = {}
 ---@class StatusLineDefaultConfig
 ---@field modules StatusLineModulesConfig | nil
 
----@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean }
+---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
 ---@alias StatusLineModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"|StatusLineModuleFn

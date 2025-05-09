@@ -1,6 +1,19 @@
-local states = require("ui.statusline_new.states")
+local states = require("ui.statusline.states")
 
 local M = {}
+
+---Truncates a string.
+---@param string string The string to truncate.
+---@param source_length integer The original string length.
+---@param target_length integer The target string length.
+---@return string The truncated string.
+local function truncate_string(string, source_length, target_length)
+	local ellipsis = "…"
+	if source_length <= target_length then
+		return string
+	end
+	return string.sub(string, 1, target_length - 1) .. ellipsis
+end
 
 ---Retrieves highlight information for a given highlight group.
 ---@param hl_name string The name of the highlight group.
@@ -366,7 +379,7 @@ M.statusline_git_branch = function()
 	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1) ")
 	return {
 		hl_group = "StatusLine",
-		string = git_branch,
+		string = vim.api.nvim_eval_statusline(git_branch, { maxwidth = 15 }).str,
 		icon_hl = "StatusLineGitBranchIcon",
 		icon = "  ",
 	}
@@ -432,7 +445,7 @@ end
 
 M.statusline_file_percent = function()
 	return {
-		string = " %p ",
+		string = " %P ",
 		hl_group = "StatusLineFilePerc",
 		icon = '  ',
 		icon_hl = "StatusLineFilePercIcon",
@@ -453,8 +466,6 @@ M.statusline_lsp_info = function()
 end
 
 function M.initialize_stl(opts)
-	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
-	states.current_config = config
 	states.modules_map["buf-status"] = M.buf_status
 	states.modules_map["mode"] = M.statusline_mode
 	states.modules_map["bufinfo"] = M.statusline_bufinfo
