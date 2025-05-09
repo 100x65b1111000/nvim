@@ -124,7 +124,7 @@ end
 ---Gets the buffer state.
 ---@param bufnr integer The buffer number.
 ---@return integer
-local function get_buffer_state(bufnr)
+local function get_buffer_state(bufnr, bufs)
 	if bufnr == vim.api.nvim_get_current_buf() then
 		return states.BufferStates.ACTIVE
 	elseif vim.tbl_contains(vim.api.nvim_list_bufs(), bufnr) then
@@ -187,11 +187,11 @@ end
 ---Gets buffer information.
 ---@param bufnr integer The buffer number.
 ---@return { buf_name: string, buf_name_length: integer, icon_hl: string,icon:  string,length: integer,state: integer, left_padding: string, right_padding: string }|nil
-local function get_buffer_info(bufnr)
+local function get_buffer_info(bufnr, bufs)
 	local buf_name = process_buffer_name(bufnr)
 	local icon, icon_hl = get_file_icon(bufnr)
 	icon = icon .. " "
-	icon_hl = generate_tabline_highlight(icon_hl, get_buffer_state(bufnr), {}, nil)
+	icon_hl = generate_tabline_highlight(icon_hl, get_buffer_state(bufnr, bufs), {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
 	buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
 	local length = vim.fn.strwidth(buf_name)
@@ -200,7 +200,7 @@ local function get_buffer_info(bufnr)
 		+ vim.fn.strwidth(right_padding)
 		+ vim.fn.strwidth(states.icons.close)
 		+ vim.fn.strwidth(states.icons.separator)
-	local state = get_buffer_state(bufnr)
+	local state = get_buffer_state(bufnr, bufs)
 	return {
 		buf_name = buf_name,
 		padding_length = #left_padding + #right_padding,
@@ -222,7 +222,7 @@ M.get_buffer_info = get_buffer_info
 local function get_buffers_with_specs(bufs)
 	local valid_bufs = {}
 	for _, i in ipairs(bufs) do
-		local info = get_buffer_info(i)
+		local info = get_buffer_info(i, bufs)
 		valid_bufs[i] = info
 	end
 	return valid_bufs
@@ -231,7 +231,7 @@ end
 local calculate_buf_space = function(bufs)
 	local length = 0
 	for _, i in ipairs(bufs) do
-		local buf_len = get_buffer_info(i).length
+		local buf_len = get_buffer_info(i, bufs).length
 		length = length + buf_len
 	end
 	return length
@@ -419,8 +419,8 @@ end
 ---Generates the buffer string for the tabline.
 ---@param bufnr integer The buffer number.
 ---@return string The formatted buffer string.
-local function generate_buffer_string(bufnr)
-	local buf_spec = get_buffer_info(bufnr)
+local function generate_buffer_string(bufnr, bufs)
+	local buf_spec = get_buffer_info(bufnr, bufs)
 	if not buf_spec then
 		return ""
 	end
@@ -446,7 +446,7 @@ local function update_tabline_buffer_string()
 	local str = ""
 	local bufs = states.buffers_list
 	for _, bufnr in ipairs(states.visible_buffers) do
-		str = str .. generate_buffer_string(bufnr)
+		str = str .. generate_buffer_string(bufnr, bufs)
 	end
 	local overflow_info = get_overflow_indicator_info(bufs)
 	states.cache.tabline_buf_string = overflow_info.left_overflow_str
@@ -454,6 +454,7 @@ local function update_tabline_buffer_string()
 		.. "%#TabLineFill#"
 		.. "%="
 		.. overflow_info.right_overflow_str
+	return states.cache.tabline_buf_string
 end
 
 M.get_tabline_buffers_list = get_tabline_buffers_list

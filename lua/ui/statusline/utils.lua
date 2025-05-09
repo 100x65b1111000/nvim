@@ -460,7 +460,7 @@ M.statusline_lsp_info = function()
 	}
 end
 
----@param opts StatusLineModulesConfig
+---@param opts StatusLineConfig
 function M.initialize_stl(opts)
 	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
 	states.current_config = config
