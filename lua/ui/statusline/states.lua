@@ -6,7 +6,7 @@ local M = {}
 ---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
----@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic-info"|"lsp-info"|"cursor-pos"|"scroll-pos"
+---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"
 
 ---@class StatusLineModulesConfig
 ---@field left StatusLineBuiltinModules[]|nil
@@ -29,7 +29,7 @@ M.default_config = {
 			"git-status",
 		},
 		right = {
-			"diagnostic-info",
+			"diagnostic",
 			"lsp-info",
 			"cursor-pos",
 			"file-percent",

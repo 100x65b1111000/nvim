@@ -32,4 +32,9 @@ vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
 	end,
 })
 
--- vim.api.nvim_create_autocmd({ ""})
+vim.api.nvim_create_autocmd({ "DiagnosticChanged"}, {
+	group = statusline_fetchers,
+	callback = function ()
+		utils.fetch_diagnostics()
+	end
+})
