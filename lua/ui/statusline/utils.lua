@@ -458,6 +458,7 @@ M.statusline_lsp_info = function()
 	}
 end
 
+---@param opts StatusLineConfig
 local format_diagnostics = function(severity)
 	local count = states.cache.severity_map[severity].count
 	local hl = states.cache.severity_map[severity].hl
@@ -496,6 +497,7 @@ M.statusline_diagnostics = function()
 end
 
 ---@param opts StatusLineModulesConfig
+
 function M.initialize_stl(opts)
 	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
 	states.current_config = config

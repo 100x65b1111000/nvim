@@ -4,6 +4,23 @@ local states = require("ui.tabline.states")
 
 local M = {}
 
+---@param timer uv.uv_timer_t|nil
+---@param timeout integer
+---@param callback function
+local timer_fn = function(timer, timeout, callback)
+	if timer then
+		timer:stop()
+		timer:close()
+	end
+
+	timer = vim.uv.new_timer()
+	assert(timer, "Error creating timer")
+	timer:start(timeout, 0, function()
+		vim.schedule(callback)
+	end)
+	return timer
+end
+
 ---Checks if a buffer is valid for display in the tabline.
 ---@param bufnr integer The buffer number to check.
 ---@return boolean True if the buffer is valid, false otherwise.
@@ -84,8 +101,11 @@ end
 ---@param prefix? string The hl_group name's prefix
 ---@param suffix? string The hl_group name's suffix
 ---@param new_name? string The new highlight group name.
----@return table The name of the generated highlight group.
+---@return string The name of the generated highlight group.
 local function generate_highlight(source_fg, source_bg, opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
+	if new_name and vim.tbl_contains(states.cache.highlights) then
+		return new_name
+	end
 	opts = opts or {}
 	local source_hl_fg = get_highlight(source_fg).fg
 	local source_hl_bg = get_highlight(source_bg).bg
@@ -104,30 +124,30 @@ local function generate_highlight(source_fg, source_bg, opts, brightness_bg, bri
 		vim.api.nvim_set_hl(0, hl_string, hl_opts)
 		table.insert(states.cache.highlights, hl_string)
 	end
-	return { hl_string = hl_string, fg = hl_opts.fg, bg = hl_opts.bg }
+	return hl_string
 end
 
 --@param state integer
 local function generate_tabline_highlight(source, state, opts, new_name)
 	if state == states.BufferStates.ACTIVE then
-		return generate_highlight(source, "TabLineFill", opts, 75, 0, "TabLine", "Active", new_name).hl_string
+		return generate_highlight(source, "TabLineFill", opts, 75, 0, "TabLine", "Active", new_name)
 	end
 	if state == states.BufferStates.INACTIVE then
-		return generate_highlight(source, "TabLineFill", opts, 50, -50, "TabLine", "Inactive", new_name).hl_string
+		return generate_highlight(source, "TabLineFill", opts, 50, -50, "TabLine", "Inactive", new_name)
 	end
 	if state == states.BufferStates.NONE then
-		return generate_highlight(source, "Normal", opts, 75, -35, "TabLine", "None", new_name).hl_string
+		return generate_highlight(source, "Normal", opts, 75, -35, "TabLine", "None", new_name)
 	end
-	return generate_highlight(source, "TabLineFill", {}, 0, 0, nil, nil, new_name).hl_string
+	return generate_highlight(source, "TabLineFill", {}, 0, 0, nil, nil, new_name)
 end
 
 ---Gets the buffer state.
 ---@param bufnr integer The buffer number.
 ---@return integer
-local function get_buffer_state(bufnr)
+local function get_buffer_state(bufnr, bufs)
 	if bufnr == vim.api.nvim_get_current_buf() then
 		return states.BufferStates.ACTIVE
-	elseif vim.tbl_contains(vim.api.nvim_list_bufs(), bufnr) then
+	elseif vim.tbl_contains(bufs, bufnr) then
 		return states.BufferStates.INACTIVE
 	end
 	return states.BufferStates.NONE
@@ -187,11 +207,11 @@ end
 ---Gets buffer information.
 ---@param bufnr integer The buffer number.
 ---@return { buf_name: string, buf_name_length: integer, icon_hl: string,icon:  string,length: integer,state: integer, left_padding: string, right_padding: string }|nil
-local function get_buffer_info(bufnr)
+local function get_buffer_info(bufnr, bufs)
 	local buf_name = process_buffer_name(bufnr)
 	local icon, icon_hl = get_file_icon(bufnr)
 	icon = icon .. " "
-	icon_hl = generate_tabline_highlight(icon_hl, get_buffer_state(bufnr), {}, nil)
+	icon_hl = generate_tabline_highlight(icon_hl, get_buffer_state(bufnr, bufs), {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
 	buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
 	local length = vim.fn.strwidth(buf_name)
@@ -200,7 +220,7 @@ local function get_buffer_info(bufnr)
 		+ vim.fn.strwidth(right_padding)
 		+ vim.fn.strwidth(states.icons.close)
 		+ vim.fn.strwidth(states.icons.separator)
-	local state = get_buffer_state(bufnr)
+	local state = get_buffer_state(bufnr, bufs)
 	return {
 		buf_name = buf_name,
 		padding_length = #left_padding + #right_padding,
@@ -222,7 +242,7 @@ M.get_buffer_info = get_buffer_info
 local function get_buffers_with_specs(bufs)
 	local valid_bufs = {}
 	for _, i in ipairs(bufs) do
-		local info = get_buffer_info(i)
+		local info = get_buffer_info(i, bufs)
 		valid_bufs[i] = info
 	end
 	return valid_bufs
@@ -231,7 +251,7 @@ end
 local calculate_buf_space = function(bufs)
 	local length = 0
 	for _, i in ipairs(bufs) do
-		local buf_len = get_buffer_info(i).length
+		local buf_len = get_buffer_info(i, bufs).length
 		length = length + buf_len
 	end
 	return length
@@ -419,8 +439,8 @@ end
 ---Generates the buffer string for the tabline.
 ---@param bufnr integer The buffer number.
 ---@return string The formatted buffer string.
-local function generate_buffer_string(bufnr)
-	local buf_spec = get_buffer_info(bufnr)
+local function generate_buffer_string(bufnr, bufs)
+	local buf_spec = get_buffer_info(bufnr, bufs)
 	if not buf_spec then
 		return ""
 	end
@@ -446,7 +466,7 @@ local function update_tabline_buffer_string()
 	local str = ""
 	local bufs = states.buffers_list
 	for _, bufnr in ipairs(states.visible_buffers) do
-		str = str .. generate_buffer_string(bufnr)
+		str = str .. generate_buffer_string(bufnr, bufs)
 	end
 	local overflow_info = get_overflow_indicator_info(bufs)
 	states.cache.tabline_buf_string = overflow_info.left_overflow_str
@@ -454,6 +474,7 @@ local function update_tabline_buffer_string()
 		.. "%#TabLineFill#"
 		.. "%="
 		.. overflow_info.right_overflow_str
+	return states.cache.tabline_buf_string
 end
 
 M.get_tabline_buffers_list = get_tabline_buffers_list
