@@ -1,5 +1,5 @@
-local utils = require("core.tabline.utils")
-local states = require("core.tabline.states")
+local utils = require("ui.tabline.utils")
+local states = require("ui.tabline.states")
 
 local tabline_augroup = vim.api.nvim_create_augroup("TablineBuffers", { clear = true })
 vim.api.nvim_create_autocmd({ "BufEnter", "BufUnload", "BufDelete", "VimResized" }, {
@@ -10,7 +10,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufUnload", "BufDelete", "VimResized"
 		local bufs = states.buffers_list
 		local buf_specs = states.buffers_spec
 		utils.fetch_visible_buffers(bufnr, bufs, buf_specs)
-		-- states.buffer_count = states.buffer_count + 1
+		states.buffer_count = states.buffer_count + 1
 	end,
 	group = tabline_augroup,
 })

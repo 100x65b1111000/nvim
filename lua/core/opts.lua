@@ -50,11 +50,9 @@ vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
 	desc = "Replicate the auto save feature in some text editors",
 	callback = function(args)
 		if vim.bo.modified and vim.bo.modifiable and not vim.bo.readonly and vim.bo.buftype == "" then
-			vim.cmd([[ w ]])
-			vim.api.nvim_exec_autocmds("BufWrite", {
-				group = "AutoSave",
-				buffer = args.buf,
-			})
+			vim.schedule(function ()
+				vim.cmd("w")
+			end)
 		end
 	end,
 })

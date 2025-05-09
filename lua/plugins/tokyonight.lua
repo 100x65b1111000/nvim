@@ -251,54 +251,64 @@ P.opts = {
 			bg = c.bg_dark
 		}
 		hl.StatusLineNormalMode = {
-			bg = c.blue,
+			fg = c.blue,
 			bold = true,
-			fg = c.bg_dark
+			bg = c.bg_dark,
+			reverse = true,
 		}
 		hl.StatusLineVisualMode = {
-			bg = c.magenta,
+			fg = c.magenta,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineOperatorMode = {
-			bg = c.magenta,
+			fg = c.magenta,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineTerminalMode = {
-			bg = c.yellow,
+			fg = c.yellow,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineReplaceMode = {
-			bg = c.orange,
+			fg = c.orange,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineSelectMode = {
-			bg = c.teal,
+			fg = c.teal,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineShellMode = {
-			bg = c.red,
+			fg = c.red,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineCommandMode = {
-			bg = c.green1,
+			fg = c.green1,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineInsertMode = {
-			bg = c.blue2,
+			fg = c.blue2,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineMode = {
-			bg = c.blue5,
+			fg = c.blue5,
 			bold = true,
-			fg = c.bg_dark
+			reverse = true,
+			bg = c.bg_dark
 		}
 		hl.StatusLineCwdIcon = {
 			bg = c.bg_dark,
@@ -324,11 +334,11 @@ P.opts = {
 			fg = c.orange,
 			bg = c.bg_dark
 		}
-		hl.StatusLineScrollPerc = {
+		hl.StatusLineFilePerc = {
 			fg = c.green,
 			-- bg = c.bg_highlight
 		}
-		hl.StatusLineScrollIcon = {
+		hl.StatusLineFilePercIcon = {
 			fg =c.bg_dark,
 			bg = c.green
 		}
