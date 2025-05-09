@@ -123,75 +123,75 @@ P.keys = {
 		end,
 		desc = "Toggle Terminal(vsplit)",
 	},
-	-- {
-	-- 	"<leader>fg",
-	-- 	function()
-	-- 		Snacks.picker.grep({
-	-- 			hidden = true,
-	-- 			supports_live = true,
-	-- 			show_empty = false,
-	-- 		})
-	-- 	end,
-	-- 	desc = "Live Grep",
-	-- },
-	-- {
-	-- 	"<leader>ff",
-	-- 	function()
-	-- 		Snacks.picker.files({
-	-- 			hidden = true,
-	-- 		})
-	-- 	end,
-	-- 	desc = "Find Files",
-	-- },
-	-- {
-	-- 	"<leader>fb",
-	-- 	function()
-	-- 		Snacks.picker.buffers()
-	-- 	end,
-	-- 	desc = "Find Buffers",
-	-- },
-	-- {
-	-- 	"<leader>fli",
-	-- 	function()
-	-- 		Snacks.picker.lsp_implementations()
-	-- 	end,
-	-- 	desc = "Find LSP Implementations",
-	-- },
-	-- {
-	-- 	"<leader>fls",
-	-- 	function()
-	-- 		Snacks.picker.lsp_symbols()
-	-- 	end,
-	-- 	desc = "Find LSP Symbols",
-	-- },
-	-- {
-	-- 	"<leader>fd",
-	-- 	function()
-	-- 		Snacks.picker.diagnostics_buffer()
-	-- 	end,
-	-- 	desc = "Diagnostics picker(buffer)",
-	-- },
-	-- {
-	-- 	"<leader>fh",
-	-- 	function()
-	-- 		Snacks.picker.help()
-	-- 	end,
-	-- 	desc = "Find Help Pages",
-	-- },
-	-- {
-	-- 	"<leader>fc",
-	-- 	function()
-	-- 		Snacks.picker.colorschemes()
-	-- 	end,
-	-- 	desc = "Pick Colorschemes",
-	-- },
-	-- {
-	-- 	"<leader>fH",
-	-- 	function()
-	-- 		Snacks.picker.highlights()
-	-- 	end,
-	-- 	desc = "Find hl_groups",
-	-- },
+	{
+		"<leader>fg",
+		function()
+			Snacks.picker.grep({
+				hidden = true,
+				supports_live = true,
+				show_empty = false,
+			})
+		end,
+		desc = "Live Grep",
+	},
+	{
+		"<leader>ff",
+		function()
+			Snacks.picker.files({
+				hidden = true,
+			})
+		end,
+		desc = "Find Files",
+	},
+	{
+		"<leader>fb",
+		function()
+			Snacks.picker.buffers()
+		end,
+		desc = "Find Buffers",
+	},
+	{
+		"<leader>fli",
+		function()
+			Snacks.picker.lsp_implementations()
+		end,
+		desc = "Find LSP Implementations",
+	},
+	{
+		"<leader>fls",
+		function()
+			Snacks.picker.lsp_symbols()
+		end,
+		desc = "Find LSP Symbols",
+	},
+	{
+		"<leader>fd",
+		function()
+			Snacks.picker.diagnostics_buffer()
+		end,
+		desc = "Diagnostics picker(buffer)",
+	},
+	{
+		"<leader>fh",
+		function()
+			Snacks.picker.help()
+		end,
+		desc = "Find Help Pages",
+	},
+	{
+		"<leader>fc",
+		function()
+			Snacks.picker.colorschemes()
+		end,
+		desc = "Pick Colorschemes",
+	},
+	{
+		"<leader>fH",
+		function()
+			Snacks.picker.highlights()
+		end,
+		desc = "Find hl_groups",
+	},
 }
 
 return P
