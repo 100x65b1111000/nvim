@@ -238,9 +238,6 @@ local calculate_buf_space = function(bufs)
 end
 
 local get_overflow_indicator_info = function(bufs)
-	-- if not states.should_overflow then
-	-- 	return { left_overflow_str = "", right_overflow_str = "" }
-	-- end
 	local left_dist = states.start_idx - 1
 	local right_dist = #bufs - states.end_idx
 	local left_overflow_str = states.icons.left_overflow_indicator
@@ -292,13 +289,6 @@ end
 
 M.calculate_buf_range = calculate_buf_range
 M.calculate_buf_space = calculate_buf_space
-
---- Caches and Maps buffers to their indices
-local generate_buffer_mappings = function(bufs)
-	for index, buf in ipairs(bufs) do
-		states.buffer_map[tostring(index)] = buf
-	end
-end
 
 local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	local available_space = vim.o.columns - 9
@@ -374,12 +364,6 @@ _G.tabline_close_button_callback = function(bufnr)
 		end
 	end
 	vim.api.nvim_buf_delete(bufnr, { force = true })
-	-- local index = find_index(states.visible_buffers, bufnr)
-	-- table.remove(states.visible_buffers, index)
-	-- index = find_index(states.buffers_list, bufnr)
-	-- table.remove(states.buffers_list, index)
-	-- fetch_visible_buffers(states.buffers_list[index], states.buffers_list, states.buffers_spec)
-	-- Recalculate visible buffers
 	states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
 	states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 	local bufs = states.buffers_list
