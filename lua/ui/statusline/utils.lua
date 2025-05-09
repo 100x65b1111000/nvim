@@ -252,7 +252,6 @@ M.statusline_git_file_status = function()
 	return { hl_group = "", string = git_status }
 end
 
----@return StatusLineModuleFnTable
 M.fetch_git_branch = function()
 	states.statusline_git_branch = timer_fn(states.statusline_git_branch, 50, function()
 		local file_path = vim.fn.expand("%:p")
@@ -410,7 +409,6 @@ M.statusline_ts_info = function()
 	}
 end
 
----@return StatusLineModuleFnTable
 M.fetch_lsp_info = function()
 	states.lsp_debounce_timer = timer_fn(states.lsp_debounce_timer, 200, function()
 		local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) or {}
@@ -461,6 +459,45 @@ M.statusline_lsp_info = function()
 end
 
 ---@param opts StatusLineConfig
+local format_diagnostics = function(severity)
+	local count = states.cache.severity_map[severity].count
+	local hl = states.cache.severity_map[severity].hl
+	local icon = states.cache.severity_map[severity].icon
+	if count > 0 then
+		return hl .. icon .. count
+	end
+
+	return ""
+end
+
+M.fetch_diagnostics = function()
+	states.diagnostic_debounce_timer = timer_fn(states.diagnostic_debounce_timer, 100, function()
+		local bufnr = vim.api.nvim_get_current_buf()
+		states.cache.severity_map = {
+			["ERROR"] = { hl = "%#DiagnosticError#", icon = "  ", count = vim.diagnostic.count(bufnr)[1] or 0 },
+			["WARN"] = { hl = "%#DiagnosticWarn#", icon = "  ", count = vim.diagnostic.count(bufnr)[2] or 0 },
+			["INFO"] = { hl = "%#DiagnosticInfo#", icon = "  ", count = vim.diagnostic.count(bufnr)[3] or 0 },
+			["HINT"] = { hl = "%#DiagnosticHint#", icon = "  ", count = vim.diagnostic.count(bufnr)[4] or 0 },
+		}
+
+		local diagnostic_str = format_diagnostics("ERROR")
+			.. format_diagnostics("WARN")
+			.. format_diagnostics("INFO")
+			.. format_diagnostics("HINT")
+
+		vim.schedule(function()
+			vim.b.statusline_diagnostic_info = " " .. diagnostic_str .. " "
+			vim.cmd([[redrawstatus]])
+		end)
+	end)
+end
+
+M.statusline_diagnostics = function()
+	return { string = vim.b.statusline_diagnostic_info }
+end
+
+---@param opts StatusLineModulesConfig
+
 function M.initialize_stl(opts)
 	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
 	states.current_config = config
@@ -476,6 +513,7 @@ function M.initialize_stl(opts)
 	states.modules_map["lsp-info"] = M.statusline_lsp_info
 	states.modules_map["cursor-pos"] = M.statusline_cursor_pos
 	states.modules_map["file-percent"] = M.statusline_file_percent
+	states.modules_map["diagnostic"] = M.statusline_diagnostics
 end
 
 local function format_hl_string(hl_group)
