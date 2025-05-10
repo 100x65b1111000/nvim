@@ -390,6 +390,24 @@ P.opts = {
 			fg = c.red,
 			bg = c.bg_highlight
 		}
+		hl.MiniFilesTitle = {
+			fg = c.blue,
+			bg = c.bg,
+			reverse = true
+		}
+		hl.MiniFilesTitleFocused = {
+			fg = c.green,
+			bg = c.bg,
+			reverse = true
+		}
+		hl.MiniFilesBorder = {
+			fg = c.bg_float,
+			bg = c.bg_float
+		}
+		hl.MiniFilesBorderModified = {
+			fg = c.orange,
+			bg = c.bg_float
+		}
 	end,
 }
 

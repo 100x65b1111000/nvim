@@ -1,9 +1,9 @@
-local utils = require("ui.statusline.utils")
 local statusline_fetchers = vim.api.nvim_create_augroup("StatusLineFetchers", { clear = true })
 
 vim.api.nvim_create_autocmd({ "FocusLost", "BufReadPost", "BufWritePost", "FocusGained", "InsertLeave" }, {
 	group = statusline_fetchers,
 	callback = function()
+		local utils = require("ui.statusline.utils")
 		if utils.buf_is_file() then
 			utils.fetch_git_file_stat()
 			utils.fetch_git_file_diff()
@@ -15,6 +15,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufReadPost", "BufWritePost", "Focus
 vim.api.nvim_create_autocmd({ "BufReadPost" }, {
 	group = statusline_fetchers,
 	callback = function()
+		local utils = require("ui.statusline.utils")
 		if utils.buf_is_file() then
 			utils.fetch_git_branch()
 			vim.cmd("redrawstatus")
@@ -25,6 +26,7 @@ vim.api.nvim_create_autocmd({ "BufReadPost" }, {
 vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
 	group = statusline_fetchers,
 	callback = function()
+		local utils = require("ui.statusline.utils")
 		if utils.buf_is_file() then
 			utils.fetch_lsp_info()
 			vim.cmd("redrawstatus")
@@ -35,6 +37,7 @@ vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
 vim.api.nvim_create_autocmd({ "DiagnosticChanged"}, {
 	group = statusline_fetchers,
 	callback = function ()
+		local utils = require("ui.statusline.utils")
 		utils.fetch_diagnostics()
 	end
 })

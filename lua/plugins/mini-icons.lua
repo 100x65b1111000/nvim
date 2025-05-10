@@ -1,6 +1,6 @@
 local P = {
 	"echasnovski/mini.icons",
-    lazy = false,
+    lazy = true,
 	opts = function()
 		require("mini.icons").mock_nvim_web_devicons()
 		return {

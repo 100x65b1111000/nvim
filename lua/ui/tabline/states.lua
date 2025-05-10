@@ -15,7 +15,8 @@ M.cache = {
 	tabline_buf_string = "",
 	highlights = {},
 	fileicons = {},
-	last_visible_buffers = {}
+	last_visible_buffers = {},
+	close_button_string = ""
 }
 
 M.init_files = {
@@ -45,6 +46,7 @@ M.buffer_map = {}
 M.buffer_count = 0
 M.buffers_list = {}
 M.buffers_spec = {}
+M.highlight_gen_count = 0
 
 -- M.should_overflow = false
 

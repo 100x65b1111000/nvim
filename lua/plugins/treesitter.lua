@@ -1,7 +1,7 @@
 local P = {
 	"nvim-treesitter/nvim-treesitter",
 	version = false,
-	event = { "BufReadPost" },
+	event = { "BufReadPre" },
 	cmd = { "TSUpdateSync", "TSInstall", "TSDisable", "TSEnable" },
 	build = ":TSUpdate",
 	config = function()

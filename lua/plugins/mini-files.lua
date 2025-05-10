@@ -2,19 +2,19 @@
 local P = {
 	"echasnovski/mini.files",
 	lazy = true,
-	enabled = true
+	enabled = true,
 }
 -- Define the toggle function for mini.files
 function ToggleMiniFiles()
 	local MiniFiles = require("mini.files")
 	local file_path = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
 	local buftype = vim.api.nvim_get_option_value("buftype", { buf = vim.api.nvim_get_current_buf() })
-	if buftype ~= '' or '' == file_path or not vim.uv.fs_stat(file_path) then
-        if '' ~= file_path then
-            file_path = vim.fn.fnamemodify(file_path, ':h')
-        else
-            file_path = vim.fn.getcwd(0)
-        end
+	if buftype ~= "" or "" == file_path or not vim.uv.fs_stat(file_path) then
+		if "" ~= file_path then
+			file_path = vim.fn.fnamemodify(file_path, ":h")
+		else
+			file_path = vim.fn.getcwd(0)
+		end
 	end
 	if not MiniFiles.close() then
 		MiniFiles.open(file_path)
@@ -46,12 +46,13 @@ P.dependencies = {
 }
 
 P.keys = {
-    {
-        "<leader>e", function ()
-            ToggleMiniFiles()
-        end ,
-        desc = "Toggle mini-files explorer"
-    }
+	{
+		"<leader>e",
+		function()
+			ToggleMiniFiles()
+		end,
+		desc = "Toggle mini-files explorer",
+	},
 }
 
 P.config = function()
@@ -89,13 +90,12 @@ P.config = function()
 			-- Width of focused window
 			width_focus = 50,
 			-- Width of non-focused window
-			width_nofocus = 15,
+			width_nofocus = 20,
 			-- Width of preview window
 			width_preview = 100,
 		},
 	})
 
-	-- Map a key to toggle mini.files
 	vim.keymap.set(
 		"n",
 		"<leader>e",
@@ -104,10 +104,9 @@ P.config = function()
 	)
 
 	-- toggle dotfiles(from mini.files wiki)
-
 	local show_dotfiles = true
 
-	local filter_show = function(fs_entry)
+	local filter_show = function()
 		return true
 	end
 
@@ -125,7 +124,54 @@ P.config = function()
 		pattern = "MiniFilesBufferCreate",
 		callback = function(args)
 			local buf_id = args.data.bufid
-			vim.keymap.set("n", "g.", toggle_dotfiles, { desc = 'Toggle hidden files', buffer = buf_id })
+			vim.keymap.set("n", "g.", toggle_dotfiles, { desc = "Toggle hidden files", buffer = buf_id })
+			-- vim.wo[args.data.win_id].number = true
+		end,
+	})
+
+	-- Set focused directory as current working directory
+	local set_cwd = function()
+		local path = (MiniFiles.get_fs_entry() or {}).path
+		if path == nil then
+			return vim.notify("Cursor is not on valid entry")
+		end
+		vim.fn.chdir(vim.fs.dirname(path))
+	end
+
+	-- Yank in register full path of entry under cursor
+	local yank_path = function()
+		local path = (MiniFiles.get_fs_entry() or {}).path
+		if path == nil then
+			return vim.notify("Cursor is not on valid entry")
+		end
+		vim.fn.setreg(vim.v.register, path)
+	end
+
+	-- Open path with system default handler (useful for non-text files)
+	local ui_open = function()
+		vim.ui.open(MiniFiles.get_fs_entry().path)
+	end
+
+	vim.api.nvim_create_autocmd("User", {
+		pattern = "MiniFilesBufferCreate",
+		callback = function(args)
+			local b = args.data.buf_id
+			vim.keymap.set("n", "g/", set_cwd, { buffer = b, desc = "Set cwd" })
+			vim.keymap.set("n", "go", ui_open, { buffer = b, desc = "OS open" })
+			vim.keymap.set("n", "gy", yank_path, { buffer = b, desc = "Yank path" })
+		end,
+	})
+
+	vim.api.nvim_create_autocmd("User", {
+		pattern = "MiniFilesWindowOpen",
+		callback = function(args)
+			local win_id = args.data.win_id
+
+			-- Customize window-local settings
+			vim.wo[win_id].relativenumber = true
+			local config = vim.api.nvim_win_get_config(win_id)
+			config.border, config.title_pos = "single", "center"
+			vim.api.nvim_win_set_config(win_id, config)
 		end,
 	})
 end
