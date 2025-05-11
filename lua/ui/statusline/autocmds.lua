@@ -28,16 +28,20 @@ vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
 	callback = function()
 		local utils = require("ui.statusline.utils")
 		if utils.buf_is_file() then
-			utils.fetch_lsp_info()
-			vim.cmd("redrawstatus")
+			vim.schedule(function()
+				utils.fetch_lsp_info()
+				vim.cmd("redrawstatus")
+			end)
 		end
 	end,
 })
 
-vim.api.nvim_create_autocmd({ "DiagnosticChanged"}, {
+vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 	group = statusline_fetchers,
-	callback = function ()
+	callback = function()
 		local utils = require("ui.statusline.utils")
-		utils.fetch_diagnostics()
-	end
+		if utils.buf_is_file() then
+			utils.fetch_diagnostics()
+		end
+	end,
 })

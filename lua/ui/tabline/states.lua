@@ -47,6 +47,7 @@ M.buffer_count = 0
 M.buffers_list = {}
 M.buffers_spec = {}
 M.highlight_gen_count = 0
+M.available_width = vim.o.columns
 
 -- M.should_overflow = false
 

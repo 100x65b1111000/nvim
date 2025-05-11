@@ -19,6 +19,8 @@ local timer_fn = function(timer, timeout, callback)
 	return timer
 end
 
+M.timer_fn = timer_fn
+
 ---Checks if a buffer is valid for display in the tabline.
 ---@param bufnr integer The buffer number to check.
 ---@return boolean True if the buffer is valid, false otherwise.
@@ -26,7 +28,7 @@ local function buf_is_valid(bufnr)
 	return vim.api.nvim_buf_is_loaded(bufnr)
 		and vim.api.nvim_buf_is_valid(bufnr)
 		and vim.api.nvim_buf_get_name(bufnr) ~= ""
-		and (vim.bo[bufnr].buftype == "")
+		and (vim.api.nvim_get_option_value("buftype", { buf = bufnr }) == "")
 		and vim.fn.isdirectory(vim.api.nvim_buf_get_name(bufnr)) == 0
 end
 
@@ -136,7 +138,7 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	elseif state == states.BufferStates.INACTIVE then
 		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "Tabline", 50, -50
 	elseif state == states.BufferStates.NONE then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 75, -35
+		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 50, 0
 	end
 	states.highlight_gen_count = states.highlight_gen_count + 1
 	return generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
@@ -210,9 +212,82 @@ local get_file_icon = function(bufnr)
 	return states.cache.fileicons[filetype].icon, states.cache.fileicons[filetype].hl
 end
 
+---Gets the close button string.
+---@param bufnr integer The buffer number.
+local function get_close_button(bufnr)
+	local close_btn_inactive_hl =
+		generate_tabline_highlight("MiniIconsRed", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
+
+	if vim.api.nvim_get_mode().mode == "i" and bufnr == vim.api.nvim_get_current_buf() then
+		local close_btn_insert_mode_hl =
+			generate_tabline_highlight("MiniIconsGreen", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
+		return string.format(
+			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
+			bufnr,
+			close_btn_insert_mode_hl,
+			states.icons.active_dot
+		)
+	end
+	if vim.api.nvim_get_option_value("modified", { buf = bufnr }) and bufnr == vim.api.nvim_get_current_buf() then
+		local close_btn_modified_hl =
+			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModified")
+		return string.format(
+			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
+			bufnr,
+			close_btn_modified_hl,
+			states.icons.active_dot
+		)
+	end
+	if vim.api.nvim_get_option_value("modified", { buf = bufnr }) then
+		local close_btn_modified_hl =
+			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.NONE, {}, "TabLineModified")
+		return string.format(
+			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
+			bufnr,
+			close_btn_modified_hl,
+			states.icons.active_dot
+		)
+	end
+	if bufnr == vim.api.nvim_get_current_buf() then
+		local close_btn_active_hl =
+			generate_tabline_highlight("MiniIconsRed", states.BufferStates.ACTIVE, {}, "TabLineCloseButtonActive")
+		return string.format(
+			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
+			bufnr,
+			close_btn_active_hl,
+			states.icons.close
+		)
+	end
+
+	return string.format(
+		"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
+		bufnr,
+		close_btn_inactive_hl,
+		states.icons.close
+	)
+end
+
+-- M.tabline_update_close_button = tabline_update_close_button
+
+-- M.tabline_get_close_button = function()
+-- 	states.tabline_close_btn_debounce_timer = timer_fn(states.tabline_close_btn_debounce_timer, 50, function()
+-- 		for _, buf in ipairs(states.visible_buffers) do
+-- 			tabline_update_close_button(buf)
+-- 		end
+-- 	end)
+-- end
+
+_G.tabline_click_buffer_callback = function(bufnr)
+	if not buf_is_valid(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
+		return
+	end
+
+	vim.cmd(string.format("buffer %s", bufnr))
+end
+
 ---Gets buffer information.
 ---@param bufnr integer The buffer number.
----@return { buf_name: string, buf_name_length: integer, icon_hl: string,icon:  string,length: integer,state: integer, left_padding: string, right_padding: string }|nil
+---@return { buf_name: string, buf_name_length: integer, icon_hl: string,icon:  string,length: integer,state: integer, left_padding: string, right_padding: string, close_btn: string }|nil
 local function get_buffer_info(bufnr, bufs)
 	local buf_name = process_buffer_name(bufnr)
 	local state = get_buffer_state(bufnr, bufs)
@@ -227,6 +302,7 @@ local function get_buffer_info(bufnr, bufs)
 		+ vim.fn.strwidth(right_padding)
 		+ vim.fn.strwidth(states.icons.close)
 		+ vim.fn.strwidth(states.icons.separator)
+	local close_btn = get_close_button(bufnr)
 	return {
 		buf_name = buf_name,
 		padding_length = #left_padding + #right_padding,
@@ -236,6 +312,7 @@ local function get_buffer_info(bufnr, bufs)
 		state = state,
 		left_padding = left_padding,
 		right_padding = right_padding,
+		close_btn = close_btn,
 	}
 end
 
@@ -320,6 +397,9 @@ M.calculate_buf_space = calculate_buf_space
 local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	local available_space = vim.o.columns
 		- (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
+	vim.schedule(function()
+		available_space = vim.o.columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
+	end)
 	local buf_space = calculate_buf_space(bufs)
 	local average_buf_width = math.floor(buf_space / #bufs)
 	local nbufs = math.floor(available_space / average_buf_width) -- guess the number of buffers to be displayed based on the average width
@@ -382,128 +462,26 @@ local function get_buffer_highlight(bufnr) -- changed from get_buf_hl
 end
 
 _G.tabline_close_button_callback = function(bufnr)
-	if not buf_is_valid(bufnr) and vim.bo[bufnr].buflisted then
-		return
-	end
-	if vim.bo[bufnr].modified then
-		local choice = vim.fn.confirm("This buffer's been modified!! Wanna save first before closing?", "&Yes\n&No", 2)
-		if choice == 1 then
-			vim.cmd([[ silent! w ]])
+	timer_fn(states.close_button_click_timer, 50, function()
+		if not buf_is_valid(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
+			return
 		end
-	end
-	vim.api.nvim_buf_delete(bufnr, { force = true })
-	states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
-	states.buffers_spec = get_buffers_with_specs(states.buffers_list)
-	local bufs = states.buffers_list
-	local buf_specs = states.buffers_spec
-	fetch_visible_buffers(vim.api.nvim_get_current_buf(), bufs, buf_specs)
-end
-
----Gets the close button string.
----@param bufnr integer The buffer number.
----@return string The close button string with highlight.
-local function get_close_button(bufnr)
-	local close_btn_active_hl =
-		generate_tabline_highlight("MiniIconsRed", states.BufferStates.ACTIVE, {}, "TabLineCloseButtonActive")
-	local close_btn_dot_hl = function(buf)
-		if vim.bo[buf].modified then
-			return generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModified")
+		if vim.api.nvim_get_option_value("modified", { buf = bufnr }) then
+			local choice =
+				vim.fn.confirm("This buffer's been modified!! Wanna save first before closing?", "&Yes\n&No", 2)
+			if choice == 1 then
+				vim.cmd([[ silent! w ]])
+			end
 		end
-		return generate_tabline_highlight("MiniIconsGreen", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
-	end
-	local close_btn_inactive_hl =
-		generate_tabline_highlight("MiniIconsRed", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
-
-	if vim.bo[bufnr].modified then
-		return string.format("%%#%s#%s", close_btn_dot_hl(bufnr), states.icons.active_dot)
-	end
-	if bufnr == vim.api.nvim_get_current_buf() then
-		if vim.api.nvim_get_mode().mode == "i" then
-			return string.format("%%#%s#%s", close_btn_dot_hl(bufnr), states.icons.active_dot)
-		end
-		return string.format(
-			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-			bufnr,
-			close_btn_active_hl,
-			states.icons.close
-		)
-	end
-	return string.format(
-		"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-		bufnr,
-		close_btn_inactive_hl,
-		states.icons.close
-	)
-end
-
----Gets the close button string.
----@param bufnr integer The buffer number.
-local function tabline_update_close_button(bufnr)
-	local close_btn_inactive_hl =
-		generate_tabline_highlight("MiniIconsRed", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
-
-	states.cache.close_button_string = string.format(
-		"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-		bufnr,
-		close_btn_inactive_hl,
-		states.icons.close
-	)
-
-	if vim.api.nvim_get_mode().mode == "i" and bufnr == vim.api.nvim_get_current_buf() then
-		local close_btn_insert_mode_hl =
-			generate_tabline_highlight("MiniIconsGreen", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
-		states.cache.close_button_string = string.format(
-			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-			bufnr,
-			close_btn_insert_mode_hl,
-			states.icons.active_dot
-		)
-	elseif vim.bo[bufnr].modified and bufnr == vim.api.nvim_get_current_buf() then
-		local close_btn_modified_hl =
-			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModified")
-		states.cache.close_button_string = string.format(
-			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-			bufnr,
-			close_btn_modified_hl,
-			states.icons.active_dot
-		)
-	elseif vim.bo[bufnr].modified then
-		local close_btn_modified_hl =
-			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.INACTIVE, {}, "TabLineModified")
-		states.cache.close_button_string = string.format(
-			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-			bufnr,
-			close_btn_modified_hl,
-			states.icons.active_dot
-		)
-	elseif bufnr == vim.api.nvim_get_current_buf() then
-		local close_btn_active_hl =
-			generate_tabline_highlight("MiniIconsRed", states.BufferStates.ACTIVE, {}, "TabLineCloseButtonActive")
-		states.cache.close_button_string = string.format(
-			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
-			bufnr,
-			close_btn_active_hl,
-			states.icons.close
-		)
-	end
-end
-
-M.tabline_update_close_button = tabline_update_close_button
-
-M.tabline_set_close_button = function()
-	states.tabline_close_btn_debounce_timer = timer_fn(states.tabline_close_btn_debounce_timer, 50, function()
-		for _, buf in states.visible_buffers do
-			tabline_update_close_button(buf)
-		end
+		vim.schedule(function()
+			vim.api.nvim_buf_delete(bufnr, { force = true })
+			states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
+			states.buffers_spec = get_buffers_with_specs(states.buffers_list)
+			local bufs = states.buffers_list
+			local buf_specs = states.buffers_spec
+			fetch_visible_buffers(vim.api.nvim_get_current_buf(), bufs, buf_specs)
+		end)
 	end)
-end
-
-_G.tabline_click_buffer_callback = function(bufnr)
-	if not buf_is_valid(bufnr) and vim.bo[bufnr].buflisted then
-		return
-	end
-
-	vim.cmd(string.format("buffer %s", bufnr))
 end
 
 ---Generates the buffer string for the tabline.
@@ -516,9 +494,8 @@ local function generate_buffer_string(bufnr, bufs)
 	end
 	local buf_hl = get_buffer_highlight(bufnr)
 	local left_padding, right_padding = buf_spec.left_padding, buf_spec.right_padding
-	-- tabline_update_close_button(bufnr)
 	local buf_string = string.format(
-		"%%%d@v:lua.tabline_click_buffer_callback@%%#%s#%s%s%s%%#%s#%s%s",
+		"%%%d@v:lua.tabline_click_buffer_callback@%%#%s#%s%s%s%%#%s#%s%s%s",
 		bufnr,
 		buf_spec.icon_hl,
 		states.icons.separator,
@@ -526,24 +503,31 @@ local function generate_buffer_string(bufnr, bufs)
 		buf_spec.icon,
 		buf_hl,
 		buf_spec.buf_name,
-		right_padding
-	) .. (states.cache.close_button_string or "")
+		right_padding,
+		buf_spec.close_btn
+	)
 	return buf_string
 end
 
 ---Updates the global tabline buffer string.
 local function update_tabline_buffer_string()
-	local str = ""
-	local bufs = states.buffers_list
-	for _, bufnr in ipairs(states.visible_buffers) do
-		str = str .. generate_buffer_string(bufnr, bufs)
-	end
-	local overflow_info = get_overflow_indicator_info(bufs)
-	states.cache.tabline_buf_string = overflow_info.left_overflow_str
-		.. str
-		.. "%#TabLineFill#"
-		.. "%="
-		.. overflow_info.right_overflow_str
+	timer_fn(states.tabline_update_debounce_timer, 50, function()
+		local str = ""
+		local bufs = states.buffers_list
+		for _, bufnr in ipairs(states.visible_buffers) do
+			str = str .. generate_buffer_string(bufnr, bufs)
+		end
+		local overflow_info = get_overflow_indicator_info(bufs)
+		states.cache.tabline_buf_string = overflow_info.left_overflow_str
+			.. str
+			.. "%#TabLineFill#"
+			.. "%="
+			.. overflow_info.right_overflow_str
+		vim.cmd([[redrawtabline]])
+	end)
+end
+
+M.get_tabline = function()
 	return states.cache.tabline_buf_string
 end
 
@@ -554,9 +538,9 @@ M.generate_buffer_string = generate_buffer_string
 M.find_index = find_index
 
 M.update_tabline_buffer_info = function()
-	states.tabline_debounce_timer = timer_fn(states.tabline_debounce_timer, 50, function()
-		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
+	timer_fn(states.tabline_debounce_timer, 50, function()
 		states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
+		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 		local bufnr = vim.api.nvim_get_current_buf()
 		local bufs = states.buffers_list
 		local buf_specs = states.buffers_spec

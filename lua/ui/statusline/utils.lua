@@ -86,8 +86,8 @@ end
 --- Display readonly and modified status of the current file
 ---@return StatusLineModuleFnTable
 function M.buf_status()
-	local mo_string = vim.bo.modified and "%m " or ""
-	local ro_string = vim.bo.readonly and " %r " or " "
+	local mo_string = vim.api.nvim_get_option_value('modified', { buf = 0 }) and "%m " or ""
+	local ro_string = vim.api.nvim_get_option_value('readonly', { buf = 0 }) and " %r " or " "
 	local hl = generate_highlight(
 		"MiniIconsOrange",
 		"StatusLineNormalMode",
@@ -117,7 +117,7 @@ end
 --- To check whether the opened buffer is a file
 --- @return boolean
 local function buf_is_file()
-	return vim.fn.expand("%:p") ~= "" and vim.bo[0].buftype == ""
+	return vim.fn.expand("%:p") ~= "" and vim.api.nvim_get_option_value('buftype', { buf = 0 }) == ""
 end
 
 M.buf_is_file = buf_is_file
@@ -197,7 +197,7 @@ M.fetch_git_file_stat = function()
 		local git_stat_cmd = states.git_cmd .. parent .. " status --short --porcelain " .. file_path
 		vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
 			vim.schedule(function()
-				vim.b.statusline_git_stat_obj = { code = out.code, stdout = out.stdout, stderr = out.stderr }
+				vim.api.nvim_buf_set_var(0, 'statusline_git_stat_obj', { code = out.code, stdout = out.stdout, stderr = out.stderr })
 				vim.cmd([[redrawstatus]])
 			end)
 		end)
@@ -216,7 +216,7 @@ M.fetch_git_file_diff = function()
 		local git_diff_cmd = states.git_cmd .. parent .. " diff --numstat " .. file_path
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
 			vim.schedule(function()
-				vim.b.statusline_git_diff_obj = { code = out.code, stdout = out.stdout, stderr = out.stderr }
+				vim.api.nvim_buf_set_var(0, 'statusline_git_diff_obj', { code = out.code, stdout = out.stdout, stderr = out.stderr })
 				vim.cmd([[redrawstatus]])
 			end)
 		end)
@@ -266,14 +266,14 @@ M.fetch_git_branch = function()
 		local file_path = vim.fn.expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
-			vim.b.statusline_git_branch_obj = nil
+			vim.api.nvim_buf_set_var(0, 'statusline_git_branch_obj', nil)
 			return
 		end
 
 		local git_diff_cmd = states.git_cmd .. parent .. " branch --show-current "
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
 			vim.schedule(function()
-				vim.b.statusline_git_branch_obj = out
+				vim.api.nvim_buf_set_var(0, 'statusline_git_branch_obj', out)
 				vim.cmd("redrawstatus")
 			end)
 		end)
@@ -293,10 +293,10 @@ end
 --- Display the filetype information about the buffers
 ---@return StatusLineModuleFnTable
 M.statusline_filetype_info = function()
-	local filetype_ = vim.bo.filetype
+	local filetype_ = vim.api.nvim_get_option_value('filetype', { buf = 0 })
 	local filetype = (filetype_ == "" and "") or filetype_ .. " "
-	-- if states.cache.filetype_icons[vim.bo.buftype] and not states.cache.filetype_icons[filetype_] then
-	-- 	filetype_ = vim.bo.buftype
+	-- if states.cache.filetype_icons[vim.api.nvim_get_option_value('buftype', { buf = 0 })] and not states.cache.filetype_icons[filetype_] then
+	-- 	filetype_ = vim.api.nvim_get_option_value('buftype', { buf = 0 })
 	-- end
 
 	if not package.loaded["mini.icons"] then
@@ -431,7 +431,7 @@ M.fetch_lsp_info = function()
 			table.insert(client_names, i.name)
 		end
 		vim.schedule(function()
-			vim.b.statusline_lsp_clients = client_names
+			vim.api.nvim_buf_set_var(0, 'statusline_lsp_clients', client_names)
 			vim.cmd("redrawstatus")
 		end)
 	end)
@@ -506,7 +506,7 @@ M.fetch_diagnostics = function()
 			.. format_diagnostics("HINT")
 
 		vim.schedule(function()
-			vim.b.statusline_diagnostic_info = " " .. diagnostic_str .. " "
+			vim.api.nvim_buf_set_var(0, 'statusline_diagnostic_info', " " .. diagnostic_str .. " ")
 			vim.cmd([[redrawstatus]])
 		end)
 	end)
