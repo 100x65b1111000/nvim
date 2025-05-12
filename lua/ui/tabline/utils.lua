@@ -442,6 +442,7 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	states.start_idx = find_index(bufs, visible_buffers[1])
 	states.end_idx = find_index(bufs, visible_buffers[#visible_buffers])
 	states.visible_buffers = visible_buffers
+	vim.print(visible_buffers)
 end
 
 M.fetch_visible_buffers = fetch_visible_buffers
@@ -546,7 +547,6 @@ M.update_tabline_buffer_info = function()
 		local buf_specs = states.buffers_spec
 		states.buffer_count = states.buffer_count + 1
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
-		vim.cmd([[redrawtabline]])
 	end)
 end
 
