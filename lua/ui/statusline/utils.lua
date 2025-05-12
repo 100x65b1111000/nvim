@@ -86,8 +86,8 @@ end
 --- Display readonly and modified status of the current file
 ---@return StatusLineModuleFnTable
 function M.buf_status()
-	local mo_string = vim.api.nvim_get_option_value('modified', { buf = 0 }) and "%m " or ""
-	local ro_string = vim.api.nvim_get_option_value('readonly', { buf = 0 }) and " %r " or " "
+	local mo_string = vim.api.nvim_get_option_value("modified", { buf = 0 }) and "%m " or ""
+	local ro_string = vim.api.nvim_get_option_value("readonly", { buf = 0 }) and " %r " or " "
 	local hl = generate_highlight(
 		"MiniIconsOrange",
 		"StatusLineNormalMode",
@@ -117,7 +117,7 @@ end
 --- To check whether the opened buffer is a file
 --- @return boolean
 local function buf_is_file()
-	return vim.fn.expand("%:p") ~= "" and vim.api.nvim_get_option_value('buftype', { buf = 0 }) == ""
+	return vim.fn.expand("%:p") ~= "" and vim.api.nvim_get_option_value("buftype", { buf = 0 }) == ""
 end
 
 M.buf_is_file = buf_is_file
@@ -168,8 +168,8 @@ local deletions = function(del)
 	return ""
 end
 
----@param timer uv.uv_timer_t|nil
----@param timeout integer
+---@param timer uv.uv_timer_t|nil Timer object
+---@param timeout integer timeout in ms
 ---@param callback function
 local timer_fn = function(timer, timeout, callback)
 	if timer then
@@ -187,7 +187,7 @@ end
 
 --- Fetch the git file status info about the current file
 M.fetch_git_file_stat = function()
-	states.stat_debounce_timer = timer_fn(states.stat_debounce_timer, 50, function()
+	timer_fn(states.stat_debounce_timer, 50, function()
 		local file_path = vim.fn.expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
@@ -197,7 +197,11 @@ M.fetch_git_file_stat = function()
 		local git_stat_cmd = states.git_cmd .. parent .. " status --short --porcelain " .. file_path
 		vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
 			vim.schedule(function()
-				vim.api.nvim_buf_set_var(0, 'statusline_git_stat_obj', { code = out.code, stdout = out.stdout, stderr = out.stderr })
+				vim.api.nvim_buf_set_var(
+					0,
+					"statusline_git_stat_obj",
+					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
+				)
 				vim.cmd([[redrawstatus]])
 			end)
 		end)
@@ -206,7 +210,7 @@ end
 
 --- Fetch the git diff status info about the current file
 M.fetch_git_file_diff = function()
-	states.diff_debounce_timer = timer_fn(states.diff_debounce_timer, 50, function()
+	timer_fn(states.diff_debounce_timer, 50, function()
 		local file_path = vim.fn.expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
@@ -216,7 +220,11 @@ M.fetch_git_file_diff = function()
 		local git_diff_cmd = states.git_cmd .. parent .. " diff --numstat " .. file_path
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
 			vim.schedule(function()
-				vim.api.nvim_buf_set_var(0, 'statusline_git_diff_obj', { code = out.code, stdout = out.stdout, stderr = out.stderr })
+				vim.api.nvim_buf_set_var(
+					0,
+					"statusline_git_diff_obj",
+					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
+				)
 				vim.cmd([[redrawstatus]])
 			end)
 		end)
@@ -262,18 +270,22 @@ end
 
 --- Fetch the gir branch of the current file (if inside a git repo)
 M.fetch_git_branch = function()
-	states.statusline_git_branch = timer_fn(states.statusline_git_branch, 50, function()
+	timer_fn(states.statusline_git_branch, 50, function()
 		local file_path = vim.fn.expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
-			vim.api.nvim_buf_set_var(0, 'statusline_git_branch_obj', nil)
+			-- vim.api.nvim_buf_set_var(0, "statusline_git_branch_obj", nil)
 			return
 		end
 
 		local git_diff_cmd = states.git_cmd .. parent .. " branch --show-current "
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
 			vim.schedule(function()
-				vim.api.nvim_buf_set_var(0, 'statusline_git_branch_obj', out)
+				vim.api.nvim_buf_set_var(
+					0,
+					"statusline_git_branch_obj",
+					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
+				)
 				vim.cmd("redrawstatus")
 			end)
 		end)
@@ -293,7 +305,7 @@ end
 --- Display the filetype information about the buffers
 ---@return StatusLineModuleFnTable
 M.statusline_filetype_info = function()
-	local filetype_ = vim.api.nvim_get_option_value('filetype', { buf = 0 })
+	local filetype_ = vim.api.nvim_get_option_value("filetype", { buf = 0 })
 	local filetype = (filetype_ == "" and "") or filetype_ .. " "
 	-- if states.cache.filetype_icons[vim.api.nvim_get_option_value('buftype', { buf = 0 })] and not states.cache.filetype_icons[filetype_] then
 	-- 	filetype_ = vim.api.nvim_get_option_value('buftype', { buf = 0 })
@@ -374,7 +386,7 @@ end
 ---@return StatusLineModuleFnTable
 M.statusline_git_branch = function()
 	local git_branch_obj = vim.b.statusline_git_branch_obj
-	if not git_branch_obj or git_branch_obj.code ~= 0 then
+	if not git_branch_obj or (git_branch_obj.code ~= 0) then
 		return {}
 	end
 
@@ -424,14 +436,14 @@ end
 
 --- Fetch lsp information about the current file
 M.fetch_lsp_info = function()
-	states.lsp_debounce_timer = timer_fn(states.lsp_debounce_timer, 200, function()
+	timer_fn(states.lsp_debounce_timer, 200, function()
 		local clients = vim.lsp.get_clients({ bufnr = vim.api.nvim_get_current_buf() }) or {}
 		local client_names = {}
 		for _, i in ipairs(clients) do
 			table.insert(client_names, i.name)
 		end
 		vim.schedule(function()
-			vim.api.nvim_buf_set_var(0, 'statusline_lsp_clients', client_names)
+			vim.api.nvim_buf_set_var(0, "statusline_lsp_clients", client_names)
 			vim.cmd("redrawstatus")
 		end)
 	end)
@@ -491,7 +503,7 @@ end
 
 --- Fetch the diagnostic information for the current file
 M.fetch_diagnostics = function()
-	states.diagnostic_debounce_timer = timer_fn(states.diagnostic_debounce_timer, 100, function()
+	timer_fn(states.diagnostic_debounce_timer, 100, function()
 		local bufnr = vim.api.nvim_get_current_buf()
 		states.cache.severity_map = {
 			["ERROR"] = { hl = "%#DiagnosticError#", icon = "  ", count = vim.diagnostic.count(bufnr)[1] or 0 },
@@ -506,7 +518,7 @@ M.fetch_diagnostics = function()
 			.. format_diagnostics("HINT")
 
 		vim.schedule(function()
-			vim.api.nvim_buf_set_var(0, 'statusline_diagnostic_info', " " .. diagnostic_str .. " ")
+			vim.api.nvim_buf_set_var(0, "statusline_diagnostic_info", " " .. diagnostic_str .. " ")
 			vim.cmd([[redrawstatus]])
 		end)
 	end)
@@ -546,7 +558,6 @@ local function format_hl_string(hl_group)
 	end
 	return "%#" .. hl_group .. "#"
 end
-
 
 --- Converts the module information to string
 ---@param modules StatusLineBuiltinModules[]|StatusLineModuleFn[] A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}

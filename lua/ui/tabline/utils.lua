@@ -347,7 +347,7 @@ local get_overflow_indicator_info = function(bufs)
 	local right_overflow_str = states.icons.right_overflow_indicator
 	local left_overflow_indicator_hl = generate_tabline_highlight(
 		"MiniIconsOrange",
-		states.BufferStates.NONE,
+		states.BufferStates.INACTIVE,
 		{ reverse = false },
 		"OverflowIndicatorInactive"
 	)
@@ -442,7 +442,6 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	states.start_idx = find_index(bufs, visible_buffers[1])
 	states.end_idx = find_index(bufs, visible_buffers[#visible_buffers])
 	states.visible_buffers = visible_buffers
-	vim.print(visible_buffers)
 end
 
 M.fetch_visible_buffers = fetch_visible_buffers
