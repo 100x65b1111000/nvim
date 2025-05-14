@@ -1,2 +1,2 @@
 vim.g.mapleader = " "
-require("imports")
+require('imports')
