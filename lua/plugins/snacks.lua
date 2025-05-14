@@ -78,7 +78,7 @@ P.opts = {
 	scroll = { enabled = false },
 	---@type snacks.statuscolumn.Config
 	statuscolumn = {
-		enabled = true,
+		enabled = false,
 		-- left = { "git" },
 		-- right = { "fold", "sign" },
 		-- folds = {
