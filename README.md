@@ -29,18 +29,22 @@ nvim
 ```
 
 # Highlights
-1. Home baked statusline ( ~500 loc ) and tabline ( ~500 loc) with minimalism and aesthetics in mind, however not much configurable.
-2. Reasonable defaults.
-3. [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management.
-4. Customized dashboard with [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
-5. [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
-6. [blink.cmp](https://github.com/Saghen/blink.cmp) for completions.
-8. [snacks.nvim](https://github.com/folke/snacks.nvim) for tasty snacks.
-9. [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
-12. lsp setup via `vim.lsp.config`.
+- Home baked statusline ( ~500 loc ) and tabline ( ~500 loc) with minimalism and aesthetics in mind, however not much configurable.
+![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
+
+
+- Reasonable defaults.
+- [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management.
+- Customized dashboard with [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
+- [tokyonight.nvim](https://github.com/folke/tokyonight.nvim) theme with tweaked colors for better visibility.
+- [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
+- [blink.cmp](https://github.com/Saghen/blink.cmp) for completions.
+- [snacks.nvim](https://github.com/folke/snacks.nvim) for tasty snacks.
+- [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
+- lsp setup via `vim.lsp.config`.
 
 There are many more plugins included by default, such as git-signs.nvim, mini.pairs, helpview.nvim, markview.nvim, showkeys.nvim, dropbar.nvim, nvim-treesitter, vim-startuptime, lazydev, conform.nvim,highlight-colors.nvim.
 
 # Things not done yet, but are planned
-> [ ] luasnip snippets. (right now it just servers the purpose to complete lsp snippets via `blink.cmp`)
-> [ ] 
+- [ ] luasnip snippets (right now it just servers the purpose of completing lsp snippets via `blink.cmp`).
+- [ ] add more keybinds.
