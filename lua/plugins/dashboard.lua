@@ -13,7 +13,7 @@ P.init = function()
 	math.randomseed(os.time())
 	g.dashboard_custom_header = dashboard_headers.neovim_4
 	local dashboard_footer_art = dashboard_footers.cat2
-	local dashboard_footer_text = " " .. dashboard_footers.lyrics[math.random(#dashboard_footers.lyrics)] .. " "
+	local dashboard_footer_text = " " .. dashboard_footers.lyrics[math.random(#dashboard_footers.lyrics)] .. "  "
 	table.insert(dashboard_footer_art, 1, dashboard_footer_text)
 	table.insert(dashboard_footer_art, 2, "")
 	table.insert(dashboard_footer_art, 1, "")

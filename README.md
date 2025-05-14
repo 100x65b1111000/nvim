@@ -5,7 +5,6 @@ This is my personal neovim config that I have developed thoughout my journey of 
 > As of right now, this config is somewhat experimental but functional as changes are undergoing onl the fly, the code is a mess rn (I'm trying my best to clean that). Any issues that I tackle, I try to fix them asap.
 > However if you try out this setup (which is greatly appreciated) and encounter any issues, I'd be more than happy to fix them up. PR's are more than welcomed.
 
-
 # SHOWCASE
 ![Dashboard](.assets/image.png)
 ![custom statusline and tabline](.assets/image-1.png)

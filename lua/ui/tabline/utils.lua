@@ -38,7 +38,7 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	elseif state == states.BufferStates.INACTIVE then
 		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "Tabline", 50, -50
 	elseif state == states.BufferStates.NONE then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 20, -50
+		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 0, -50
 	elseif state == states.BufferStates.MISC then
 		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 50, 0
 	end

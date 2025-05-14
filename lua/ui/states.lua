@@ -161,4 +161,5 @@ M.statusline_states.Modes = {
 }
 
 M.statusline_states.git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
+
 return M
