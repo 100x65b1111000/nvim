@@ -6,10 +6,10 @@ This is my personal neovim config that I have developed thoughout my journey of 
 > However if you try out this setup (which is greatly appreciated) and encounter any issues, I'd be more than happy to fix them up. PR's are more than welcomed.
 
 # SHOWCASE
+![image](https://github.com/user-attachments/assets/f13a2d7e-517c-4792-b2d9-096b52d11639)
 ![image](https://github.com/user-attachments/assets/ae4418d4-3f5a-430f-ba7a-23181e05c2e4)
 ![image](https://github.com/user-attachments/assets/e9eace77-fc08-4cfc-87c7-b115913fee6e)
 ![image](https://github.com/user-attachments/assets/3ea0ad23-76eb-4aae-b1c5-49b2f7c25b83)
-![image](https://github.com/user-attachments/assets/f13a2d7e-517c-4792-b2d9-096b52d11639)
 ![image](https://github.com/user-attachments/assets/0501a297-2e16-4fff-bc58-a6345cd72268)
 
 
