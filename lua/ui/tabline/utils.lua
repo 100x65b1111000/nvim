@@ -1,25 +1,7 @@
-local states = require("ui.tabline.states")
+local states = require("ui.states").tabline_states
+local utils = require('ui.utils')
 
 local M = {}
-
----@param timer uv.uv_timer_t|nil
----@param timeout integer
----@param callback function
-local timer_fn = function(timer, timeout, callback)
-	if timer then
-		timer:stop()
-		timer:close()
-	end
-
-	timer = vim.uv.new_timer()
-	assert(timer, "Error creating timer")
-	timer:start(timeout, 0, function()
-		vim.schedule(callback)
-	end)
-	return timer
-end
-
-M.timer_fn = timer_fn
 
 ---Checks if a buffer is valid for display in the tabline.
 ---@param bufnr integer The buffer number to check.
@@ -45,88 +27,6 @@ local function get_tabline_buffers_list(buffers)
 	return buf_list
 end
 
----Retrieves highlight information for a given highlight group.
----@param hl_name string The name of the highlight group.
----@return vim.api.keyset.get_hl_info The highlight information.
-local function get_highlight(hl_name)
-	local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = hl_name })
-	if not ok or not hl then
-		return { fg = 0xFFFFFF, bg = 0x000000 } -- Default colors
-	end
-	return hl
-end
-
----Finds the index of a value in a table.
----@param tbl integer[] The table to search.
----@param n integer The value to find.
----@return integer|nil The index of the value, or nil if not found.
-local function find_index(tbl, n)
-	for i, v in ipairs(tbl) do
-		if v == n then
-			return i
-		end
-	end
-	return 1
-end
-
----Alters a color value.
----@param c integer The color value (0-255).
----@param val integer The percentage to alter the color by.
----@return integer The altered color value.
-local function alter_color(c, val)
-	return math.min(255, math.max(0, c * (1 + val / 100)))
-end
-
----Alters the color of a hex string.
----@param hex string The hex color string (e.g., "#rrggbb").
----@param val integer The percentage to alter the color by.
----@return string The altered hex color string.
-local function alter_hex_color(hex, val)
-	hex = hex:gsub("#", "")
-	local r = tonumber(hex:sub(1, 2), 16)
-	local g = tonumber(hex:sub(3, 4), 16)
-	local b = tonumber(hex:sub(5, 6), 16)
-
-	r, g, b = alter_color(r, val), alter_color(g, val), alter_color(b, val)
-
-	return string.format("#%02x%02x%02x", r, g, b)
-end
-
----Generates a highlight group.
----@param source_fg string The source highlight group for fg.
----@param source_bg string The source highlight group for bg.
----@param opts? table Additional highlight options.
----@param brightness_bg integer Brightness value.
----@param brightness_fg integer Brightness value.
----@param prefix? string The hl_group name's prefix
----@param suffix? string The hl_group name's suffix
----@param new_name? string The new highlight group name.
----@return string The name of the generated highlight group.
-local function generate_highlight(source_fg, source_bg, opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
-	if new_name and vim.tbl_contains(states.cache.highlights) then
-		return new_name
-	end
-	opts = opts or {}
-	local source_hl_fg = get_highlight(source_fg).fg
-	local source_hl_bg = get_highlight(source_bg).bg
-	local fallback_hl = get_highlight("Normal") -- User Normal as default hlgroup as fg and bg values are defined in it
-	local fg = "#" .. string.format("%06x", source_hl_fg or fallback_hl.fg)
-	local bg = "#" .. string.format("%06x", source_hl_bg or fallback_hl.bg)
-
-	bg = alter_hex_color(bg, brightness_bg)
-	fg = alter_hex_color(fg, brightness_fg)
-	suffix = suffix or ""
-	prefix = prefix or ""
-	local hl_opts = vim.tbl_extend("force", { fg = fg, bg = bg }, opts)
-	local hl_string = new_name or prefix .. (source_fg or source_bg) .. suffix
-	if not vim.tbl_contains(states.cache.highlights, hl_string) then
-		-- vim.notify("Tabline: Generating highlight group: " .. hl_string) --debug purposes
-		vim.api.nvim_set_hl(0, hl_string, hl_opts)
-		table.insert(states.cache.highlights, hl_string)
-	end
-	return hl_string
-end
-
 --@param state integer
 local function generate_tabline_highlight(source, state, opts, new_name)
 	if vim.tbl_contains(states.cache.highlights, new_name) then
@@ -138,10 +38,11 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	elseif state == states.BufferStates.INACTIVE then
 		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "Tabline", 50, -50
 	elseif state == states.BufferStates.NONE then
+		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 20, -50
+	elseif state == states.BufferStates.MISC then
 		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 50, 0
 	end
-	states.highlight_gen_count = states.highlight_gen_count + 1
-	return generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
+	return utils.generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
 end
 
 ---Gets the buffer state.
@@ -230,7 +131,7 @@ local function get_close_button(bufnr)
 	end
 	if vim.api.nvim_get_option_value("modified", { buf = bufnr }) and bufnr == vim.api.nvim_get_current_buf() then
 		local close_btn_modified_hl =
-			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModified")
+			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModifiedActive")
 		return string.format(
 			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
 			bufnr,
@@ -240,7 +141,7 @@ local function get_close_button(bufnr)
 	end
 	if vim.api.nvim_get_option_value("modified", { buf = bufnr }) then
 		local close_btn_modified_hl =
-			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.NONE, {}, "TabLineModified")
+			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.MISC, {}, "TabLineModifiedInactive")
 		return string.format(
 			"%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X",
 			bufnr,
@@ -316,7 +217,6 @@ local function get_buffer_info(bufnr, bufs)
 	}
 end
 
-M.alter_hex_color = alter_hex_color
 M.buf_is_valid = buf_is_valid
 M.get_buffer_info = get_buffer_info
 
@@ -347,8 +247,8 @@ local get_overflow_indicator_info = function(bufs)
 	local right_overflow_str = states.icons.right_overflow_indicator
 	local left_overflow_indicator_hl = generate_tabline_highlight(
 		"MiniIconsOrange",
-		states.BufferStates.INACTIVE,
-		{ reverse = false },
+		states.BufferStates.NONE,
+		{ },
 		"OverflowIndicatorInactive"
 	)
 	local right_overflow_indicator_hl = left_overflow_indicator_hl
@@ -403,7 +303,7 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	local buf_space = calculate_buf_space(bufs)
 	local average_buf_width = math.floor(buf_space / #bufs)
 	local nbufs = math.floor(available_space / average_buf_width) -- guess the number of buffers to be displayed based on the average width
-	local current_buf_index = find_index(bufs, bufnr)
+	local current_buf_index = utils.find_index(bufs, bufnr)
 
 	local occupied_space = 0
 	local visible_buffers = {}
@@ -439,8 +339,8 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 		end
 	end
 
-	states.start_idx = find_index(bufs, visible_buffers[1])
-	states.end_idx = find_index(bufs, visible_buffers[#visible_buffers])
+	states.start_idx = utils.find_index(bufs, visible_buffers[1])
+	states.end_idx = utils.find_index(bufs, visible_buffers[#visible_buffers])
 	states.visible_buffers = visible_buffers
 end
 
@@ -462,7 +362,7 @@ local function get_buffer_highlight(bufnr) -- changed from get_buf_hl
 end
 
 _G.tabline_close_button_callback = function(bufnr)
-	timer_fn(states.close_button_click_timer, 50, function()
+	utils.timer_fn(states.close_button_click_timer, 50, function()
 		if not buf_is_valid(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
 			return
 		end
@@ -511,7 +411,7 @@ end
 
 ---Updates the global tabline buffer string.
 local function update_tabline_buffer_string()
-	timer_fn(states.tabline_update_debounce_timer, 50, function()
+	utils.timer_fn(states.tabline_update_debounce_timer, 50, function()
 		local str = ""
 		local bufs = states.buffers_list
 		for _, bufnr in ipairs(states.visible_buffers) do
@@ -535,10 +435,9 @@ M.get_tabline_buffers_list = get_tabline_buffers_list
 M.update_tabline_buffer_string = update_tabline_buffer_string
 M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
-M.find_index = find_index
 
 M.update_tabline_buffer_info = function()
-	timer_fn(states.tabline_debounce_timer, 50, function()
+	utils.timer_fn(states.tabline_debounce_timer, 50, function()
 		states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 		local bufnr = vim.api.nvim_get_current_buf()

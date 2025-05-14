@@ -1,94 +1,14 @@
-local states = require("ui.statusline.states")
+local states = require("ui.states").statusline_states
+local utils = require('ui.utils')
 
 local M = {}
-
----Retrieves highlight information for a given highlight group.
----@param hl_name string The name of the highlight group.
----@return vim.api.keyset.get_hl_info The highlight information.
-local function get_highlight(hl_name)
-	local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = hl_name })
-	if not ok or not hl then
-		return { fg = 0xFFFFFF, bg = 0x000000 } -- Default colors
-	end
-	return hl
-end
-
----Alters a color value.
----@param c integer The color value (0-255).
----@param val integer The percentage to alter the color by.
----@return integer The altered color value.
-local function alter_color(c, val)
-	return math.min(255, math.max(0, c * (1 + val / 100)))
-end
-
----Alters the color of a hex string.
----@param hex string The hex color string (e.g., "#rrggbb").
----@param val integer The percentage to alter the color by.
----@return string The altered hex color string.
-local function alter_hex_color(hex, val)
-	hex = hex:gsub("#", "")
-	local r = tonumber(hex:sub(1, 2), 16)
-	local g = tonumber(hex:sub(3, 4), 16)
-	local b = tonumber(hex:sub(5, 6), 16)
-
-	r, g, b = alter_color(r, val), alter_color(g, val), alter_color(b, val)
-
-	return string.format("#%02x%02x%02x", r, g, b)
-end
-
----Generates a highlight group.
----@param source_fg string The source highlight group for fg.
----@param source_bg string The source highlight group for bg.
----@param opts? table Additional highlight options.
----@param brightness_bg integer Brightness value.
----@param brightness_fg integer Brightness value.
----@param prefix? string The hl_group name's prefix
----@param suffix? string The hl_group name's suffix
----@param new_name? string The new highlight group name.
----@param extra_opts? {use_fg_for_bg: boolean, use_bg_for_fg: boolean} Extra opts for misc purposes
----@return string The name of the generated highlight group.
-local function generate_highlight(
-	source_fg,
-	source_bg,
-	opts,
-	brightness_bg,
-	brightness_fg,
-	prefix,
-	suffix,
-	new_name,
-	extra_opts
-)
-	if new_name and vim.tbl_contains(states.cache.highlights, new_name) then
-		return new_name
-	end
-	opts = opts or {}
-	local source_hl_fg = (extra_opts and extra_opts.use_bg_for_fg and get_highlight(source_fg).bg)
-		or get_highlight(source_fg).fg
-	local source_hl_bg = (extra_opts and extra_opts.use_fg_for_bg and get_highlight(source_bg).fg)
-		or get_highlight(source_bg).bg
-	local fallback_hl = get_highlight("Normal") -- User Normal as default hlgroup if get_highlight return nil
-	local fg = "#" .. string.format("%06x", source_hl_fg or fallback_hl.fg)
-	local bg = "#" .. string.format("%06x", source_hl_bg or fallback_hl.bg)
-
-	bg = alter_hex_color(bg, brightness_bg)
-	fg = alter_hex_color(fg, brightness_fg)
-	suffix = suffix or ""
-	prefix = prefix or ""
-	local hl_opts = vim.tbl_extend("force", { fg = fg, bg = bg }, opts)
-	local hl_group = new_name or prefix .. (source_fg or source_bg) .. suffix
-	if not vim.tbl_contains(states.cache.highlights, hl_group) then
-		vim.api.nvim_set_hl(0, hl_group, hl_opts)
-		table.insert(states.cache.highlights, hl_group)
-	end
-	return hl_group
-end
 
 --- Display readonly and modified status of the current file
 ---@return StatusLineModuleFnTable
 function M.buf_status()
 	local mo_string = vim.api.nvim_get_option_value("modified", { buf = 0 }) and "%m " or ""
 	local ro_string = vim.api.nvim_get_option_value("readonly", { buf = 0 }) and " %r " or " "
-	local hl = generate_highlight(
+	local hl = utils.generate_highlight(
 		"MiniIconsOrange",
 		"StatusLineNormalMode",
 		{},
@@ -125,7 +45,7 @@ M.buf_is_file = buf_is_file
 --- Display the filename
 ---@return StatusLineModuleFnTable
 function M.statusline_bufinfo()
-	local buf_hl = generate_highlight(
+	local buf_hl = utils.generate_highlight(
 		"StatusLine",
 		"StatusLineNormalMode",
 		{},
@@ -144,6 +64,7 @@ end
 ---@return string?
 local find_parent = function(path)
 	local git_parent = vim.fs.find({ ".git" }, { path = path, upward = true, stop = vim.env.HOME })[1]
+	vim.fn.finddir('.git', "/home/dex/.config/nvim/lua/ui/statusline/utils.lua")
 	if git_parent then
 		return vim.fn.fnamemodify(git_parent, ":h")
 	end
@@ -154,7 +75,7 @@ end
 ---@return string
 local insertions = function(ins)
 	if ins and ins ~= "0" and ins ~= "" then
-		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
+		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
 	end
 	return ""
 end
@@ -163,7 +84,7 @@ end
 ---@return string
 local deletions = function(del)
 	if del and del ~= "0" and del ~= "" then
-		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
+		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
 	end
 	return ""
 end
@@ -260,9 +181,9 @@ M.statusline_git_file_status = function()
 	local file_status = stat_output:match("[^%s]+")
 
 	if not file_status then
-		git_status = "%#StatusLineGitUptodate# " .. git_status
+		git_status = "%#StatusLineGitUptodate# " .. git_status
 	elseif file_status == "??" then
-		git_status = "%#StatusLineGitUnstaged#" .. git_status
+		git_status = "%#StatusLineGitUnstaged# " .. git_status
 	end
 
 	return { hl_group = "", string = git_status }
@@ -314,7 +235,7 @@ M.statusline_filetype_info = function()
 	if not package.loaded["mini.icons"] then
 		return {
 			string = filetype,
-			hl_group = generate_highlight(
+			hl_group = utils.generate_highlight(
 				"StatusLine",
 				"StatusLineNormalMode",
 				{},
@@ -331,7 +252,7 @@ M.statusline_filetype_info = function()
 	end
 	if states.cache.filetype_icons[filetype_] then
 		local icon_hl = states.cache.filetype_icons[filetype_].icon_hl
-			or generate_highlight(
+			or utils.generate_highlight(
 				"statuslineinsertmode",
 				"statuslinenormalmode",
 				{},
@@ -345,7 +266,7 @@ M.statusline_filetype_info = function()
 		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
 		return {
 			string = filetype,
-			hl_group = generate_highlight(
+			hl_group = utils.generate_highlight(
 				"StatusLine",
 				"StatusLineNormalMode",
 				{},
@@ -362,7 +283,7 @@ M.statusline_filetype_info = function()
 	end
 	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
 	icon = " " .. icon .. " "
-	icon_hl = generate_highlight(
+	icon_hl = utils.generate_highlight(
 		icon_hl,
 		"StatusLineNormalMode",
 		{},
@@ -403,7 +324,7 @@ end
 ---@return StatusLineModuleFnTable
 M.statusline_ts_info = function()
 	local ts_info = vim.treesitter.highlighter.active[vim.api.nvim_get_current_buf()]
-	local hl_group = generate_highlight(
+	local hl_group = utils.generate_highlight(
 		"MiniIconsGreen",
 		"StatusLineNormalMode",
 		{ reverse = false },
@@ -415,7 +336,7 @@ M.statusline_ts_info = function()
 		{ use_fg_for_bg = true }
 	)
 	if not ts_info then
-		hl_group = generate_highlight(
+		hl_group = utils.generate_highlight(
 			"Comment",
 			"StatusLineNormalMode",
 			{ reverse = false },

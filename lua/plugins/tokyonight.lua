@@ -378,17 +378,17 @@ P.opts = {
 			fg = c.fg_dark,
 			bg = c.bg,
 		}
-		hl.TabLineActiveDot = {
-			fg = c.orange,
-			bg = c.bg_highlight
+		hl.OerflowIndicatorRightActive = {
+			fg = c.bg,
+			bg = c.orange
 		}
-		hl.TabLineCloseButtonInactive = {
-			fg = c.yellow,
-			bg = c.bg
+		hl.OerflowIndicatorInactive = {
+			fg = c.bg,
+			bg = c.orange
 		}
-		hl.TabLineCloseButtonActive = {
-			fg = c.red,
-			bg = c.bg_highlight
+		hl.OerflowIndicatorLeftActive = {
+			fg = c.bg,
+			bg = c.orange
 		}
 		hl.MiniFilesTitle = {
 			fg = c.blue,

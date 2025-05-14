@@ -1,5 +1,57 @@
 local M = {}
 
+M.cache = { highlights = {}}
+
+-- *** Tabline Cache ***
+M.tabline_states = {}
+M.tabline_states.BufferStates = {
+	ACTIVE = 1,
+	INACTIVE = 2,
+	NONE = 3,
+}
+
+M.tabline_states.tabline_buf_str_max_width = 18
+
+M.tabline_states.cache = {
+	tabline_buf_string = "",
+	highlights = M.cache.highlights,
+	fileicons = {},
+	last_visible_buffers = {},
+	close_button_string = "",
+}
+
+M.tabline_states.init_files = {
+	"init.lua",
+}
+
+---@class Icons
+M.tabline_states.icons = {
+	active_dot = "  ",
+	close = "  ",
+	separator = "▎",
+	left_overflow_indicator = "  ",
+	right_overflow_indicator = "  ",
+}
+
+M.tabline_states.end_idx = 1
+M.tabline_states.start_idx = 1
+M.tabline_states.diff = 0
+M.tabline_states.offset = 0
+---@type integer[]
+M.tabline_states.visible_buffers = {}
+
+M.tabline_states.left_overflow_idicator_length = 0
+M.tabline_states.right_overflow_idicator_length = 0
+
+M.tabline_states.buffer_map = {}
+M.tabline_states.buffer_count = 0
+M.tabline_states.buffers_list = {}
+M.tabline_states.buffers_spec = {}
+M.tabline_states.highlight_gen_count = 0
+M.tabline_states.available_width = vim.o.columns
+
+
+M.statusline_states = {}
 ---@class StatusLineDefaultConfig
 ---@field modules StatusLineModulesConfig | nil
 
@@ -14,7 +66,7 @@ local M = {}
 ---@field right StatusLineBuiltinModules[]|nil
 
 ---@type StatusLineDefaultConfig
-M.default_config = {
+M.statusline_states.default_config = {
 	modules = {
 		left = {
 			"mode",
@@ -38,10 +90,10 @@ M.default_config = {
 }
 
 ---@type StatusLineConfig
-M.current_config = {}
+M.statusline_states.current_config = {}
 
-M.cache = {
-	highlights = {},
+M.statusline_states.cache = {
+	highlights = M.cache.highlights,
 	statusline_string = nil,
 	mode_string = nil,
 	buf_status = nil,
@@ -58,7 +110,7 @@ M.cache = {
 		["prompt"] = { icon = " 󰘎 " },
 		["nofile"] = { icon = " 󱀶 " },
 		["minifiles"] = { icon = " 󰙅 " },
-	}
+	},
 }
 ---@return StatusLineModuleFnTable
 local fallback_fn = function()
@@ -66,7 +118,7 @@ local fallback_fn = function()
 end
 
 ---@type StatusLineModuleFn[]
-M.modules_map = {
+M.statusline_states.modules_map = {
 	["mode"] = fallback_fn,
 	["buf-status"] = fallback_fn,
 	["bufinfo"] = fallback_fn,
@@ -77,10 +129,10 @@ M.modules_map = {
 	["lsp-info"] = fallback_fn,
 	["cursor-pos"] = fallback_fn,
 	["scroll-pos"] = fallback_fn,
-	["filetype"] = fallback_fn
+	["filetype"] = fallback_fn,
 }
 
-M.Modes = {
+M.statusline_states.Modes = {
 	["n"] = { name = "  NORMAL ", hl = "StatusLineNormalMode" },
 	["no"] = { name = "  OPERATOR ", hl = "StatusLineMode" },
 	["v"] = { name = "  VISUAL ", hl = "StatusLineVisualMode" },
@@ -108,6 +160,5 @@ M.Modes = {
 	["ntT"] = { name = "  TERMINAL ", hl = "StatusLineTerminalMode" },
 }
 
-M.git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
-
+M.statusline_states.git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
 return M
