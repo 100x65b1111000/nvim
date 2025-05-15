@@ -218,9 +218,9 @@ end
 M.statusline_root_dir = function()
 	local parent = vim.fn.fnamemodify(find_parent(vim.fn.expand("%:p")) or "", ":~")
 	if parent then
-		return { hl_group = "StatusLine", string = parent .. " ", icon_hl = "StatusLineCwdIcon", icon = "  " }
+		return { hl_group = "StatusLine", string = "%-05.35(" .. parent .. "%) ", icon_hl = "StatusLineCwdIcon", icon = "  " }
 	end
-	return { hl_group = "StatusLine", string = vim.uv.cwd() .. " ", icon_hl = "StatusLineCwdIcon", icon = "  " }
+	return { hl_group = "StatusLine", string = "%-05.35(" .. vim.uv.cwd() .. "%) ", icon_hl = "StatusLineCwdIcon", icon = "  " }
 end
 
 --- Display the filetype information about the buffers

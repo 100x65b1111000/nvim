@@ -78,9 +78,9 @@ P.opts = {
 	scroll = { enabled = false },
 	---@type snacks.statuscolumn.Config
 	statuscolumn = {
-		enabled = true,
-		left = { "sign", "mark" },
-		right = { "fold", "git" },
+		enabled = false,
+		left = { "git" },
+		right = { "fold", "sign" },
 		folds = {
 			open = true, -- show open fold icons
 			git_hl = true, -- use Git Signs hl for fold icons

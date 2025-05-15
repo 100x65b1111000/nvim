@@ -1,11 +1,11 @@
 local M = {}
 
 local test2 = function()
-	local var = vim.api.nvim_strwidth("this is a text")
+	local var = vim.fn.line("$")
 end
 
 local test1 = function()
-	local var = vim.fn.strwidth("this is a text")
+	local var = vim.api.nvim_buf_line_count(0)
 end
 
 M.test = function(fn, iterations)

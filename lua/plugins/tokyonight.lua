@@ -408,6 +408,10 @@ P.opts = {
 			fg = c.orange,
 			bg = c.bg_float
 		}
+		hl.FoldedSign = {
+			fg = c.blue,
+			bg = c.none
+		}
 	end,
 }
 
