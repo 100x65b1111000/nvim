@@ -218,9 +218,9 @@ end
 M.statusline_root_dir = function()
 	local parent = vim.fn.fnamemodify(find_parent(vim.fn.expand("%:p")) or "", ":~")
 	if parent then
-		return { hl_group = "StatusLine", string = "%-05.35(" .. parent .. "%) ", icon_hl = "StatusLineCwdIcon", icon = "  " }
+		return { hl_group = "StatusLine", string = parent, icon_hl = "StatusLineCwdIcon", icon = "  " }
 	end
-	return { hl_group = "StatusLine", string = "%-05.35(" .. vim.uv.cwd() .. "%) ", icon_hl = "StatusLineCwdIcon", icon = "  " }
+	return { hl_group = "StatusLine", string = vim.uv.cwd(), icon_hl = "StatusLineCwdIcon", icon = "  " }
 end
 
 --- Display the filetype information about the buffers
@@ -314,7 +314,7 @@ M.statusline_git_branch = function()
 	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1)")
 	return {
 		hl_group = "StatusLine",
-		string = "%-06.20(" .. git_branch .. "%) ",
+		string = git_branch,
 		icon_hl = "StatusLineGitBranchIcon",
 		icon = "  ",
 	}
