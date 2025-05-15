@@ -197,12 +197,12 @@ local function get_buffer_info(bufnr, bufs)
 	icon_hl = generate_tabline_highlight(icon_hl, state, {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
 	buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
-	local length = vim.fn.strwidth(buf_name)
-		+ vim.fn.strwidth(icon)
-		+ vim.fn.strwidth(left_padding)
-		+ vim.fn.strwidth(right_padding)
-		+ vim.fn.strwidth(states.icons.close)
-		+ vim.fn.strwidth(states.icons.separator)
+	local length = vim.api.nvim_strwidth(buf_name)
+		+ vim.api.nvim_strwidth(icon)
+		+ vim.api.nvim_strwidth(left_padding)
+		+ vim.api.nvim_strwidth(right_padding)
+		+ vim.api.nvim_strwidth(states.icons.close)
+		+ vim.api.nvim_strwidth(states.icons.separator)
 	local close_btn = get_close_button(bufnr)
 	return {
 		buf_name = buf_name,
@@ -295,10 +295,11 @@ M.calculate_buf_range = calculate_buf_range
 M.calculate_buf_space = calculate_buf_space
 
 local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
-	local available_space = vim.o.columns
+	local columns = vim.api.nvim_get_option_value("columns", {})
+	local available_space = columns
 		- (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
 	vim.schedule(function()
-		available_space = vim.o.columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
+		available_space = columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
 	end)
 	local buf_space = calculate_buf_space(bufs)
 	local average_buf_width = math.floor(buf_space / #bufs)

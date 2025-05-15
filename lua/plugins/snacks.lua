@@ -78,18 +78,18 @@ P.opts = {
 	scroll = { enabled = false },
 	---@type snacks.statuscolumn.Config
 	statuscolumn = {
-		enabled = false,
-		-- left = { "git" },
-		-- right = { "fold", "sign" },
-		-- folds = {
-		-- 	open = true, -- show open fold icons
-		-- 	git_hl = true, -- use Git Signs hl for fold icons
-		-- },
-		-- git = {
-		-- 	-- patterns to match Git signs
-		-- 	patterns = { "GitSign" },
-		-- },
-		-- refresh = 100, -- refresh at most every 50ms
+		enabled = true,
+		left = { "sign", "mark" },
+		right = { "fold", "git" },
+		folds = {
+			open = true, -- show open fold icons
+			git_hl = true, -- use Git Signs hl for fold icons
+		},
+		git = {
+			-- patterns to match Git signs
+			patterns = { "GitSign" },
+		},
+		refresh = 100, -- refresh at most every 50ms
 	},
 	words = { enabled = false },
 }
