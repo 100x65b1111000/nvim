@@ -314,7 +314,7 @@ M.statusline_git_branch = function()
 	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1)")
 	return {
 		hl_group = "StatusLine",
-		string = "%-06.10(" .. git_branch .. "%) ",
+		string = "%-06.20(" .. git_branch .. "%) ",
 		icon_hl = "StatusLineGitBranchIcon",
 		icon = "  ",
 	}
