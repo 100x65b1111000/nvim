@@ -1,6 +1,6 @@
 local statusline_fetchers = vim.api.nvim_create_augroup("StatusLineFetchers", { clear = true })
 
-vim.api.nvim_create_autocmd({ "FocusLost", "BufReadPost", "BufWritePost", "FocusGained", "InsertLeave" }, {
+vim.api.nvim_create_autocmd({ "FocusLost", "BufReadPost", "BufWritePost", "FocusGained", "InsertLeave", "CmdlineLeave" }, {
 	group = statusline_fetchers,
 	callback = function()
 		local utils = require("ui.statusline.utils")
