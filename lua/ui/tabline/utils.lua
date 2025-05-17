@@ -1,5 +1,24 @@
 local states = require("ui.states").tabline_states
-local utils = require('ui.utils')
+local utils = require("ui.utils")
+
+local api = vim.api
+local nvim_buf_is_loaded = api.nvim_buf_is_loaded
+local nvim_buf_is_valid = api.nvim_buf_is_valid
+local nvim_buf_get_name = api.nvim_buf_get_name
+local nvim_get_option_value = api.nvim_get_option_value
+local nvim_list_bufs = api.nvim_list_bufs
+local nvim_strwidth = api.nvim_strwidth
+local nvim_eval_statusline = api.nvim_eval_statusline
+local nvim_get_current_buf = api.nvim_get_current_buf
+local nvim_buf_delete = api.nvim_buf_delete
+local nvim_get_mode = api.nvim_get_mode
+local timer_fn = utils.timer_fn
+local generate_highlight = utils.generate_highlight
+local find_index = utils.find_index
+local isdirectory = vim.fn.isdirectory
+local fnamemodify = vim.fn.fnamemodify
+local schedule = vim.schedule
+local tbl_contains = vim.tbl_contains
 
 local M = {}
 
@@ -7,11 +26,11 @@ local M = {}
 ---@param bufnr integer The buffer number to check.
 ---@return boolean True if the buffer is valid, false otherwise.
 local function buf_is_valid(bufnr)
-	return vim.api.nvim_buf_is_loaded(bufnr)
-		and vim.api.nvim_buf_is_valid(bufnr)
-		and vim.api.nvim_buf_get_name(bufnr) ~= ""
-		and (vim.api.nvim_get_option_value("buftype", { buf = bufnr }) == "")
-		and vim.fn.isdirectory(vim.api.nvim_buf_get_name(bufnr)) == 0
+	return nvim_buf_is_loaded(bufnr)
+		and nvim_buf_is_valid(bufnr)
+		and nvim_buf_get_name(bufnr) ~= ""
+		and (nvim_get_option_value("buftype", { buf = bufnr }) == "")
+		and isdirectory(nvim_buf_get_name(bufnr)) == 0
 end
 
 ---Filters a list of buffer numbers, returning only the valid ones.
@@ -29,7 +48,7 @@ end
 
 --@param state integer
 local function generate_tabline_highlight(source, state, opts, new_name)
-	if vim.tbl_contains(states.cache.highlights, new_name) then
+	if states.cache.highlights[new_name] then
 		return new_name
 	end
 	local suffix, prefix, brightness_bg, brightness_fg = nil, nil, 0, 0
@@ -42,16 +61,16 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	elseif state == states.BufferStates.MISC then
 		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 50, 0
 	end
-	return utils.generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
+	return generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
 end
 
 ---Gets the buffer state.
 ---@param bufnr integer The buffer number.
 ---@return integer
 local function get_buffer_state(bufnr, bufs)
-	if bufnr == vim.api.nvim_get_current_buf() then
+	if bufnr == nvim_get_current_buf() then
 		return states.BufferStates.ACTIVE
-	elseif vim.tbl_contains(bufs, bufnr) then
+	elseif tbl_contains(bufs, bufnr) then
 		return states.BufferStates.INACTIVE
 	end
 	return states.BufferStates.NONE
@@ -61,11 +80,11 @@ end
 ---@param bufnr integer The buffer number.
 ---@return string The processed buffer name.
 local function process_buffer_name(bufnr)
-	local buf = vim.api.nvim_buf_get_name(bufnr)
-	local bufname = vim.fn.fnamemodify(buf, ":t")
+	local buf = nvim_buf_get_name(bufnr)
+	local bufname = fnamemodify(buf, ":t")
 	local init_files = states.init_files or { "init.lua" }
 	if vim.list_contains(init_files, bufname) then
-		bufname = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(bufnr), ":h:t") .. "/" .. bufname
+		bufname = fnamemodify(nvim_buf_get_name(bufnr), ":h:t") .. "/" .. bufname
 	end
 	return bufname
 end
@@ -100,7 +119,7 @@ local function get_lr_padding(buf_string)
 end
 
 local get_file_icon = function(bufnr)
-	local filetype = vim.api.nvim_buf_get_name(bufnr)
+	local filetype = nvim_buf_get_name(bufnr)
 	local icon, hl = "", ""
 	if not package.loaded["mini.icons"] then
 		icon, hl = "", "TabLineFill"
@@ -119,7 +138,7 @@ local function get_close_button(bufnr)
 	local close_btn_inactive_hl =
 		generate_tabline_highlight("MiniIconsRed", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
 
-	if vim.api.nvim_get_mode().mode == "i" and bufnr == vim.api.nvim_get_current_buf() then
+	if nvim_get_mode().mode == "i" and bufnr == nvim_get_current_buf() then
 		local close_btn_insert_mode_hl =
 			generate_tabline_highlight("MiniIconsGreen", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
 		return string.format(
@@ -129,7 +148,7 @@ local function get_close_button(bufnr)
 			states.icons.active_dot
 		)
 	end
-	if vim.api.nvim_get_option_value("modified", { buf = bufnr }) and bufnr == vim.api.nvim_get_current_buf() then
+	if nvim_get_option_value("modified", { buf = bufnr }) and bufnr == nvim_get_current_buf() then
 		local close_btn_modified_hl =
 			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModifiedActive")
 		return string.format(
@@ -139,7 +158,7 @@ local function get_close_button(bufnr)
 			states.icons.active_dot
 		)
 	end
-	if vim.api.nvim_get_option_value("modified", { buf = bufnr }) then
+	if nvim_get_option_value("modified", { buf = bufnr }) then
 		local close_btn_modified_hl =
 			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.MISC, {}, "TabLineModifiedInactive")
 		return string.format(
@@ -149,7 +168,7 @@ local function get_close_button(bufnr)
 			states.icons.active_dot
 		)
 	end
-	if bufnr == vim.api.nvim_get_current_buf() then
+	if bufnr == nvim_get_current_buf() then
 		local close_btn_active_hl =
 			generate_tabline_highlight("MiniIconsRed", states.BufferStates.ACTIVE, {}, "TabLineCloseButtonActive")
 		return string.format(
@@ -179,7 +198,7 @@ end
 -- end
 
 _G.tabline_click_buffer_callback = function(bufnr)
-	if not buf_is_valid(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
+	if not buf_is_valid(bufnr) and nvim_get_option_value("buflisted", { buf = bufnr }) then
 		return
 	end
 
@@ -197,12 +216,12 @@ local function get_buffer_info(bufnr, bufs)
 	icon_hl = generate_tabline_highlight(icon_hl, state, {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
 	buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
-	local length = vim.api.nvim_strwidth(buf_name)
-		+ vim.api.nvim_strwidth(icon)
-		+ vim.api.nvim_strwidth(left_padding)
-		+ vim.api.nvim_strwidth(right_padding)
-		+ vim.api.nvim_strwidth(states.icons.close)
-		+ vim.api.nvim_strwidth(states.icons.separator)
+	local length = nvim_strwidth(buf_name)
+		+ nvim_strwidth(icon)
+		+ nvim_strwidth(left_padding)
+		+ nvim_strwidth(right_padding)
+		+ nvim_strwidth(states.icons.close)
+		+ nvim_strwidth(states.icons.separator)
 	local close_btn = get_close_button(bufnr)
 	return {
 		buf_name = buf_name,
@@ -245,12 +264,8 @@ local get_overflow_indicator_info = function(bufs)
 	local right_dist = #bufs - states.end_idx
 	local left_overflow_str = states.icons.left_overflow_indicator
 	local right_overflow_str = states.icons.right_overflow_indicator
-	local left_overflow_indicator_hl = generate_tabline_highlight(
-		"MiniIconsOrange",
-		states.BufferStates.NONE,
-		{ },
-		"OverflowIndicatorInactive"
-	)
+	local left_overflow_indicator_hl =
+		generate_tabline_highlight("MiniIconsOrange", states.BufferStates.NONE, {}, "OverflowIndicatorInactive")
 	local right_overflow_indicator_hl = left_overflow_indicator_hl
 	if left_dist > 0 then
 		left_overflow_indicator_hl = generate_tabline_highlight(
@@ -270,44 +285,21 @@ local get_overflow_indicator_info = function(bufs)
 	end
 	left_overflow_str = string.format("%%#%s#%s%%#TabLineFill# ", left_overflow_indicator_hl, left_overflow_str)
 	right_overflow_str = string.format(" %%#%s#%s", right_overflow_indicator_hl, right_overflow_str)
-	states.left_overflow_idicator_length = vim.api.nvim_eval_statusline(left_overflow_str, { use_tabline = true }).width
+	states.left_overflow_idicator_length = nvim_eval_statusline(left_overflow_str, { use_tabline = true }).width
 	states.right_overflow_idicator_length =
-		vim.api.nvim_eval_statusline(right_overflow_str, { use_tabline = true }).width
+		nvim_eval_statusline(right_overflow_str, { use_tabline = true }).width
 	return {
 		left_overflow_str = left_overflow_str,
 		right_overflow_str = right_overflow_str,
 	}
 end
 
-local calculate_buf_range = function(bufs, current_buf_index, nbufs)
-	states.diff = #bufs - current_buf_index
-	states.offset = math.floor(nbufs / 2)
-	if states.diff >= states.offset then
-		states.start_idx = math.max(1, current_buf_index - states.offset)
-		states.end_idx = math.min(#bufs, states.start_idx + nbufs)
-	else
-		states.end_idx = current_buf_index + states.diff
-		states.start_idx = math.max(1, states.end_idx - nbufs + 1)
-	end
-end
-
-M.calculate_buf_range = calculate_buf_range
 M.calculate_buf_space = calculate_buf_space
 
 local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
-	local columns = vim.api.nvim_get_option_value("columns", {})
-	local available_space = columns
-		- (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
-	vim.schedule(function()
-		available_space = columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
-	end)
+	local columns = nvim_get_option_value("columns", {})
+	local available_space = columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
 	local buf_space = calculate_buf_space(bufs)
-	local average_buf_width = math.floor(buf_space / #bufs)
-	local nbufs = math.floor(available_space / average_buf_width) -- guess the number of buffers to be displayed based on the average width
-	local current_buf_index = utils.find_index(bufs, bufnr)
-
-	local occupied_space = 0
-	local visible_buffers = {}
 	states.start_idx = 1
 	states.end_idx = #bufs
 	states.visible_buffers = bufs
@@ -316,32 +308,39 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 		return
 	end
 
-	local right_offset = #bufs - current_buf_index
-	local left_offset = math.floor(nbufs / 2)
-	local initial_idx = #bufs
+	local current_buf_index = find_index(bufs, bufnr)
+	local visible_buffers = { bufnr }
+	local occupied_space = buf_specs[bufnr].length
+	local left = current_buf_index - 1
+	local right = current_buf_index + 1
+	local left_space = 0
+	local right_space = 0
+	while occupied_space <= available_space do
+		local left_buf = bufs[left]
+		local right_buf = bufs[right]
+		local left_len = left_buf and buf_specs[left_buf].length or nil
+		local right_len = right_buf and buf_specs[right_buf].length or nil
 
-	if right_offset >= left_offset then
-		initial_idx = math.max(1, current_buf_index - left_offset)
-		while occupied_space + buf_specs[bufs[initial_idx]].length <= available_space do
-			local buf = bufs[initial_idx]
-			local info = buf_specs[buf]
-			occupied_space = occupied_space + info.length
-			table.insert(visible_buffers, buf)
-			initial_idx = math.min(#bufs, initial_idx + 1)
-		end
-	else
-		initial_idx = math.min(#bufs, current_buf_index + right_offset)
-		while occupied_space + buf_specs[bufs[initial_idx]].length <= available_space do
-			local buf = bufs[initial_idx]
-			local info = buf_specs[buf]
-			occupied_space = occupied_space + info.length
-			table.insert(visible_buffers, 1, buf)
-			initial_idx = math.max(1, initial_idx - 1)
+		local can_add_left = left_len and (occupied_space + left_len <= available_space)
+		local can_add_right = right_len and (occupied_space + right_len <= available_space)
+
+		if can_add_left and (not can_add_right or left_space <= right_space) then
+			table.insert(visible_buffers, 1, left_buf)
+			left_space = left_space + left_len
+			occupied_space = occupied_space + left_len
+			left = left - 1
+		elseif can_add_right then
+			table.insert(visible_buffers, right_buf)
+			occupied_space = occupied_space + right_len
+			right_space = right_space + right_len
+			right = right + 1
+		else
+			break
 		end
 	end
 
-	states.start_idx = utils.find_index(bufs, visible_buffers[1])
-	states.end_idx = utils.find_index(bufs, visible_buffers[#visible_buffers])
+	states.start_idx = find_index(bufs, visible_buffers[1])
+	states.end_idx = find_index(bufs, visible_buffers[#visible_buffers])
 	states.visible_buffers = visible_buffers
 end
 
@@ -351,7 +350,7 @@ M.fetch_visible_buffers = fetch_visible_buffers
 ---@param bufnr integer The buffer number.
 ---@return string The highlight group name.
 local function get_buffer_highlight(bufnr) -- changed from get_buf_hl
-	if vim.api.nvim_get_current_buf() == bufnr then
+	if nvim_get_current_buf() == bufnr then
 		return generate_tabline_highlight(
 			"TabLineFill",
 			states.BufferStates.ACTIVE,
@@ -363,24 +362,24 @@ local function get_buffer_highlight(bufnr) -- changed from get_buf_hl
 end
 
 _G.tabline_close_button_callback = function(bufnr)
-	utils.timer_fn(states.close_button_click_timer, 50, function()
-		if not buf_is_valid(bufnr) and vim.api.nvim_get_option_value("buflisted", { buf = bufnr }) then
+	states.close_button_click_timer = timer_fn(states.close_button_click_timer, 50, function()
+		if not buf_is_valid(bufnr) and nvim_get_option_value("buflisted", { buf = bufnr }) then
 			return
 		end
-		if vim.api.nvim_get_option_value("modified", { buf = bufnr }) then
+		if nvim_get_option_value("modified", { buf = bufnr }) then
 			local choice =
 				vim.fn.confirm("This buffer's been modified!! Wanna save first before closing?", "&Yes\n&No", 2)
 			if choice == 1 then
 				vim.cmd([[ silent! w ]])
 			end
 		end
-		vim.schedule(function()
-			vim.api.nvim_buf_delete(bufnr, { force = true })
-			states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
+		schedule(function()
+			nvim_buf_delete(bufnr, { force = true })
+			states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
 			states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 			local bufs = states.buffers_list
 			local buf_specs = states.buffers_spec
-			fetch_visible_buffers(vim.api.nvim_get_current_buf(), bufs, buf_specs)
+			fetch_visible_buffers(nvim_get_current_buf(), bufs, buf_specs)
 		end)
 	end)
 end
@@ -412,7 +411,7 @@ end
 
 ---Updates the global tabline buffer string.
 local function update_tabline_buffer_string()
-	utils.timer_fn(states.tabline_update_debounce_timer, 50, function()
+	states.tabline_update_debounce_timer2 = timer_fn(states.tabline_update_debounce_timer2, 50, function()
 		local str = ""
 		local bufs = states.buffers_list
 		for _, bufnr in ipairs(states.visible_buffers) do
@@ -438,10 +437,13 @@ M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
 
 M.update_tabline_buffer_info = function()
-	utils.timer_fn(states.tabline_debounce_timer, 50, function()
-		states.buffers_list = get_tabline_buffers_list(vim.api.nvim_list_bufs())
+	states.tabline_update_debounce_timer1 = timer_fn(states.tabline_update_debounce_timer1, 50, function()
+		local bufnr = nvim_get_current_buf()
+		if not buf_is_valid(bufnr) then
+			return
+		end
+		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
-		local bufnr = vim.api.nvim_get_current_buf()
 		local bufs = states.buffers_list
 		local buf_specs = states.buffers_spec
 		states.buffer_count = states.buffer_count + 1

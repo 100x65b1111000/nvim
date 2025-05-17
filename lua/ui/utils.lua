@@ -70,7 +70,7 @@ M.generate_highlight = function(
 	new_name,
 	extra_opts
 )
-	if new_name and vim.tbl_contains(states.cache.highlights, new_name) then
+	if new_name and states.cache.highlights[new_name] then
 		return new_name
 	end
 	opts = opts or {}
@@ -88,9 +88,9 @@ M.generate_highlight = function(
 	prefix = prefix or ""
 	local hl_opts = vim.tbl_extend("force", { fg = fg, bg = bg }, opts)
 	local hl_group = new_name or prefix .. (source_fg or source_bg) .. suffix
-	if not vim.tbl_contains(states.cache.highlights, hl_group) then
+	if not states.cache.highlights[hl_group] then
 		vim.api.nvim_set_hl(0, hl_group, hl_opts)
-		table.insert(states.cache.highlights, hl_group)
+		states.cache.highlights[hl_group] = true
 	end
 	return hl_group
 end

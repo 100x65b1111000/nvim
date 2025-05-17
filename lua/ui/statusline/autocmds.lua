@@ -45,7 +45,10 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 	callback = function()
 		local utils = require("ui.statusline.utils")
 		if utils.buf_is_file() then
-			utils.fetch_diagnostics()
+			vim.schedule(function()
+				utils.fetch_diagnostics()
+				vim.cmd("redrawstatus")
+			end)
 		end
 	end,
 })

@@ -46,5 +46,5 @@ nvim
 There are many more plugins included by default, such as git-signs.nvim, mini.pairs, helpview.nvim, markview.nvim, showkeys.nvim, dropbar.nvim, nvim-treesitter, vim-startuptime, lazydev, conform.nvim,highlight-colors.nvim.
 
 # Things not done yet, but are planned
-- [ ] luasnip snippets (right now it just servers the purpose of completing lsp snippets via `blink.cmp`).
+- [x] luasnip snippets (right now it just servers the purpose of completing lsp snippets via `blink.cmp`).
 - [ ] add more keybinds.

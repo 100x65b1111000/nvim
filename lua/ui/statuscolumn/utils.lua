@@ -15,21 +15,30 @@ M.get_folds = function(lnum)
 		return ""
 	end
 	if vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1 then
-		return "%#Folded#" .. " "
+		return "%#Folded#" .. " "
 	end
 	if foldlevel(lnum) > fold_before then
-		return hl .. "╭◁"
+		return hl .. " "
 	end
 	if foldlevel(lnum) > fold_after then
-		return hl .. "╰▶"
+		return hl .. " "
 	end
 
-	return hl .. "│ "
+	return hl .. "┆ "
 end
 
-M.get_extmark_info = function()
+M.get_extmark_info = function(lnum)
+
+	local bufnr = vim.api.nvim_get_current_buf()
+	local extmark_cache = vim.api.nvim_buf_get_var(bufnr, '_extmark_cache')
+
+	if extmark_cache[lnum] and not extmark_cache[lnum] ~=vim.NIL then
+		return extmark_cache
+	end
+
 	local signs = {}
 	local extmarks = vim.api.nvim_buf_get_extmarks(0, -1, 0, -1, { details = true, type = "sign" })
+
 	for _, extmark in pairs(extmarks) do
 		local line = extmark[2] + 1
 		signs[line] = signs[line] or {}
@@ -42,6 +51,9 @@ M.get_extmark_info = function()
 			priority = extmark[4].priority,
 		})
 	end
+
+	vim.api.nvim_buf_set_var(bufnr, '_extmark_cache', signs)
+
 	return signs
 end
 
@@ -68,8 +80,8 @@ M.generate_extmark_string = function(lnum)
 	if vim.v.virtnum ~= 0 then
 		return ""
 	end
-	local extmarks = M.get_extmark_info()[lnum] or {}
-	local str = M.get_git_sign(extmarks) .. "%=%l%=" .. M.get_diagnostic_sign(extmarks) .. M.get_folds(lnum)
+	local extmarks = M.get_extmark_info(lnum)[lnum] or {}
+	local str = M.get_git_sign(extmarks) .. "%=%2.10l%=" .. M.get_diagnostic_sign(extmarks) .. M.get_folds(lnum)
 	return str
 end
 
