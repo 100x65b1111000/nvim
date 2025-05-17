@@ -143,9 +143,13 @@ M.statusline_states.Modes = {
 	["S"] = { name = "  SELECT LINE ", hl = "StatusLineSelectMode" },
 	[""] = { name = "  SELECT BLOCK ", hl = "StatusLineSelectMode" },
 	["i"] = { name = "  INSERT ", hl = "StatusLineInsertMode" },
+	["niI"] = { name = "  INSERT ", hl = "StatusLineInsertMode" },
+
 	["ic"] = { name = "  INSERT ", hl = "StatusLineInsertMode" },
 	["R"] = { name = "  REPLACE ", hl = "StatusLineReplaceMode" },
+	["niR"] = { name = "  REPLACE ", hl = "StatusLineInsertMode" },
 	["Rv"] = { name = "  [V] REPLACE ", hl = "StatusLineReplaceMode" },
+	["niV"] = { name = "  [V] REPLACE ", hl = "StatusLineReplaceMode" },
 	["c"] = { name = "  COMMAND ", hl = "StatusLineCommandMode" },
 	["cr"] = { name = "  COMMAND ", hl = "StatusLineCommandMode" },
 	["cv"] = { name = "  VIM EX ", hl = "StatusLineCommandMode" },

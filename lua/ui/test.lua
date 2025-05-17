@@ -4,7 +4,6 @@ local test2 = function()
 	local var = vim.b[0].changedtick
 	-- utils.get_tabline()
 end
-
 local test1 = function()
 	local var = vim.api.nvim_buf_get_var(0, 'changedtick')
 end

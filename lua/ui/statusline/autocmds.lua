@@ -4,10 +4,13 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufReadPost", "BufWritePost", "Focus
 	group = statusline_fetchers,
 	callback = function()
 		local utils = require("ui.statusline.utils")
+		local buf_is_file = utils.buf_is_file
+		local fetch_git_file_diff = utils.fetch_git_file_diff
+		local fetch_git_file_stat = utils.fetch_git_file_stat
 		if utils.buf_is_file() then
 			vim.schedule(function()
-				utils.fetch_git_file_stat()
-				utils.fetch_git_file_diff()
+				fetch_git_file_stat()
+				fetch_git_file_diff()
 				vim.cmd("redrawstatus")
 			end)
 		end

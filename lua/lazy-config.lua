@@ -17,6 +17,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Setup lazy.nvim
+---@type LazySpec
 require("lazy").setup({
 	spec = {
 		-- import your plugins
@@ -34,7 +35,7 @@ require("lazy").setup({
 	performance = {
 		disables_plugins = {
 			"gzip",
-			-- "matchit",
+			"matchit",
 			-- "matchparen",
 			"netrwPlugin",
 			"tarPlugin",

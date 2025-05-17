@@ -17,8 +17,9 @@ local M = {}
 --- Display readonly and modified status of the current file
 ---@return StatusLineModuleFnTable
 function M.buf_status()
-	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and "%m " or ""
-	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or " "
+	if not M.buf_is_file() then
+		return { hl_group = "", string = "" }
+	end
 	local hl = generate_highlight(
 		"MiniIconsOrange",
 		"StatusLineNormalMode",
@@ -30,15 +31,17 @@ function M.buf_status()
 		"StatusLineBufStatus",
 		{ use_bg_for_fg = false, use_fg_for_bg = true }
 	)
+	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and "%m " or ""
+	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or " "
 	return { hl_group = hl, string = ro_string .. mo_string }
 end
 
 --- Display the current mode
 ---@return StatusLineModuleFnTable
 function M.statusline_mode()
-	local mode = nvim_get_mode().mode
-	statusline_states.cache.mode_string = statusline_states.Modes[mode].name
-	local hl = statusline_states.Modes[mode].hl
+	local mode = nvim_get_mode().mode or "nn"
+	statusline_states.cache.mode_string = statusline_states.Modes[mode or "n" ].name or "NA"
+	local hl = statusline_states.Modes[mode or "n" ].hl
 	return {
 		hl_group = hl,
 		string = statusline_states.cache.mode_string,

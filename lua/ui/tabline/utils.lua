@@ -119,14 +119,14 @@ local function get_lr_padding(buf_string)
 end
 
 local get_file_icon = function(bufnr)
-	local filetype = nvim_buf_get_name(bufnr)
+	local filetype = nvim_get_option_value('filetype', { buf = bufnr })
 	local icon, hl = "", ""
 	if not package.loaded["mini.icons"] then
 		icon, hl = "", "TabLineFill"
 		return icon, hl
 	end
 	if states.cache.fileicons[filetype] == nil then
-		icon, hl = MiniIcons.get("file", filetype)
+		icon, hl = MiniIcons.get("filetype", filetype)
 		states.cache.fileicons[filetype] = { icon = icon, hl = hl }
 	end
 	return states.cache.fileicons[filetype].icon, states.cache.fileicons[filetype].hl
@@ -186,16 +186,6 @@ local function get_close_button(bufnr)
 		states.icons.close
 	)
 end
-
--- M.tabline_update_close_button = tabline_update_close_button
-
--- M.tabline_get_close_button = function()
--- 	states.tabline_close_btn_debounce_timer = timer_fn(states.tabline_close_btn_debounce_timer, 50, function()
--- 		for _, buf in ipairs(states.visible_buffers) do
--- 			tabline_update_close_button(buf)
--- 		end
--- 	end)
--- end
 
 _G.tabline_click_buffer_callback = function(bufnr)
 	if not buf_is_valid(bufnr) and nvim_get_option_value("buflisted", { buf = bufnr }) then
@@ -300,9 +290,9 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	local columns = nvim_get_option_value("columns", {})
 	local available_space = columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
 	local buf_space = calculate_buf_space(bufs)
-	states.start_idx = 1
-	states.end_idx = #bufs
 	states.visible_buffers = bufs
+	states.start_idx = 1
+	states.end_idx = #states.visible_buffers
 
 	if buf_space <= available_space then
 		return
