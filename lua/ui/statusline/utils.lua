@@ -1,6 +1,6 @@
-local states = require('ui.states')
+local states = require("ui.states")
 local statusline_states = states.statusline_states
-local utils = require('ui.utils')
+local utils = require("ui.utils")
 local generate_highlight = utils.generate_highlight
 local timer_fn = utils.timer_fn
 local api = vim.api
@@ -40,8 +40,8 @@ end
 ---@return StatusLineModuleFnTable
 function M.statusline_mode()
 	local mode = nvim_get_mode().mode or "nn"
-	statusline_states.cache.mode_string = statusline_states.Modes[mode or "n" ].name or "NA"
-	local hl = statusline_states.Modes[mode or "n" ].hl
+	statusline_states.cache.mode_string = statusline_states.Modes[mode or "n"].name or "NA"
+	local hl = statusline_states.Modes[mode or "n"].hl
 	return {
 		hl_group = hl,
 		string = statusline_states.cache.mode_string,
@@ -88,7 +88,7 @@ end
 ---@return string
 local insertions = function(ins)
 	if ins and ins ~= "0" and ins ~= "" then
-		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
+		return "%#StatusLineGitInsertions#+" .. ins .. " "
 	end
 	return ""
 end
@@ -97,14 +97,14 @@ end
 ---@return string
 local deletions = function(del)
 	if del and del ~= "0" and del ~= "" then
-		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
+		return "%#StatusLineGitDeletions#-" .. del .. " "
 	end
 	return ""
 end
 
 --- Fetch the git file status info about the current file
 M.fetch_git_file_stat = function()
-	statusline_states.stat_debounce_timer = timer_fn(statusline_states.stat_debounce_timer, 50, function()
+	statusline_states.git_stat_debounce_timer = timer_fn(statusline_states.git_stat_debounce_timer, 50, function()
 		local file_path = expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
@@ -127,7 +127,7 @@ end
 
 --- Fetch the git diff status info about the current file
 M.fetch_git_file_diff = function()
-	statusline_states.diff_debounce_timer = timer_fn(statusline_states.diff_debounce_timer, 50, function()
+	statusline_states.git_diff_debounce_timer = timer_fn(statusline_states.git_diff_debounce_timer, 50, function()
 		local file_path = expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
@@ -154,7 +154,7 @@ M.statusline_git_file_status = function()
 	if not buf_is_file() then
 		return { hl_group = "", string = "" }
 	end
-	local git_status = ""
+	local git_diff = ""
 
 	local diff_output_obj = vim.b.statusline_git_diff_obj
 	if not diff_output_obj or diff_output_obj.code ~= 0 then
@@ -164,7 +164,7 @@ M.statusline_git_file_status = function()
 	local diff_output = diff_output_obj.stdout:gsub("([^%s]+)[\r\n]", "%1") or ""
 	if diff_output ~= "" and diff_output then
 		local diff_split = vim.split(diff_output, "\t")
-		git_status = insertions(diff_split[1]) .. deletions(diff_split[2])
+		git_diff = insertions(diff_split[1]) .. deletions(diff_split[2])
 	end
 
 	local stat_output_obj = vim.b.statusline_git_stat_obj
@@ -172,41 +172,57 @@ M.statusline_git_file_status = function()
 		return { hl_group = "", string = "" }
 	end
 
+	local git_status = ""
+
 	local stat_output = stat_output_obj.stdout or ""
+	-- vim.notify(stat_output)
 
-	local file_status = stat_output:match("[^%s]+")
+	local first, second = stat_output:sub(1, 1), stat_output:sub(2, 2)
+	local changed = second == "M"
+	local staged = first == "M"
+	local staged_and_changed = staged and changed
+	local untracked = first == "?" and second == "?"
+	local up_to_date = stat_output == ""
 
-	if not file_status then
-		git_status = "%#StatusLineGitUptodate# " .. git_status
-	elseif file_status == "??" then
-		git_status = "%#StatusLineGitUnstaged# " .. git_status
+	if staged_and_changed then
+		git_status = "%#StatusLineModified#[%#StatusLineGitStaged#%*%#StatusLineModified#]%* "
+	elseif staged then
+		git_status = "%#StatusLineGitStaged#[] "
+	elseif up_to_date then
+		git_status = "%#StatusLineGitUptodate# %*"
+	elseif untracked then
+		git_status = "%#StatusLineGitUntracked# %*"
 	end
 
-	return { hl_group = "", string = git_status }
+	return { hl_group = "", string = git_status .. git_diff }
 end
 
 --- Fetch the gir branch of the current file (if inside a git repo)
 M.fetch_git_branch = function()
-	statusline_states.statusline_git_branch_timer = timer_fn(statusline_states.statusline_git_branch_timer, 50, function()
-		local file_path = expand("%:p")
-		local parent = find_parent(file_path)
-		if not parent then
-			-- nvim_buf_set_var(0, "statusline_git_branch_obj", nil)
-			return
-		end
+	statusline_states.statusline_git_branch_timer = timer_fn(
+		statusline_states.statusline_git_branch_timer,
+		50,
+		function()
+			local file_path = expand("%:p")
+			local parent = find_parent(file_path)
+			if not parent then
+				-- nvim_buf_set_var(0, "statusline_git_branch_obj", nil)
+				return
+			end
 
-		local git_diff_cmd = statusline_states.git_cmd .. parent .. " branch --show-current "
-		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-			vim.schedule(function()
-				nvim_buf_set_var(
-					0,
-					"statusline_git_branch_obj",
-					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
-				)
-				vim.cmd("redrawstatus")
+			local git_diff_cmd = statusline_states.git_cmd .. parent .. " branch --show-current "
+			vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
+				vim.schedule(function()
+					nvim_buf_set_var(
+						0,
+						"statusline_git_branch_obj",
+						{ code = out.code, stdout = out.stdout, stderr = out.stderr }
+					)
+					vim.cmd("redrawstatus")
+				end)
 			end)
-		end)
-	end)
+		end
+	)
 end
 
 --- Display the git diff status (insertions + deletions)

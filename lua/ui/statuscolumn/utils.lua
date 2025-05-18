@@ -28,11 +28,10 @@ M.get_folds = function(lnum)
 end
 
 M.get_extmark_info = function(lnum)
-
 	local bufnr = vim.api.nvim_get_current_buf()
-	local extmark_cache = vim.api.nvim_buf_get_var(bufnr, '_extmark_cache')
+	local extmark_cache = vim.b[bufnr]._extmark_cache or {} -- not using api call here, as it throws an error when the var is nil
 
-	if extmark_cache[lnum] and not extmark_cache[lnum] ~=vim.NIL then
+	if #extmark_cache > 0 and extmark_cache[lnum] ~= vim.NIL then -- setting a bufvar populates the missing indices with vim.NIL
 		return extmark_cache
 	end
 

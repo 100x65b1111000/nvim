@@ -330,10 +330,6 @@ P.opts = {
 			fg = c.green,
 			bg = c.bg_dark
 		}
-		hl.StatusLineGitUnstaged = {
-			fg = c.orange,
-			bg = c.bg_dark
-		}
 		hl.StatusLineFilePerc = {
 			fg = c.green,
 			-- bg = c.bg_highlight
@@ -358,12 +354,11 @@ P.opts = {
 			fg = c.bg_dark,
 			bg = c.magenta
 		}
-		hl.StatusLineRO = {
+		hl.StatusLineModified = {
 			fg = c.orange,
-			bg = c.blue7
 		}
-		hl.StatusLineModifiedIcon = {
-			link = 'StatusLineRO'
+		hl.StatusLineGitStaged = {
+			fg = c.blue2
 		}
 		hl.TabLineFill = {
 		 	bg = c.bg_dark1,

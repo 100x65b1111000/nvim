@@ -6,17 +6,16 @@ local reset_cache = function(bufnr)
 end
 
 M.setup = function()
-	vim.api.nvim_create_augroup("StatusColumnRefresh", { clear = true })
-	vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "DiagnosticChanged", "TextChanged", "CursorMoved" }, {
-		group = "StatusColumnRefresh",
-		callback = function(args)
-			reset_cache(args.buf)
-			vim.cmd[[redrawstatus]]
-		end,
+	vim.api.nvim_create_augroup('StatusColumnRefresh', { clear = true })
+	vim.api.nvim_create_autocmd({ 'BufWrite', "BufEnter", "TextChanged", "TextChangedI", "FocusGained", "LspAttach", "DiagnosticChanged" }, {
+		group = 'StatusColumnRefresh',
+		callback = function (args)
+			vim.schedule(function ()
+				reset_cache(args.buf)
+			end)
+		end
 	})
-	vim.schedule(function()
-		vim.api.nvim_set_option_value("statuscolumn", "%!v:lua.require('ui.statuscolumn.utils').set_statuscolumn()", {})
-	end)
+	vim.api.nvim_set_option_value("statuscolumn", "%!v:lua.require('ui.statuscolumn.utils').set_statuscolumn()", {})
 end
 
 return M

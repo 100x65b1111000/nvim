@@ -119,7 +119,7 @@ local function get_lr_padding(buf_string)
 end
 
 local get_file_icon = function(bufnr)
-	local filetype = nvim_get_option_value('filetype', { buf = bufnr })
+	local filetype = nvim_get_option_value("filetype", { buf = bufnr })
 	local icon, hl = "", ""
 	if not package.loaded["mini.icons"] then
 		icon, hl = "", "TabLineFill"
@@ -252,11 +252,9 @@ end
 local get_overflow_indicator_info = function(bufs)
 	local left_dist = states.start_idx - 1
 	local right_dist = #bufs - states.end_idx
-	local left_overflow_str = states.icons.left_overflow_indicator
-	local right_overflow_str = states.icons.right_overflow_indicator
-	local left_overflow_indicator_hl =
-		generate_tabline_highlight("MiniIconsOrange", states.BufferStates.NONE, {}, "OverflowIndicatorInactive")
-	local right_overflow_indicator_hl = left_overflow_indicator_hl
+	local left_overflow_str = ""
+	local right_overflow_str = ""
+	local left_overflow_indicator_hl, right_overflow_indicator_hl = "", ""
 	if left_dist > 0 then
 		left_overflow_indicator_hl = generate_tabline_highlight(
 			"MiniIconsOrange",
@@ -264,6 +262,9 @@ local get_overflow_indicator_info = function(bufs)
 			{ reverse = true },
 			"OverflowIndicatorLeftActive"
 		)
+		left_overflow_str = states.icons.left_overflow_indicator
+		M.update_tabline_buffer_info()
+		M.update_tabline_buffer_string()
 	end
 	if right_dist > 0 then
 		right_overflow_indicator_hl = generate_tabline_highlight(
@@ -272,12 +273,14 @@ local get_overflow_indicator_info = function(bufs)
 			{ reverse = true },
 			"OverflowIndicatorRightActive"
 		)
+		right_overflow_str = states.icons.right_overflow_indicator
+		M.update_tabline_buffer_info()
+		M.update_tabline_buffer_string()
 	end
 	left_overflow_str = string.format("%%#%s#%s%%#TabLineFill# ", left_overflow_indicator_hl, left_overflow_str)
 	right_overflow_str = string.format(" %%#%s#%s", right_overflow_indicator_hl, right_overflow_str)
 	states.left_overflow_idicator_length = nvim_eval_statusline(left_overflow_str, { use_tabline = true }).width
-	states.right_overflow_idicator_length =
-		nvim_eval_statusline(right_overflow_str, { use_tabline = true }).width
+	states.right_overflow_idicator_length = nvim_eval_statusline(right_overflow_str, { use_tabline = true }).width
 	return {
 		left_overflow_str = left_overflow_str,
 		right_overflow_str = right_overflow_str,
@@ -410,9 +413,8 @@ local function update_tabline_buffer_string()
 		local overflow_info = get_overflow_indicator_info(bufs)
 		states.cache.tabline_buf_string = overflow_info.left_overflow_str
 			.. str
-			.. "%#TabLineFill#"
-			.. "%="
 			.. overflow_info.right_overflow_str
+			.. "%#TabLineFill#%="
 		vim.cmd([[redrawtabline]])
 	end)
 end

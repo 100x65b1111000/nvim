@@ -9,12 +9,11 @@ M.setup = function()
 			group = tabline_augroup,
 			callback = function(args)
 				local utils = require("ui.tabline.utils")
-				-- if not utils.buf_is_valid(args.buf) then
-				-- 	return
-				-- end
+				local update_tabline_buffer_info = utils.update_tabline_buffer_info
+				local update_tabline_buffer_string = utils.update_tabline_buffer_string
 				vim.schedule(function()
-					utils.update_tabline_buffer_info()
-					utils.update_tabline_buffer_string()
+					update_tabline_buffer_info()
+					update_tabline_buffer_string()
 					vim.cmd([[redrawtabline]])
 				end)
 			end,
