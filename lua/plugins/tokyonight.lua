@@ -63,17 +63,6 @@ P.opts = {
 			fg = c.purple,
 			bg = "NONE",
 		}
-		hl.CmpMenu = {
-			bg = c.bg,
-		}
-		hl.CmpMenuBorder = {
-			bg = nil,
-			fg = c.dark5,
-		}
-		hl.CmpDocBorder = {
-			bg = nil,
-			fg = c.blue1,
-		}
 		hl.DiagnosticError = {
 			fg = c.error,
 		}
@@ -82,27 +71,6 @@ P.opts = {
 			underline = true,
 			undercurl = false,
 		}
-		-- hl.DiagnosticVirtualTextError = {
-		--           fg = c.error
-		-- }
-		-- hl.DiagnosticVirtualTextWarn = {
-		--           fg = c.warning
-		-- }
-		-- hl.DiagnosticVirtualTextInfo = {
-		--           fg = c.info
-		-- }
-		-- hl.DiagnosticVirtualTextHint = {
-		--           fg = c.hint
-		-- }
-		-- hl.DiagnosticWarn = {
-		-- 	fg = c.warning,
-		-- }
-		-- hl.DiagnosticHint = {
-		-- 	fg = c.hint,
-		-- }
-		-- hl.DiagnosticInfo = {
-		-- 	fg = c.info,
-		-- }
 		hl.SnacksPickerPreviewTitle = {
 			reverse = true,
 			fg = c.blue,
@@ -403,9 +371,38 @@ P.opts = {
 			fg = c.orange,
 			bg = c.bg_float
 		}
-		hl.FoldedSign = {
+		hl.FoldSign = {
 			fg = c.blue,
 			bg = c.none
+		}
+		hl.SnacksPickerTotals = {
+			fg = c.orange,
+			bg = c.none
+		}
+		hl.MasonMutedBlock = {
+			fg = c.bg,
+			bg = c.comment
+		}
+		hl.MasonMuted = {
+			fg = c.orange,
+			bg = c.none
+		}
+		hl.MasonHighlightBlockBold = {
+			fg = c.bg,
+			bg = c.blue,
+			bold = true
+		}
+		hl.MasonHighlight = {
+			fg = c.green1,
+			bg = c.none
+		}
+		hl.MasonHeader = {
+			fg = c.bg,
+			bg = c.purple
+		}
+		hl.FloatTitle = {
+			bg = c.purple,
+			fg = c.bg
 		}
 	end,
 }

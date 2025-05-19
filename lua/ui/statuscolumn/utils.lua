@@ -7,7 +7,7 @@ end
 
 M.get_folds = function(lnum)
 	local end_ = vim.api.nvim_buf_line_count(0)
-	local hl = "%#FoldedSign#"
+	local hl = "%#FoldSign#"
 	local foldlevel = vim.fn.foldlevel
 	local fold_before = foldlevel(((lnum - 1) >= 1 and lnum - 1) or 0)
 	local fold_after = foldlevel(((lnum + 1) <= end_ and lnum + 1) or 0)
@@ -15,13 +15,13 @@ M.get_folds = function(lnum)
 		return ""
 	end
 	if vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1 then
-		return "%#Folded#" .. " "
+		return "%#Folded#" .. " "
 	end
 	if foldlevel(lnum) > fold_before then
-		return hl .. " "
+		return hl .. " "
 	end
 	if foldlevel(lnum) > fold_after then
-		return hl .. " "
+		return hl .. " "
 	end
 
 	return hl .. "┆ "

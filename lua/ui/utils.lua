@@ -51,7 +51,7 @@ end
 ---Generates a highlight group.
 ---@param source_fg string The source highlight group for fg.
 ---@param source_bg string The source highlight group for bg.
----@param opts? table Additional highlight options.
+---@param opts table Additional highlight options.
 ---@param brightness_bg integer Brightness value.
 ---@param brightness_fg integer Brightness value.
 ---@param prefix? string The hl_group name's prefix
