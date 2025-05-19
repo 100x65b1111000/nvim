@@ -388,7 +388,7 @@ local function generate_buffer_string(bufnr, bufs)
 	local buf_hl = get_buffer_highlight(bufnr)
 	local left_padding, right_padding = buf_spec.left_padding, buf_spec.right_padding
 	local buf_string = string.format(
-		"%%%d@v:lua.tabline_click_buffer_callback@%%#%s#%s%s%s%%#%s#%s%s%s",
+		"%%%d@v:lua.tabline_click_buffer_callback@%%#%s#%s%s%s%%#%s#%s%s%s%%*",
 		bufnr,
 		buf_spec.icon_hl,
 		states.icons.separator,

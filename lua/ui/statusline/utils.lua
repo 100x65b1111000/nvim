@@ -88,7 +88,7 @@ end
 ---@return string
 local insertions = function(ins)
 	if ins and ins ~= "0" and ins ~= "" then
-		return "%#StatusLineGitInsertions#+" .. ins .. " "
+		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
 	end
 	return ""
 end
@@ -97,7 +97,7 @@ end
 ---@return string
 local deletions = function(del)
 	if del and del ~= "0" and del ~= "" then
-		return "%#StatusLineGitDeletions#-" .. del .. " "
+		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
 	end
 	return ""
 end
@@ -187,7 +187,7 @@ M.statusline_git_file_status = function()
 	if staged_and_changed then
 		git_status = "%#StatusLineModified#[%#StatusLineGitStaged#%*%#StatusLineModified#]%* "
 	elseif staged then
-		git_status = "%#StatusLineGitStaged#[] "
+		git_status = "%#StatusLineGitStaged# "
 	elseif up_to_date then
 		git_status = "%#StatusLineGitUptodate# %*"
 	elseif untracked then

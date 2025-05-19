@@ -7,7 +7,7 @@ M.setup = function()
 		{ "BufEnter", "BufUnload", "TextChanged", "InsertEnter", "InsertLeave", "BufWrite", "VimResized" },
 		{
 			group = tabline_augroup,
-			callback = function(args)
+			callback = function()
 				local utils = require("ui.tabline.utils")
 				local update_tabline_buffer_info = utils.update_tabline_buffer_info
 				local update_tabline_buffer_string = utils.update_tabline_buffer_string
