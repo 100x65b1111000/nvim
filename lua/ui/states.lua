@@ -16,8 +16,6 @@ M.tabline_states.cache = {
 	tabline_buf_string = "",
 	highlights = M.cache.highlights,
 	fileicons = {},
-	last_visible_buffers = {},
-	close_button_string = "",
 }
 
 M.tabline_states.init_files = {
@@ -35,19 +33,14 @@ M.tabline_states.icons = {
 
 M.tabline_states.end_idx = 1
 M.tabline_states.start_idx = 1
-M.tabline_states.diff = 0
-M.tabline_states.offset = 0
 ---@type integer[]
 M.tabline_states.visible_buffers = {}
 
 M.tabline_states.left_overflow_idicator_length = 0
 M.tabline_states.right_overflow_idicator_length = 0
 
-M.tabline_states.buffer_map = {}
-M.tabline_states.buffer_count = 0
 M.tabline_states.buffers_list = {}
 M.tabline_states.buffers_spec = {}
-M.tabline_states.highlight_gen_count = 0
 M.tabline_states.available_width = vim.o.columns
 
 
@@ -96,15 +89,6 @@ M.statusline_states.cache = {
 	highlights = M.cache.highlights,
 	statusline_string = nil,
 	mode_string = nil,
-	buf_status = nil,
-	bufname_string = nil,
-	root_dir_string = nil,
-	git_branch_string = nil,
-	git_status_string = nil,
-	diagnostic_info_string = nil,
-	lsp_info_string = nil,
-	cursor_pos_string = nil,
-	scroll_pos_string = nil,
 	filetype_icons = {
 		["terminal"] = { icon = "  " },
 		["prompt"] = { icon = " 󰘎 " },

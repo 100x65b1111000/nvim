@@ -27,14 +27,25 @@ M.get_folds = function(lnum)
 	return hl .. "┆ "
 end
 
+-- Retrieves extmark information for the current buffer.
+-- It uses a buffer-local cache (vim.b[bufnr]._extmark_cache) which maps line numbers
+-- to a list of sign objects for that line.
+-- This cache is invalidated (e.g., set to an empty table or nil) by autocommands
+-- in lua/ui/statuscolumn/init.lua on relevant events (e.g., BufEnter, BufWritePost, DiagnosticsChanged),
+-- prompting this function to rebuild it.
 M.get_extmark_info = function(lnum)
 	local bufnr = vim.api.nvim_get_current_buf()
-	local extmark_cache = vim.b[bufnr]._extmark_cache or {} -- not using api call here, as it throws an error when the var is nil
+	local current_buf_cache = vim.b[bufnr]._extmark_cache
 
-	if #extmark_cache > 0 and extmark_cache[lnum] ~= vim.NIL then -- setting a bufvar populates the missing indices with vim.NIL
-		return extmark_cache
+	-- Check if cache exists (is not nil) and is not an empty table.
+	-- The cache stores a table mapping line numbers to a list of sign objects.
+	-- It's managed by autocommands in lua/ui/statuscolumn/init.lua.
+	if current_buf_cache and next(current_buf_cache) ~= nil then
+		return current_buf_cache
 	end
 
+	-- If cache is empty or doesn't exist, proceed to build it.
+	-- Ensure 'signs' is a new table for population.
 	local signs = {}
 	local extmarks = vim.api.nvim_buf_get_extmarks(0, -1, 0, -1, { details = true, type = "sign" })
 
@@ -45,14 +56,13 @@ M.get_extmark_info = function(lnum)
 		table.insert(signs[line], {
 			name = name,
 			text = extmark[4].sign_text,
-			type = M.get_sign_type(name),
+			type = M.get_sign_type(name), -- Assuming M is the module table
 			text_hl = extmark[4].sign_hl_group,
 			priority = extmark[4].priority,
 		})
 	end
 
 	vim.api.nvim_buf_set_var(bufnr, '_extmark_cache', signs)
-
 	return signs
 end
 

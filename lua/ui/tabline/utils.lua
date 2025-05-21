@@ -249,6 +249,10 @@ local calculate_buf_space = function(bufs)
 	return length
 end
 
+-- Generates the strings for left and/or right overflow indicators if needed
+-- (i.e., if there are more buffers than can fit based on states.start_idx and states.end_idx).
+-- It also calculates and stores the screen width occupied by these indicators in
+-- states.left_overflow_idicator_length and states.right_overflow_idicator_length.
 local get_overflow_indicator_info = function(bufs)
 	local left_dist = states.start_idx - 1
 	local right_dist = #bufs - states.end_idx
@@ -263,8 +267,6 @@ local get_overflow_indicator_info = function(bufs)
 			"OverflowIndicatorLeftActive"
 		)
 		left_overflow_str = states.icons.left_overflow_indicator
-		M.update_tabline_buffer_info()
-		M.update_tabline_buffer_string()
 	end
 	if right_dist > 0 then
 		right_overflow_indicator_hl = generate_tabline_highlight(
@@ -274,8 +276,6 @@ local get_overflow_indicator_info = function(bufs)
 			"OverflowIndicatorRightActive"
 		)
 		right_overflow_str = states.icons.right_overflow_indicator
-		M.update_tabline_buffer_info()
-		M.update_tabline_buffer_string()
 	end
 	left_overflow_str = string.format("%%#%s#%s%%#TabLineFill# ", left_overflow_indicator_hl, left_overflow_str)
 	right_overflow_str = string.format(" %%#%s#%s", right_overflow_indicator_hl, right_overflow_str)
@@ -403,16 +403,19 @@ local function generate_buffer_string(bufnr, bufs)
 end
 
 ---Updates the global tabline buffer string.
+-- Constructs the string by joining parts from a table (buffer_strings_table)
+-- using table.concat for better performance compared to repeated string concatenation.
 local function update_tabline_buffer_string()
 	states.tabline_update_debounce_timer2 = timer_fn(states.tabline_update_debounce_timer2, 50, function()
-		local str = ""
+		local buffer_strings_table = {}
 		local bufs = states.buffers_list
 		for _, bufnr in ipairs(states.visible_buffers) do
-			str = str .. generate_buffer_string(bufnr, bufs)
+			table.insert(buffer_strings_table, generate_buffer_string(bufnr, bufs))
 		end
+		local concatenated_buffer_strings = table.concat(buffer_strings_table, "")
 		local overflow_info = get_overflow_indicator_info(bufs)
 		states.cache.tabline_buf_string = overflow_info.left_overflow_str
-			.. str
+			.. concatenated_buffer_strings
 			.. overflow_info.right_overflow_str
 			.. "%#TabLineFill#%="
 		vim.cmd([[redrawtabline]])
@@ -438,7 +441,6 @@ M.update_tabline_buffer_info = function()
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 		local bufs = states.buffers_list
 		local buf_specs = states.buffers_spec
-		states.buffer_count = states.buffer_count + 1
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
 	end)
 end

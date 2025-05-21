@@ -1,5 +1,3 @@
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.scrolloff = 8
@@ -11,7 +9,6 @@ vim.o.backup = false
 vim.o.clipboard = "unnamedplus"
 vim.o.swapfile = false
 vim.o.whichwrap = "<,>,[,],s,b"
-vim.g.copilot_no_tab_map = false
 vim.o.showtabline = 2
 vim.o.termguicolors = true
 vim.o.expandtab = false
@@ -73,6 +70,9 @@ vim.api.nvim_create_autocmd("VimLeave", {
 	end,
 })
 
+-- The following section for 'UserCmdlineToggle' (CmdlineEnter/CmdlineLeave autocommands)
+-- is currently commented out. You can uncomment it if you wish to enable the feature
+-- that automatically adjusts cmdheight, or remove this block if it's no longer needed.
 -- local cmdlineToggleGroup = vim.api.nvim_create_augroup("UserCmdlineToggle", { clear = true })
 --
 -- vim.api.nvim_create_autocmd("CmdlineEnter", {
@@ -90,6 +90,11 @@ vim.api.nvim_create_autocmd("VimLeave", {
 -- 		vim.o.cmdheight = 0
 -- 	end,
 -- })
+--
+-- The following 'smart_help' function, which aimed to open help in a vertical split
+-- if the screen is wide enough, is currently commented out. You can uncomment it
+-- if you wish to enable this feature, or remove this block if it's no longer needed.
+-- Note: You would also need to map this function to a keybinding for it to be useful.
 -- local smart_help = function()
 --     if vim.o.columns > 80 then
 --         vim.cmd [[ vert help ]]
@@ -97,5 +102,3 @@ vim.api.nvim_create_autocmd("VimLeave", {
 --         vim.cmd[[ help ]]
 --     end
 -- end
---
-_G.init_files = { "init.lua", "main.c", "main.cpp", "init.py", "__init__.py" }
