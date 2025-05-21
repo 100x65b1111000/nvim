@@ -19,13 +19,15 @@ This is my personal neovim config that I have developed thoughout my journey of 
 # Install Instructions
 
 To get the setup up and running.
-Firstly backup your current neovim setup.
+Firstly backup your current neovim setup:
+
 ```bash
 mv ~/.config/{nvim,nvim.bak}
 mv ~/.local/share/{nvim,nvim.bak}
 ```
 
 Now, simply clone the repository into your `$XDG_CONFIG_HOME/nvim` directory.
+
 ```bash
 git clone htps://gitlab.com/100x65b1111000/nvim.git ~/.config/nvim
 nvim

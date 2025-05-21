@@ -5,31 +5,37 @@ M.get_sign_type = function(str)
 	return (str or ""):match("GitSign") or (str or ""):match("Diagnostic") or ""
 end
 
-M.get_folds = function(lnum)
-	local end_ = vim.api.nvim_buf_line_count(0)
-	local hl = "%#FoldSign#"
-	local foldlevel = vim.fn.foldlevel
-	local fold_before = foldlevel(((lnum - 1) >= 1 and lnum - 1) or 0)
-	local fold_after = foldlevel(((lnum + 1) <= end_ and lnum + 1) or 0)
-	if foldlevel(lnum) == 0 then
-		return ""
-	end
-	if vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1 then
-		return "%#Folded#" .. " "
-	end
-	if foldlevel(lnum) > fold_before then
-		return hl .. " "
-	end
-	if foldlevel(lnum) > fold_after then
-		return hl .. " "
-	end
+M.get_folds = function(win, lnum)
+	local fold_str = "  "
+	vim.api.nvim_win_call(win, function()
+		local foldlevel = vim.fn.foldlevel
+		local fold_level = foldlevel(lnum)
+		local is_fold_closed = vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1
+		local is_fold_started = fold_level > foldlevel(lnum - 1)
+		if is_fold_closed then
+			fold_str = string.format("%s%s%s", fold_str, " ", "%T")
+		elseif is_fold_started then
+			fold_str = string.format("%s%s%s", fold_str, " ", "%T")
+		end
+	end)
 
-	return hl .. "┆ "
+	return fold_str
+end
+
+_G.statuscolumn_click_fold_callback = function()
+	local pos = vim.fn.getmousepos()
+	vim.api.nvim_win_set_cursor(pos.winid, { pos.line, 1 })
+	vim.api.nvim_win_call(pos.winid, function()
+		vim.notify("I am gettin touched")
+		if vim.fn.foldlevel(pos.line) > 0 then
+			vim.cmd("normal! za")
+		end
+	end)
 end
 
 M.get_extmark_info = function(lnum)
 	local bufnr = vim.api.nvim_get_current_buf()
-	local extmark_cache = vim.b[bufnr]._extmark_cache or {} -- not using api call here, as it throws an error when the var is nil
+	local extmark_cache = vim.b[bufnr]._extmark_cache or {}
 
 	if #extmark_cache > 0 and extmark_cache[lnum] ~= vim.NIL then -- setting a bufvar populates the missing indices with vim.NIL
 		return extmark_cache
@@ -51,7 +57,7 @@ M.get_extmark_info = function(lnum)
 		})
 	end
 
-	vim.api.nvim_buf_set_var(bufnr, '_extmark_cache', signs)
+	vim.api.nvim_buf_set_var(bufnr, "_extmark_cache", signs)
 
 	return signs
 end
@@ -59,34 +65,42 @@ end
 M.get_git_sign = function(extmarks)
 	for _, i in ipairs(extmarks) do
 		if i.type == "GitSign" then
-			return "%#" .. i.text_hl .. "#" .. "%-03.3(" .. i.text .. "%)" .. "%*"
+			return string.format("%s%s%s%s%s ", "%#", i.text_hl, "#", i.text, "%*")
 		end
 	end
-	return "%-03.3( %)"
+	return "   "
 end
 
 M.get_diagnostic_sign = function(extmarks)
-	local diagnostic_string = "%03.3( %)"
+	local diagnostic_string = "   "
 	for _, i in ipairs(extmarks) do
 		if i.type == "Diagnostic" then
-			diagnostic_string = "%#" .. i.text_hl .. "#" .. "%03.3(" .. i.text .. "%)"
+			diagnostic_string = string.format("%s%s%s %s", "%#", i.text_hl, "#", i.text)
 		end
 	end
 	return diagnostic_string
 end
 
-M.generate_extmark_string = function(lnum)
+M.generate_extmark_string = function(win, lnum)
 	if vim.v.virtnum ~= 0 then
 		return ""
 	end
 	local extmarks = M.get_extmark_info(lnum)[lnum] or {}
-	local str = M.get_git_sign(extmarks) .. "%=%2.10l%=" .. M.get_diagnostic_sign(extmarks) .. M.get_folds(lnum)
+	local str = string.format(
+		"%s%s%s%s%s",
+		M.get_git_sign(extmarks),
+		"%=%2.10l%=",
+		M.get_diagnostic_sign(extmarks),
+		M.get_folds(win, lnum),
+		"%)"
+	)
 	return str
 end
 
 M.set_statuscolumn = function()
 	local lnum = vim.v.lnum
-	return M.generate_extmark_string(lnum)
+	local win = vim.g.statusline_winid
+	return M.generate_extmark_string(win, lnum)
 end
 
 return M

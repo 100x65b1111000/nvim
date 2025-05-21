@@ -61,7 +61,7 @@ require("lazy").setup({
 		size = { width = 0.75, height = 0.70 },
 		border = { " "," ", " ", " ", " ", " ", " ", " "},
 		backdrop = 50,
-		title = " Plugins 󰐱 ",
+		title = " Plugins 󰩦 ",
 	},
 })
 

@@ -308,7 +308,29 @@ P.config = function()
 			},
 		},
 		sources = {
-			transform_items = function(_, items)
+			-- Stolen from https://github.com/saecki/dotfiles/blob/d384c5ba4b023253669a121c27a9749ab4a0b916/.config/nvim/lua/config/blink.lua#L30-L53
+			transform_items = function(ctx, items)
+				local line = ctx.cursor[1] - 1
+				local col = ctx.cursor[2]
+
+				for _, item in ipairs(items) do
+					if item.textEdit then
+						if item.textEdit.range then
+							-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textEdit
+							-- trim edit range after cursor
+							local range_end = item.textEdit.range["end"]
+							if range_end.line == line and range_end.character > col then
+								range_end.character = col
+							end
+						elseif item.textEdit.insert then
+							-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#insertReplaceEdit
+							-- always use insert range
+							item.textEdit.range = item.textEdit.insert
+							item.textEdit.replace = nil
+						end
+					end
+				end
+
 				return items
 			end,
 			min_keyword_length = 0,
@@ -420,7 +442,7 @@ P.config = function()
 				return {}
 			end,
 			keymap = {
-				preset = 'none',
+				preset = "none",
 				["<tab>"] = { "show_and_insert", "select_next" },
 				["<m-j>"] = { "select_next" },
 				["<s-tab>"] = { "select_prev" },
@@ -447,8 +469,8 @@ P.config = function()
 					},
 				},
 				ghost_text = {
-					enabled = true
-				}
+					enabled = true,
+				},
 			},
 		},
 		term = {

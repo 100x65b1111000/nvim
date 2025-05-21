@@ -16,9 +16,9 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 			signs = {
 				text = {
 					[severity.ERROR] = " ",
-					[severity.WARN] = " ",
+					[severity.WARN] = " ",
 					[severity.INFO] = " ",
-					[severity.HINT] = " ",
+					[severity.HINT] = " ",
 				},
 				severity = {
 					max = 1,
@@ -37,56 +37,59 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 					min = "HINT",
 				},
 			},
-			-- virtual_text = {
-			-- 	severity = {
-			-- 		max = 1,
-			-- 		min = 4,
-			-- 	},
-			-- 	prefix = "󰹞 ",
-			-- 	format = function(diagnostic)
-			-- 		return diagnostic.message
-			-- 	end,
-			-- },
-			-- virtual_text = true,
-			virtual_lines = {
-				current_line = true,
+			virtual_text = {
+				severity = {
+					max = 1,
+					min = 4,
+				},
+				prefix = "󰹞 ",
 				format = function(diagnostic)
-					local icons = {
-						" ",
-						" ",
-						" ",
-						" ",
-					}
-					return icons[diagnostic.severity] .. " " .. diagnostic.message
+					return diagnostic.message
 				end,
+				source = "if_many",
 			},
+			virtual_lines = false,
 			float = {
 				source = "if_many",
+				focusable = false,
 				prefix = function(diagnostic, i, _)
 					local opts = {}
 					if diagnostic.severity == 1 then
-						opts = { i .. ". " .. "[E] ", "DiagnosticError" }
+						opts = { i .. ". " .. "  ", "DiagnosticError" }
 					elseif diagnostic.severity == 2 then
-						opts = { i .. ". " .. "[W] ", "DiagnosticWarn" }
+						opts = { i .. ". " .. "  ", "DiagnosticWarn" }
 					elseif diagnostic.severity == 3 then
-						opts = { i .. ". " .. "[I] ", "DiagnosticInfo" }
+						opts = { i .. ". " .. "  ", "DiagnosticInfo" }
 					elseif diagnostic.severity == 4 then
-						opts = { i .. ". " .. "[H] ", "DiagnosticHint" }
+						opts = { i .. ". " .. "  ", "DiagnosticHint" }
 					end
 					return opts[1], opts[2]
 				end,
-				scope = "cursor",
-				header = { "Diagnostics: ", "FloatTitle" },
+				scope = "line",
+				header = { " Diagnostics: ", "FloatTitle" },
 				severity_sort = true,
 				severity = {
 					min = "HINT",
 					max = "ERROR",
 				},
+				border = "none",
 			},
 			update_in_insert = false,
 		})
 	end,
 })
 
--- vim.api.nvim_create_augroup("FloatDiagnostic", { clear = true })
--- vim.api.nvim_create_autocmd()
+vim.api.nvim_create_augroup("FloatDiagnostic", { clear = true }) 
+vim.api.nvim_create_autocmd({ "CursorHold" }, {
+	group = "FloatDiagnostic",
+	callback = function()
+		local wins = vim.api.nvim_list_wins()
+		for _, i in ipairs(wins) do
+			local win = vim.api.nvim_win_get_config(i)
+			if win.zindex then
+				return
+			end
+		end
+		vim.diagnostic.open_float()
+	end,
+})

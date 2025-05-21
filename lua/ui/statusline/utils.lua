@@ -88,7 +88,7 @@ end
 ---@return string
 local insertions = function(ins)
 	if ins and ins ~= "0" and ins ~= "" then
-		return "%#StatusLineGitInsertions# %#StatusLineHl#" .. ins .. " "
+		return string.format("%s%s%s", "%#StatusLineGitInsertions# %#StatusLineHl#", ins, " ")
 	end
 	return ""
 end
@@ -97,7 +97,7 @@ end
 ---@return string
 local deletions = function(del)
 	if del and del ~= "0" and del ~= "" then
-		return "%#StatusLineGitDeletions# %#StatusLineHl#" .. del .. " "
+		return string.format("%s%s%s", "%#StatusLineGitDeletions# %#StatusLineHl#", del, " ")
 	end
 	return ""
 end
@@ -111,7 +111,8 @@ M.fetch_git_file_stat = function()
 			return
 		end
 
-		local git_stat_cmd = statusline_states.git_cmd .. parent .. " status --short --porcelain " .. file_path
+		local git_stat_cmd =
+			string.format("%s%s%s%s", statusline_states.git_cmd, parent, " status --short --porcelain ", file_path)
 		vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
 			vim.schedule(function()
 				nvim_buf_set_var(
@@ -134,7 +135,7 @@ M.fetch_git_file_diff = function()
 			return
 		end
 
-		local git_diff_cmd = statusline_states.git_cmd .. parent .. " diff --numstat " .. file_path
+		local git_diff_cmd = string.format("%s%s%s%s", statusline_states.git_cmd, parent, " diff --numstat ", file_path)
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
 			vim.schedule(function()
 				nvim_buf_set_var(
@@ -210,7 +211,7 @@ M.fetch_git_branch = function()
 				return
 			end
 
-			local git_diff_cmd = statusline_states.git_cmd .. parent .. " branch --show-current "
+			local git_diff_cmd = string.format("%s%s%s", statusline_states.git_cmd, parent, " branch --show-current ")
 			vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
 				vim.schedule(function()
 					nvim_buf_set_var(
@@ -294,7 +295,7 @@ M.statusline_filetype_info = function()
 		}
 	end
 	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
-	icon = " " .. icon .. " "
+	icon = string.format(" %s ", icon)
 	icon_hl = generate_highlight(
 		icon_hl,
 		"StatusLineNormalMode",
@@ -428,7 +429,7 @@ local format_diagnostics = function(severity)
 	local hl = statusline_states.cache.severity_map[severity].hl
 	local icon = statusline_states.cache.severity_map[severity].icon
 	if count > 0 then
-		return hl .. icon .. count
+		return string.format("%s%s%s", hl, icon, count)
 	end
 
 	return ""
@@ -445,13 +446,16 @@ M.fetch_diagnostics = function()
 			["HINT"] = { hl = "%#DiagnosticHint#", icon = "  ", count = vim.diagnostic.count(bufnr)[4] or 0 },
 		}
 
-		local diagnostic_str = format_diagnostics("ERROR")
-			.. format_diagnostics("WARN")
-			.. format_diagnostics("INFO")
-			.. format_diagnostics("HINT")
+		local diagnostic_str = string.format(
+			"%s%s%s%s",
+			format_diagnostics("ERROR"),
+			format_diagnostics("WARN"),
+			format_diagnostics("INFO"),
+			format_diagnostics("HINT")
+		)
 
 		vim.schedule(function()
-			nvim_buf_set_var(0, "statusline_diagnostic_info", " " .. diagnostic_str .. " ")
+			nvim_buf_set_var(0, "statusline_diagnostic_info", string.format(" %s ", diagnostic_str))
 			vim.cmd([[redrawstatus]])
 		end)
 	end)
@@ -489,7 +493,7 @@ local function format_hl_string(hl_group)
 	if not hl_group or hl_group == "" then
 		return ""
 	end
-	return "%#" .. hl_group .. "#"
+	return string.format("%%#%s#", hl_group)
 end
 
 --- Converts the module information to string
@@ -531,7 +535,7 @@ local generate_module_string = function(modules)
 					format_hl_string(module_info.hl_group or ""),
 					module_info.string or ""
 				)
-			modules_string = modules_string .. module_string .. "%#StatusLine#"
+			modules_string = string.format("%s%s%s", modules_string, module_string, "%#StatusLine#")
 		end
 	end
 	return modules_string
@@ -544,11 +548,14 @@ M.set_statusline = function()
 	local middle_modules_string = generate_module_string(config.modules.middle)
 	local right_modules_string = generate_module_string(config.modules.right)
 
-	statusline_states.cache.statusline_string = left_modules_string
-		.. "%=%#StatusLine#"
-		.. middle_modules_string
-		.. "%=%#StatusLine#"
-		.. right_modules_string
+	statusline_states.cache.statusline_string = string.format(
+		"%s%s%s%s%s",
+		left_modules_string,
+		"%=%#StatusLine#",
+		middle_modules_string,
+		"%=%#StatusLine#",
+		right_modules_string
+	)
 	return statusline_states.cache.statusline_string
 end
 

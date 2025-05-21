@@ -34,7 +34,7 @@ P.opts = {
       ---@param hl tokyonight.Highlights
       ---@param c ColorScheme
 	on_highlights = function(hl, c)
-		local prompt = c.bg_highlight
+		local highlight = "#2e314e"
 		hl["@module.python"] = {
 			fg = c.green1,
 			italic = true,
@@ -371,9 +371,15 @@ P.opts = {
 			fg = c.orange,
 			bg = c.bg_float
 		}
-		hl.FoldSign = {
-			fg = c.blue,
+		hl.FoldStart = {
+			fg = c.magenta,
 			bg = c.none
+		}
+		hl.FoldEnd = {
+			fg = c.yellow
+		}
+		hl.Folded = {
+			bg = highlight
 		}
 		hl.SnacksPickerTotals = {
 			fg = c.orange,

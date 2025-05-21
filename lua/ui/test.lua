@@ -1,11 +1,11 @@
 local M = {}
 
 local test2 = function()
-	local var = vim.b[0].changedtick
+	local var = string.format("%s %s %s %s", "This", "is", "a", "string")
 	-- utils.get_tabline()
 end
 local test1 = function()
-	local var = vim.api.nvim_buf_get_var(0, 'changedtick')
+	local var = ("%s %s %s %s"):format("This", "is", "a", "string")
 end
 
 M.test = function(fn, iterations)

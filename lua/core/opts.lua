@@ -39,6 +39,9 @@ vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.laststatus = 3
 vim.o.cmdheight = 1
+vim.o.foldopen = "hor,insert,percent,search,undo"
+vim.o.foldminlines = 2
+vim.o.foldmethod = "manual"
 
 vim.o.undodir = vim.fn.stdpath("cache") .. "/undo"
 
@@ -50,7 +53,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
 	desc = "Replicate the auto save feature in some text editors",
 	callback = function(args)
 		if vim.bo.modified and vim.bo.modifiable and not vim.bo.readonly and vim.bo.buftype == "" then
-			vim.schedule(function ()
+			vim.schedule(function()
 				vim.cmd("w")
 			end)
 		end
@@ -99,3 +102,43 @@ vim.api.nvim_create_autocmd("VimLeave", {
 -- end
 --
 _G.init_files = { "init.lua", "main.c", "main.cpp", "init.py", "__init__.py" }
+
+local function fold_virt_text(result, s, lnum, coloff)
+	if not coloff then
+		coloff = 0
+	end
+	local text = ""
+	local hl
+	for i = 1, #s do
+		local char = s:sub(i, i)
+		local hls = vim.treesitter.get_captures_at_pos(0, lnum, coloff + i - 1)
+		local _hl = hls[#hls]
+		if _hl then
+			local new_hl = "@" .. _hl.capture
+			if new_hl ~= hl then
+				table.insert(result, { text, hl })
+				text = ""
+				hl = nil
+			end
+			text = text .. char
+			hl = new_hl
+		else
+			text = text .. char
+		end
+	end
+	table.insert(result, { text, hl })
+end
+
+function _G.custom_foldtext()
+	local start = vim.api.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1]
+	local end_str =vim.api.nvim_buf_get_lines(0, vim.v.foldend - 1, vim.v.foldend, false)[1]
+	local end_ = vim.trim(end_str)
+	local result = {}
+	fold_virt_text(result, start, vim.v.foldstart - 1)
+	table.insert(result, { " ... ", "Delimiter" })
+	fold_virt_text(result, end_, vim.v.foldend - 1, #(end_str:match("^(%s+)") or ""))
+	return result
+end
+
+vim.opt.fillchars = "fold: "
+vim.opt.foldtext = "v:lua.custom_foldtext()"
