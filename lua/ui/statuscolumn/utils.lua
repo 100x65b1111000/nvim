@@ -37,15 +37,10 @@ M.get_extmark_info = function(lnum)
 	local bufnr = vim.api.nvim_get_current_buf()
 	local current_buf_cache = vim.b[bufnr]._extmark_cache
 
-	-- Check if cache exists (is not nil) and is not an empty table.
-	-- The cache stores a table mapping line numbers to a list of sign objects.
-	-- It's managed by autocommands in lua/ui/statuscolumn/init.lua.
 	if current_buf_cache and next(current_buf_cache) ~= nil then
 		return current_buf_cache
 	end
-
-	-- If cache is empty or doesn't exist, proceed to build it.
-	-- Ensure 'signs' is a new table for population.
+	
 	local signs = {}
 	local extmarks = vim.api.nvim_buf_get_extmarks(0, -1, 0, -1, { details = true, type = "sign" })
 
