@@ -28,11 +28,6 @@ M.get_folds = function(lnum)
 end
 
 -- Retrieves extmark information for the current buffer.
--- It uses a buffer-local cache (vim.b[bufnr]._extmark_cache) which maps line numbers
--- to a list of sign objects for that line.
--- This cache is invalidated (e.g., set to an empty table or nil) by autocommands
--- in lua/ui/statuscolumn/init.lua on relevant events (e.g., BufEnter, BufWritePost, DiagnosticsChanged),
--- prompting this function to rebuild it.
 M.get_extmark_info = function(lnum)
 	local bufnr = vim.api.nvim_get_current_buf()
 	local current_buf_cache = vim.b[bufnr]._extmark_cache
