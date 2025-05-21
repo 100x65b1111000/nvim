@@ -141,4 +141,4 @@ function _G.custom_foldtext()
 end
 
 vim.opt.fillchars = "fold: "
-vim.opt.foldtext = "v:lua.custom_foldtext()"
+-- vim.opt.foldtext = "v:lua.custom_foldtext()"
