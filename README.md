@@ -14,8 +14,6 @@ This is my personal neovim config that I have developed thoughout my journey of 
 ![image](https://github.com/user-attachments/assets/eec8d707-b1b3-4c46-8531-7dd4124975e7)
 ![image](https://github.com/user-attachments/assets/e23b0e56-67db-4301-af54-3a9e4fac650b)
 
-
-
 # Install Instructions
 
 To get the setup up and running.
@@ -36,7 +34,6 @@ nvim
 # Highlights
 - Home baked statusline ( ~500 loc ) and tabline ( ~500 loc) with minimalism and aesthetics in mind, however not much configurable.
 ![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
-
 
 - Reasonable defaults.
 - [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management.

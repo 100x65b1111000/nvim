@@ -1,21 +1,23 @@
 local M = {}
 
+
+MAX_LEN = 3
 ---@param str string?
 M.get_sign_type = function(str)
 	return (str or ""):match("GitSign") or (str or ""):match("Diagnostic") or ""
 end
 
 M.get_folds = function(win, lnum)
-	local fold_str = "  "
+	local fold_str = ""
 	vim.api.nvim_win_call(win, function()
 		local foldlevel = vim.fn.foldlevel
 		local fold_level = foldlevel(lnum)
 		local is_fold_closed = vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1
 		local is_fold_started = fold_level > foldlevel(lnum - 1)
 		if is_fold_closed then
-			fold_str = string.format("%s%s%s", fold_str, " ", "%T")
+			fold_str = string.format("%s%s", fold_str, " ")
 		elseif is_fold_started then
-			fold_str = string.format("%s%s%s", fold_str, " ", "%T")
+			fold_str = string.format("%s%s", fold_str, " ")
 		end
 	end)
 
@@ -72,7 +74,7 @@ M.get_git_sign = function(extmarks)
 end
 
 M.get_diagnostic_sign = function(extmarks)
-	local diagnostic_string = "   "
+	local diagnostic_string = ""
 	for _, i in ipairs(extmarks) do
 		if i.type == "Diagnostic" then
 			diagnostic_string = string.format("%s%s%s %s", "%#", i.text_hl, "#", i.text)
@@ -80,6 +82,8 @@ M.get_diagnostic_sign = function(extmarks)
 	end
 	return diagnostic_string
 end
+
+
 
 M.generate_extmark_string = function(win, lnum)
 	if vim.v.virtnum ~= 0 then
@@ -89,7 +93,7 @@ M.generate_extmark_string = function(win, lnum)
 	local str = string.format(
 		"%s%s%s%s%s",
 		M.get_git_sign(extmarks),
-		"%=%2.10l%=",
+		"%=%2.10l%=%3.3(",
 		M.get_diagnostic_sign(extmarks),
 		M.get_folds(win, lnum),
 		"%)"
