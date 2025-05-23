@@ -58,8 +58,7 @@ Here's a list of highlight groups you need to define, so that the colors don't l
 | Tabline Highlights | Purpose |
 |:-------------------|:--------|
 | `TabLineFill` | Background color for the Tabline |
-| `TabLineOverflowIndicator` | Overflow Indicator Icon ![image](https://github.com/user-attachments/assets/eaca5f4d-3945-4ecd-9d63-7d5725d18356)
-|
+| `TabLineOverflowIndicator` | Overflow Indicator Icon ![image](https://github.com/user-attachments/assets/eaca5f4d-3945-4ecd-9d63-7d5725d18356) |
 | `TabLineOverflowCount` | Colors for the count of the buffers, displayed beside overflow indicator ![image](https://github.com/user-attachments/assets/bb8782d4-af56-4690-8fc1-30691072b42f) |
 
 | `TabLineTabPageIcon` | Color for the icon to indicate tabpages ![image](https://github.com/user-attachments/assets/07b3b045-7f38-4ada-a8c0-1d6bd57d1ffe)
