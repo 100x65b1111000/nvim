@@ -34,8 +34,8 @@ _G.statuscolumn_click_fold_callback = function()
 	end)
 end
 
-M.get_extmark_info = function(lnum)
-	local bufnr = vim.api.nvim_get_current_buf()
+M.get_extmark_info = function(bufnr, lnum)
+
 	local extmark_cache = vim.b[bufnr]._extmark_cache or {}
 
 	if #extmark_cache > 0 and extmark_cache[lnum] ~= vim.NIL then -- setting a bufvar populates the missing indices with vim.NIL
@@ -43,7 +43,7 @@ M.get_extmark_info = function(lnum)
 	end
 
 	local signs = {}
-	local extmarks = vim.api.nvim_buf_get_extmarks(0, -1, 0, -1, { details = true, type = "sign" })
+	local extmarks = vim.api.nvim_buf_get_extmarks(bufnr, -1, 0, -1, { details = true, type = "sign" })
 
 	for _, extmark in pairs(extmarks) do
 		local line = extmark[2] + 1
@@ -51,6 +51,7 @@ M.get_extmark_info = function(lnum)
 		local name = extmark[4].sign_hl_group or extmark[4].sign_name
 		table.insert(signs[line], {
 			name = name,
+			bufnr = bufnr,
 			text = extmark[4].sign_text,
 			type = M.get_sign_type(name),
 			text_hl = extmark[4].sign_hl_group,
@@ -63,26 +64,26 @@ M.get_extmark_info = function(lnum)
 	return signs
 end
 
-M.get_git_sign = function(extmarks)
+M.get_git_sign = function(extmarks, bufnr)
 	for _, i in ipairs(extmarks) do
-		if i.type == "GitSign" then
+		if i.bufnr == bufnr and i.type == "GitSign" then
 			return string.format("%s%s%s%s%s ", "%#", i.text_hl, "#", i.text, "%*")
 		end
 	end
 	return "   "
 end
 
-M.get_diagnostic_sign = function(extmarks)
+M.get_diagnostic_sign = function(extmarks, bufnr)
 	for _, i in ipairs(extmarks) do
-		if i.type == "Diagnostic" then
+		if i.bufnr == bufnr and i.type == "Diagnostic" then
 			return string.format("%s%s%s%s", "%#", i.text_hl, "#", i.text)
 		end
 	end
 	return ""
 end
 
-M.right_sign = function (win, lnum, extmarks)
-	local str = M.get_diagnostic_sign(extmarks)
+M.right_sign = function (win, lnum, extmarks, bufnr)
+	local str = M.get_diagnostic_sign(extmarks, bufnr)
 	if str ~= "" then
 		return string.format("%%3.3(%s%%)", str)
 	end
@@ -99,12 +100,13 @@ M.generate_extmark_string = function(win, lnum)
 	if vim.v.virtnum ~= 0 then
 		return ""
 	end
-	local extmarks = M.get_extmark_info(lnum)[lnum] or {}
+	local bufnr = vim.api.nvim_win_get_buf(win)
+	local extmarks = M.get_extmark_info(bufnr, lnum)[lnum] or {}
 	local str = string.format(
 		"%s%s%s",
-		M.get_git_sign(extmarks),
+		M.get_git_sign(extmarks, bufnr),
 		"%l%=",
-		M.right_sign(win, lnum, extmarks)
+		M.right_sign(win, lnum, extmarks, bufnr)
 	)
 	return str
 end

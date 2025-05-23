@@ -19,6 +19,8 @@ local isdirectory = vim.fn.isdirectory
 local fnamemodify = vim.fn.fnamemodify
 local schedule = vim.schedule
 local tbl_contains = vim.tbl_contains
+local nvim_get_current_tabpage = api.nvim_get_current_tabpage
+local nvim_list_tabpages = api.nvim_list_tabpages
 
 local M = {}
 
@@ -53,13 +55,13 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	end
 	local suffix, prefix, brightness_bg, brightness_fg = nil, nil, 0, 0
 	if state == states.BufferStates.ACTIVE then
-		suffix, prefix, brightness_bg, brightness_fg = "Active", "Tabline", 75, 0
+		suffix, prefix, brightness_bg, brightness_fg = "Active", "TabLine", 75, 0
 	elseif state == states.BufferStates.INACTIVE then
-		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "Tabline", 10, -50
+		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "TabLine", 25, -55
 	elseif state == states.BufferStates.NONE then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 0, -50
+		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 0, -50
 	elseif state == states.BufferStates.MISC then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 50, 0
+		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 10, 0
 	end
 	return generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
 end
@@ -225,7 +227,7 @@ local calculate_buf_space = function(bufs)
 	return length
 end
 
-local fetch_overflow_indicator_info = function()
+local update_overflow_info = function()
 	local left_dist = states.start_idx - 1
 	local bufs = states.buffers_list
 	local right_dist = #bufs - states.end_idx
@@ -236,9 +238,9 @@ local fetch_overflow_indicator_info = function()
 	if left_dist > 0 then
 		states.left_overflow_str = string.format(
 			"%s%s%s %d %%* ",
-			"%#TablineOverflowIndicator#",
+			"%#TabLineOverflowIndicator#",
 			states.icons.left_overflow_indicator,
-			"%#TablineOverflowCount#",
+			"%#TabLineOverflowCount#",
 			left_dist
 		)
 		states.left_overflow_idicator_length =
@@ -247,9 +249,9 @@ local fetch_overflow_indicator_info = function()
 	if right_dist > 0 then
 		states.right_overflow_str = string.format(
 			" %s %d %s%s%%*",
-			"%#TablineOverflowCount#",
+			"%#TabLineOverflowCount#",
 			right_dist,
-			"%#TablineOverflowIndicator#",
+			"%#TabLineOverflowIndicator#",
 			states.icons.right_overflow_indicator
 		)
 		states.right_overflow_idicator_length =
@@ -263,7 +265,8 @@ M.calculate_buf_space = calculate_buf_space
 
 local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	local columns = nvim_get_option_value("columns", {})
-	local available_space = columns - (states.left_overflow_idicator_length + states.right_overflow_idicator_length)
+	local available_space = columns
+		- (states.left_overflow_idicator_length + states.right_overflow_idicator_length + states.tabpages_str_length)
 	local buf_space = calculate_buf_space(bufs)
 	states.visible_buffers = bufs
 	states.start_idx = 1
@@ -320,10 +323,10 @@ local function get_buffer_highlight(bufnr) -- changed from get_buf_hl
 			"TabLineFill",
 			states.BufferStates.ACTIVE,
 			{ italic = true, bold = true },
-			"TabLineBufActive"
+			"TabLineActive"
 		)
 	end
-	return generate_tabline_highlight("TabLineFill", states.BufferStates.INACTIVE, {}, "TabLineBufInactive")
+	return generate_tabline_highlight("TabLineFill", states.BufferStates.INACTIVE, {}, "TabLineInactive")
 end
 
 _G.tabline_close_button_callback = function(bufnr)
@@ -380,14 +383,50 @@ local function update_tabline_buffer_string()
 		for _, bufnr in ipairs(states.visible_buffers) do
 			str = str .. generate_buffer_string(bufnr, bufs)
 		end
-		states.cache.tabline_buf_string =
-			string.format("%s%s%s", states.left_overflow_str, str, states.right_overflow_str, "%#TabLineFill#%=")
+		states.cache.tabline_buf_string = string.format(
+			"%s%s%s%s%s",
+			states.left_overflow_str,
+			str,
+			states.right_overflow_str,
+			"%#TabLineFill#%=",
+			states.tabpages_str
+		)
 		vim.cmd([[redrawtabline]])
 	end)
 end
 
 M.get_tabline = function()
 	return states.cache.tabline_buf_string
+end
+
+M.tab_info = function()
+	states.tabs = api.nvim_list_tabpages()
+	states.current_tab = api.nvim_get_current_tabpage()
+end
+
+local get_tabpage_hl = function(tab)
+	if nvim_get_current_tabpage() == tab then
+		return "%#TabLineActive#", "%#TabLineCloseButtonActive#"
+	end
+	return "%#TabLineInactive#", "%#TabLineCloseButtonInactive#"
+end
+
+M.tabline_update_tab_string = function(tabs)
+	local str = ""
+	for _, i in ipairs(tabs) do
+		local hl, close_hl = get_tabpage_hl(i)
+		str = string.format("%s%%%dX%s%%X%%%dT%s %d %%T%s", close_hl, i, states.icons.tabpage_close_icon, i, hl, i, str)
+	end
+
+	states.tabpages_str = string.format(" %s%s %s ", str, "%#TabLineTabPageIcon#", states.icons.tabpage_icon)
+end
+
+M.tabline_update_tabpages_info = function()
+	states.tabline_tabpage_debounce_timer = timer_fn(states.tabline_tabpage_debounce_timer, 50, function()
+		local tabs = nvim_list_tabpages() or {}
+		M.tabline_update_tab_string(tabs)
+		states.tabpages_str_length = nvim_eval_statusline(states.tabpages_str, { use_tabline = true }).width
+	end)
 end
 
 M.get_tabline_buffers_list = get_tabline_buffers_list
@@ -407,7 +446,7 @@ M.update_tabline_buffer_info = function()
 		local buf_specs = states.buffers_spec
 		states.buffer_count = states.buffer_count + 1
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
-		fetch_overflow_indicator_info()
+		update_overflow_info()
 	end)
 end
 

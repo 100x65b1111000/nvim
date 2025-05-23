@@ -31,6 +31,8 @@ M.tabline_states.icons = {
 	separator = "▎",
 	left_overflow_indicator = "  ",
 	right_overflow_indicator = "  ",
+	tabpage_icon = "󰓩 ",
+	tabpage_close_icon = " 󰅗 "
 }
 
 M.tabline_states.end_idx = 1
@@ -52,6 +54,8 @@ M.tabline_states.buffers_spec = {}
 M.tabline_states.highlight_gen_count = 0
 M.tabline_states.available_width = vim.o.columns
 
+M.tabline_states.tabpages_str = ""
+M.tabline_states.tabpages_str_length = 0
 
 M.statusline_states = {}
 ---@class StatusLineDefaultConfig

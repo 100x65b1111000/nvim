@@ -410,14 +410,19 @@ P.opts = {
 			bg = c.purple,
 			fg = c.bg
 		}
-		hl.TablineOverflowIndicator = {
+		hl.TabLineOverflowIndicator = {
 			fg = c.yellow,
 			bg = c.bg,
 			reverse = true
 		}
-		hl.TablineOverflowCount = {
+		hl.TabLineOverflowCount = {
 			fg = c.yellow,
 			bg  = c.bg_visual
+		}
+		hl.TabLineTabpageIcon = {
+			fg = c.magenta,
+			bg = c.blue7,
+			reverse = false
 		}
 	end,
 }

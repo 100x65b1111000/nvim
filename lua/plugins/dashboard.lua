@@ -3,7 +3,7 @@ local P = {
 	dependencies = {
 		"echasnovski/mini.icons",
 	},
-	event = "VimEnter",
+	-- event = "VimEnter",
 }
 
 P.init = function()

@@ -10,13 +10,11 @@ end
 M.setup = function()
 	vim.api.nvim_create_augroup("StatusColumnRefresh", { clear = true })
 	vim.api.nvim_create_autocmd(
-		{ "BufWrite", "BufEnter", "TextChanged", "TextChangedI", "FocusGained", "LspAttach", "DiagnosticChanged" },
+		{ "BufWrite", "BufEnter", "TextChanged", "TextChangedI", "FocusGained", "LspAttach", "DiagnosticChanged", "CursorHold" },
 		{
 			group = "StatusColumnRefresh",
 			callback = function(args)
-				vim.schedule(function()
 					reset_cache(args.buf)
-				end)
 			end,
 		}
 	)

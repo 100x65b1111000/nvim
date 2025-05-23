@@ -278,7 +278,7 @@ M.default_server_config = {
 	on_attach = function(client, bufnr)
 		on_attach(client, bufnr)
 	end,
-	capabilities = require('blink.cmp').get_lsp_capabilities(),
+	capabilities = make_lsp_capabilities(),
 	root_markers = { ".git" },
 	on_error = function(code, err)
 		vim.notify("[LSP Error " .. code .. "]: " .. err, "error")

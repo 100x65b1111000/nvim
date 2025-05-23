@@ -37,7 +37,7 @@ vim.o.listchars = "tab:  ,eol:,space: ,extends:"
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.laststatus = 3
-vim.o.cmdheight = 1
+vim.o.cmdheight = 0
 vim.o.foldopen = "hor,insert,percent,search,undo"
 vim.o.foldminlines = 2
 vim.o.foldmethod = "manual"
@@ -140,4 +140,4 @@ function _G.custom_foldtext()
 end
 
 vim.opt.fillchars = "fold: "
--- vim.opt.foldtext = "v:lua.custom_foldtext()"
+vim.opt.foldtext = "v:lua.custom_foldtext()"
