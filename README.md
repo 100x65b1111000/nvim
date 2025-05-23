@@ -47,6 +47,26 @@ nvim
 - [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
 - lsp setup via `vim.lsp.config`.
 
+## You can also use the statusline/tabline/statuscolumn in your own config too !!
+Doing so is fairly easy, just grab the `ui` folder and place it inside your config, and call the setup functions for any of the statusline/tabline/statuscolumn inside your config and that's just it.
+
+> [!Note]
+> The statusline and tabline require the `[mini.icons](https://github.com/echasnovski/mini.icons)` plugin to generate some highlight groups and display file icons !!
+
+Here's a list of highlight groups you need to define, so that the colors don't look off:
+
+| Tabline Highlights | Purpose |
+|:-------------------|:--------|
+| `TabLineFill` | Background color for the Tabline |
+| `TabLineOverflowIndicator` | Overflow Indicator Icon ![image](https://github.com/user-attachments/assets/eaca5f4d-3945-4ecd-9d63-7d5725d18356)
+|
+| `TabLineOverflowCount` | Colors for the count of the buffers, displayed beside overflow indicator ![image](https://github.com/user-attachments/assets/bb8782d4-af56-4690-8fc1-30691072b42f) |
+
+| `TabLineTabPageIcon` | Color for the icon to indicate tabpages ![image](https://github.com/user-attachments/assets/07b3b045-7f38-4ada-a8c0-1d6bd57d1ffe)
+
+
+
+
 There are many more plugins included by default, such as git-signs.nvim, mini.pairs, helpview.nvim, markview.nvim, showkeys.nvim, dropbar.nvim, nvim-treesitter, vim-startuptime, lazydev, conform.nvim, highlight-colors.nvim.
 
 # Things not done yet, but are planned
