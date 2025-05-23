@@ -123,7 +123,9 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 
 ```
 
-Here's the result of the above
+**Here's what the above code results in**
+![image](https://github.com/user-attachments/assets/ad092c90-7016-44b5-8aff-741ca2d32dd9)
+
 
 # Things not done yet, but are planned
 - [ ] Better error handling for statusline/tabline/statuscolumn.
