@@ -194,7 +194,7 @@ M.dashboard_footers = {
 		"For a minute there, I lost myself, I lost myself",
 		"It doesn't have to be like this, killer whales",
 		"You share the same fate as the people you hate",
-		"You build your self up against other's feelings and it left you empty as a car coasting downhill",
+		"You build your self up against other's feelings and it left you feelin' empty as a car coasting downhill",
 		"One day, I'm gonna grow wings, a chemical reaction, hyterical and useless",
 		"I'm gonna say what's on my mind, then I'll walk out then I'll be fine",
 	},
