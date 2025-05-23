@@ -123,7 +123,8 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 
 ```
 
-**Here's what the above code results in**
+**Here's what the above setup results in**
+
 ![image](https://github.com/user-attachments/assets/ad092c90-7016-44b5-8aff-741ca2d32dd9)
 
 
