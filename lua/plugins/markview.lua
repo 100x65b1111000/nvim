@@ -10,10 +10,10 @@ local P = {
 
 P.config = function()
 	require("markview").setup({
-		preview = {
-			enabled = false,
-			icon_provider = "mini",
-		},
+		-- preview = {
+		-- 	enabled = true,
+		-- 	icon_provider = "mini",
+		-- },
 	})
 end
 

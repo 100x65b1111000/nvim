@@ -40,6 +40,8 @@ M.tabline_states.offset = 0
 ---@type integer[]
 M.tabline_states.visible_buffers = {}
 
+M.tabline_states.left_overflow_str = ""
+M.tabline_states.right_overflow_str = ""
 M.tabline_states.left_overflow_idicator_length = 0
 M.tabline_states.right_overflow_idicator_length = 0
 

@@ -329,7 +329,7 @@ P.opts = {
 			fg = c.blue2
 		}
 		hl.TabLineFill = {
-		 	bg = c.bg_dark1,
+		 	bg = c.bg_dark,
 			fg = c.fg
 		}
 		hl.TabLineActive = {
@@ -409,6 +409,15 @@ P.opts = {
 		hl.FloatTitle = {
 			bg = c.purple,
 			fg = c.bg
+		}
+		hl.TablineOverflowIndicator = {
+			fg = c.yellow,
+			bg = c.bg,
+			reverse = true
+		}
+		hl.TablineOverflowCount = {
+			fg = c.yellow,
+			bg  = c.bg_visual
 		}
 	end,
 }

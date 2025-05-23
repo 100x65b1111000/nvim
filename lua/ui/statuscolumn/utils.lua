@@ -8,20 +8,19 @@ M.get_sign_type = function(str)
 end
 
 M.get_folds = function(win, lnum)
-	local fold_str = ""
-	vim.api.nvim_win_call(win, function()
+	return vim.api.nvim_win_call(win, function()
 		local foldlevel = vim.fn.foldlevel
 		local fold_level = foldlevel(lnum)
 		local is_fold_closed = vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1
 		local is_fold_started = fold_level > foldlevel(lnum - 1)
 		if is_fold_closed then
-			fold_str = string.format("%s%s", fold_str, " ")
+			return "  "
 		elseif is_fold_started then
-			fold_str = string.format("%s%s", fold_str, " ")
+			return "  "
 		end
+		return ""
 	end)
 
-	return fold_str
 end
 
 _G.statuscolumn_click_fold_callback = function()
@@ -74,16 +73,27 @@ M.get_git_sign = function(extmarks)
 end
 
 M.get_diagnostic_sign = function(extmarks)
-	local diagnostic_string = ""
 	for _, i in ipairs(extmarks) do
 		if i.type == "Diagnostic" then
-			diagnostic_string = string.format("%s%s%s %s", "%#", i.text_hl, "#", i.text)
+			return string.format("%s%s%s%s", "%#", i.text_hl, "#", i.text)
 		end
 	end
-	return diagnostic_string
+	return ""
 end
 
+M.right_sign = function (win, lnum, extmarks)
+	local str = M.get_diagnostic_sign(extmarks)
+	if str ~= "" then
+		return string.format("%%3.3(%s%%)", str)
+	end
 
+	str = M.get_folds(win, lnum)
+	if str ~= "" then
+		return string.format("%%3.3(%s%%)", str)
+	end
+
+	return "%3.3(%)"
+end
 
 M.generate_extmark_string = function(win, lnum)
 	if vim.v.virtnum ~= 0 then
@@ -91,12 +101,10 @@ M.generate_extmark_string = function(win, lnum)
 	end
 	local extmarks = M.get_extmark_info(lnum)[lnum] or {}
 	local str = string.format(
-		"%s%s%s%s%s",
+		"%s%s%s",
 		M.get_git_sign(extmarks),
-		"%=%2.10l%=%3.3(",
-		M.get_diagnostic_sign(extmarks),
-		M.get_folds(win, lnum),
-		"%)"
+		"%l%=",
+		M.right_sign(win, lnum, extmarks)
 	)
 	return str
 end

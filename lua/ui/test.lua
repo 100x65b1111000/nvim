@@ -2,7 +2,6 @@ local M = {}
 
 local test2 = function()
 	local var = string.format("%s %s %s %s", "This", "is", "a", "string")
-	-- utils.get_tabline()
 end
 local test1 = function()
 	local var = ("%s %s %s %s"):format("This", "is", "a", "string")

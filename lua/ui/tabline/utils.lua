@@ -55,7 +55,7 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	if state == states.BufferStates.ACTIVE then
 		suffix, prefix, brightness_bg, brightness_fg = "Active", "Tabline", 75, 0
 	elseif state == states.BufferStates.INACTIVE then
-		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "Tabline", 50, -50
+		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "Tabline", 10, -50
 	elseif state == states.BufferStates.NONE then
 		suffix, prefix, brightness_bg, brightness_fg = "None", "Tabline", 0, -50
 	elseif state == states.BufferStates.MISC then
@@ -225,42 +225,38 @@ local calculate_buf_space = function(bufs)
 	return length
 end
 
-local get_overflow_indicator_info = function(bufs)
+local fetch_overflow_indicator_info = function()
 	local left_dist = states.start_idx - 1
+	local bufs = states.buffers_list
 	local right_dist = #bufs - states.end_idx
-	local left_overflow_str = ""
-	local right_overflow_str = ""
-	local left_overflow_indicator_hl, right_overflow_indicator_hl = "", ""
+	states.left_overflow_str = ""
+	states.right_overflow_str = ""
+	states.left_overflow_idicator_length = 0
+	states.right_overflow_idicator_length = 0
 	if left_dist > 0 then
-		left_overflow_indicator_hl = generate_tabline_highlight(
-			"MiniIconsOrange",
-			states.BufferStates.ACTIVE,
-			{ reverse = true },
-			"OverflowIndicatorLeftActive"
+		states.left_overflow_str = string.format(
+			"%s%s%s %d %%* ",
+			"%#TablineOverflowIndicator#",
+			states.icons.left_overflow_indicator,
+			"%#TablineOverflowCount#",
+			left_dist
 		)
-		left_overflow_str = states.icons.left_overflow_indicator
-		M.update_tabline_buffer_info()
-		M.update_tabline_buffer_string()
+		states.left_overflow_idicator_length =
+			nvim_eval_statusline(states.left_overflow_str, { use_tabline = true }).width
 	end
 	if right_dist > 0 then
-		right_overflow_indicator_hl = generate_tabline_highlight(
-			"MiniIconsOrange",
-			states.BufferStates.ACTIVE,
-			{ reverse = true },
-			"OverflowIndicatorRightActive"
+		states.right_overflow_str = string.format(
+			" %s %d %s%s%%*",
+			"%#TablineOverflowCount#",
+			right_dist,
+			"%#TablineOverflowIndicator#",
+			states.icons.right_overflow_indicator
 		)
-		right_overflow_str = states.icons.right_overflow_indicator
-		M.update_tabline_buffer_info()
-		M.update_tabline_buffer_string()
+		states.right_overflow_idicator_length =
+			nvim_eval_statusline(states.right_overflow_str, { use_tabline = true }).width
 	end
-	left_overflow_str = string.format("%%#%s#%s%%#TabLineFill# ", left_overflow_indicator_hl, left_overflow_str)
-	right_overflow_str = string.format(" %%#%s#%s", right_overflow_indicator_hl, right_overflow_str)
-	states.left_overflow_idicator_length = nvim_eval_statusline(left_overflow_str, { use_tabline = true }).width
-	states.right_overflow_idicator_length = nvim_eval_statusline(right_overflow_str, { use_tabline = true }).width
-	return {
-		left_overflow_str = left_overflow_str,
-		right_overflow_str = right_overflow_str,
-	}
+	M.update_tabline_buffer_info()
+	M.update_tabline_buffer_string()
 end
 
 M.calculate_buf_space = calculate_buf_space
@@ -384,14 +380,8 @@ local function update_tabline_buffer_string()
 		for _, bufnr in ipairs(states.visible_buffers) do
 			str = str .. generate_buffer_string(bufnr, bufs)
 		end
-		local overflow_info = get_overflow_indicator_info(bufs)
-		states.cache.tabline_buf_string = string.format(
-			"%s%s%s",
-			overflow_info.left_overflow_str,
-			str,
-			overflow_info.right_overflow_str,
-			"%#TabLineFill#%="
-		)
+		states.cache.tabline_buf_string =
+			string.format("%s%s%s", states.left_overflow_str, str, states.right_overflow_str, "%#TabLineFill#%=")
 		vim.cmd([[redrawtabline]])
 	end)
 end
@@ -417,6 +407,7 @@ M.update_tabline_buffer_info = function()
 		local buf_specs = states.buffers_spec
 		states.buffer_count = states.buffer_count + 1
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
+		fetch_overflow_indicator_info()
 	end)
 end
 
