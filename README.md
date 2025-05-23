@@ -34,9 +34,9 @@ nvim
 ```
 
 # Highlights
-- Home baked statusline ( ~500 loc ) and tabline ( ~500 loc) with minimalism and aesthetics in mind, however not much configurable.
+- Manually baked statusline ( ~500 loc ), statuscolumn ( ~150 loc ) and tabline ( ~500 loc) with minimalism and aesthetics in mind, however not much configurable.
 ![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
-
+![image](https://github.com/user-attachments/assets/e0f57119-ba19-4d1b-a8ba-e15b1e8d8f95)
 - Reasonable defaults.
 - [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management.
 - Customized dashboard with [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
@@ -47,7 +47,7 @@ nvim
 - [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
 - lsp setup via `vim.lsp.config`.
 
-There are many more plugins included by default, such as git-signs.nvim, mini.pairs, helpview.nvim, markview.nvim, showkeys.nvim, dropbar.nvim, nvim-treesitter, vim-startuptime, lazydev, conform.nvim,highlight-colors.nvim.
+There are many more plugins included by default, such as git-signs.nvim, mini.pairs, helpview.nvim, markview.nvim, showkeys.nvim, dropbar.nvim, nvim-treesitter, vim-startuptime, lazydev, conform.nvim, highlight-colors.nvim.
 
 # Things not done yet, but are planned
 - [ ] luasnip snippets (right now it just servers the purpose of completing lsp snippets via `blink.cmp`).
