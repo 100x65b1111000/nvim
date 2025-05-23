@@ -1,9 +1,9 @@
 # NEOVIM CONFIG
-This is my personal neovim config that I have developed thoughout my journey of daily driving neovim. It may or may not suit your needs but if it does, I'm happy to hear that.
+This is my personal Neovim config that I have developed throughout my journey of daily driving neovim. It may or may not suit your needs but if it does, I'm happy to hear that.
 
 > [!Note]
-> As of right now, this config is somewhat experimental but functional, as changes are undergoing on the fly, the code is a mess rn (I'm trying my best to clean that). Any issues that I tackle, I try to fix them asap.
-> If you are facing any problem or bugs, just raise an issue, I'll try to fix them asap. PR's are more than welcome !. 
+> This config is currently experimental but functional. As changes are made on the fly, the code is currently a bit messy (I'm doing my best to clean it up). I try to fix any issues I encounter as soon as possible.
+> If you encounter any problems or bugs, please raise an issue, and I'll try to fix them as soon as possible. PRs are more than welcome!
 
 # SHOWCASE
 ![image](https://github.com/user-attachments/assets/a3905980-96c2-48b0-b1ff-f425ee9b1022)
@@ -22,19 +22,19 @@ To get the setup up and running.
 Firstly backup your current neovim setup:
 
 ```bash
-mv ~/.config/{nvim,nvim.bak}
-mv ~/.local/share/{nvim,nvim.bak}
+mv ~/.config/nvim ~/.config/nvim.bak
+mv ~/.local/share/nvim ~/.local/share/nvim.bak
 ```
 
 Now, simply clone the repository into your `$XDG_CONFIG_HOME/nvim` directory.
 
 ```bash
-git clone htps://gitlab.com/100x65b1111000/nvim.git ~/.config/nvim
+git clone https://gitlab.com/100x65b1111000/nvim.git ~/.config/nvim
 nvim
 ```
 
 # Highlights
-- Manually baked statusline ( ~500 loc ), statuscolumn ( ~150 loc ) and tabline ( ~500 loc) with minimalism and aesthetics in mind, however not much configurable.
+- Manually created statusline (~500 LOC), statuscolumn (~150 LOC), and tabline (~500 LOC) with minimalism and aesthetics in mind. However, they are not highly configurable.
 ![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
 ![image](https://github.com/user-attachments/assets/e0f57119-ba19-4d1b-a8ba-e15b1e8d8f95)
 - Reasonable defaults.
@@ -47,19 +47,86 @@ nvim
 - [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
 - lsp setup via `vim.lsp.config`.
 
-## You can also use the statusline/tabline/statuscolumn in your own config too !!
+There are many more plugins included by default, such as:
+- [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim)
+- [mini.pairs](https://github.com/echasnovski/mini.nvim)
+- [helpview.nvim](https://github.com/OXY2DEV/helpview.nvim)
+- [markview.nvim](https://github.com/OXY2DEV/markview.nvim)
+- [showkeys.nvim](https://github.com/nvzone/showkeys)
+- [dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)
+- [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
+- [vim-startuptime](https://github.com/dstein64/vim-startuptime)
+- [lazydev](https://github.com/folke/lazydev.nvim)
+- [conform.nvim](https://github.com/stevearc/conform.nvim)
+- [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors)
+
+# You can also use the statusline/tabline/statuscolumn in your own config too !!
 Doing so is fairly easy, just grab the `ui` folder and place it inside your config, and call the setup functions for any of the statusline/tabline/statuscolumn inside your config and that's just it.
 
+
 > [!Note]
-> The statusline and tabline require the [`mini.icons`](https://github.com/echasnovski/mini.icons) plugin to generate some highlight groups and display file icons !!
-> There are also some highlight groups you must define first or else theh colors would look off. You can check those highlight groups in the `lua/plugins/tokyonight.lua` spec file (just search for `/StatusLine` and `/TabLine`, and define the highlight groups).
+> The statusline and tabline require the `mini.icons` plugin to generate some highlight groups and display file icons.
+> There are also some highlight groups you must define first, or else the colors will look off. You can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search for `/StatusLine` and `/TabLine` and define the highlight groups).
 
+### Adding Custom Modules to the Statusline
 
+You can extend the statusline with your own custom modules. The process involves defining a Lua function that returns information about what to display, and then adding this function to your statusline configuration.
 
+**1. Define Your Module Function**
 
-There are many more plugins included by default, such as git-signs.nvim, mini.pairs, helpview.nvim, markview.nvim, showkeys.nvim, dropbar.nvim, nvim-treesitter, vim-startuptime, lazydev, conform.nvim, highlight-colors.nvim.
+A custom module is a Lua function that returns a table with specific keys. The main keys are:
+
+*   `string`: (Required) The text content you want the module to display.
+*   `hl_group`: (Optional) The highlight group to apply to the `string`. If omitted, it will likely use a default statusline highlight.
+*   `icon`: (Optional) An icon to display for the module.
+*   `icon_hl`: (Optional) The highlight group for the `icon`.
+*   `reverse`: (Optional) A boolean. If `true`, the `string` and `hl_group` are displayed first, then the `icon` and `icon_hl`. Defaults to `false` (icon first).
+
+Here's an example of a simple custom module that displays the current date:
+
+```lua
+local function my_date_module()
+  local date_str = os.date("%Y-%m-%d")
+  return {
+    string = date_str,
+    hl_group = "Comment", -- Example highlight group
+    icon = " ",          -- Example icon (requires a Nerd Font)
+    icon_hl = "Special"    -- Example highlight group for the icon
+  }
+end
+```
+
+**2. Add Your Module to the Statusline Configuration**
+
+When you set up the statusline using `require('ui.statusline').setup(opts)`, you can pass your custom module function in the `opts.modules` table. You can add it to the `left`, `middle`, or `right` sections of the statusline.
+
+For example, to add `my_date_module` to the left section of the statusline:
+
+```lua
+-- Define your custom module function 
+local function my_date_module()
+  local date_str = os.date("%Y-%m-%d")
+  return {
+    string = date_str,
+    hl_group = "Comment",
+    icon = " ",
+    icon_hl = "Special"
+  }
+end
+```
+
+**3. Now just add this function inside your statusline setup like this**
+
+```lua
+-- Assuming the ui directly exists inside ~/.config/nvim/lua/
+require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf-info", my_date_module }, middle = { ... }, right = { ... }}})
+
+```
+
+Here's the result of the above
 
 # Things not done yet, but are planned
-- [ ] luasnip snippets (right now it just servers the purpose of completing lsp snippets via `blink.cmp`).
-- [ ] add more keybinds.
-- [ ] Lsp configuration for more lsp servers.
+- [ ] Better error handling for statusline/tabline/statuscolumn.
+- [ ] luasnip snippets (right now it just serves the purpose of completing lsp snippets via `blink.cmp`).
+- [ ] Add more keybindings.
+- [ ] LSP configuration for more LSP servers.

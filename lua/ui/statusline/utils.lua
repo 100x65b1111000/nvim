@@ -429,7 +429,7 @@ local format_diagnostics = function(severity)
 	local hl = statusline_states.cache.severity_map[severity].hl
 	local icon = statusline_states.cache.severity_map[severity].icon
 	if count > 0 then
-		return string.format("%s%s%s", hl, icon, count)
+		return string.format("%s%s%s%%*", hl, icon, count)
 	end
 
 	return ""
@@ -521,7 +521,7 @@ local generate_module_string = function(modules)
 			module_string = (
 				module_info.reverse
 				and string.format(
-					"%s%s%s%s",
+					"%s%s%%*%s%s%%*",
 					format_hl_string(module_info.hl_group or ""),
 					module_info.string or "",
 					format_hl_string(module_info.icon_hl or ""),
@@ -529,7 +529,7 @@ local generate_module_string = function(modules)
 				)
 			)
 				or string.format(
-					"%s%s%s%s",
+					"%s%s%%*%s%s%%*",
 					format_hl_string(module_info.icon_hl or ""),
 					module_info.icon or "",
 					format_hl_string(module_info.hl_group or ""),
