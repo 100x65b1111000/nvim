@@ -6,13 +6,15 @@ This is my personal neovim config that I have developed thoughout my journey of 
 > If you are facing any problem or bugs, just raise an issue, I'll try to fix them asap. PR's are more than welcome !. 
 
 # SHOWCASE
-![image](https://github.com/user-attachments/assets/225bf5a2-fa93-443a-8253-ca3315fdb233)
-![image](https://github.com/user-attachments/assets/45cb8d9f-ed50-4768-be81-b5faa6c31aff)
-![image](https://github.com/user-attachments/assets/36d85487-9804-4948-a70a-422d972e3483)
-![image](https://github.com/user-attachments/assets/f6295ec9-60e7-40d4-b31c-9cf03873d86f)
-![image](https://github.com/user-attachments/assets/24d388c8-50e5-41f1-9a46-35efb957f51b)
-![image](https://github.com/user-attachments/assets/eec8d707-b1b3-4c46-8531-7dd4124975e7)
-![image](https://github.com/user-attachments/assets/e23b0e56-67db-4301-af54-3a9e4fac650b)
+![image](https://github.com/user-attachments/assets/a3905980-96c2-48b0-b1ff-f425ee9b1022)
+![image](https://github.com/user-attachments/assets/bf625347-6098-4033-8cac-7bd0c71a9aeb)
+![image](https://github.com/user-attachments/assets/843ac2c7-1375-4c87-9197-f35bb2f543f2)
+![image](https://github.com/user-attachments/assets/e39b5f40-885e-4259-8644-ba217f3b6f93)
+![image](https://github.com/user-attachments/assets/70ce54dc-72dc-4e0b-956f-285e6729257e)
+![image](https://github.com/user-attachments/assets/31c683c3-74c1-4a03-9245-8fac62587c19)
+![image](https://github.com/user-attachments/assets/59c74c96-f067-4ee1-98b8-d0250183eb7b)
+![image](https://github.com/user-attachments/assets/258eadf4-8ce0-4337-805f-20084439f0ed)
+
 
 # Install Instructions
 
