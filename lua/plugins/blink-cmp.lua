@@ -138,7 +138,7 @@ P.config = function()
 						blocked_filetypes = { ".txt" },
 					},
 					semantic_token_resolution = {
-						enabled = false,
+						enabled = true,
 						blocked_filetypes = {},
 						timeout_ms = 400,
 					},

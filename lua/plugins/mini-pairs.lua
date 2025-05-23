@@ -1,4 +1,9 @@
-local M = { "echasnovski/mini.pairs", version = false, event = { "InsertEnter" } }
+local M = {
+	"echasnovski/mini.pairs",
+	version = false,
+	enabled = false,
+	event = { "InsertEnter" },
+}
 
 M.config = function()
 	-- No need to copy this inside `setup()`. Will be used automatically.
