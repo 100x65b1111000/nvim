@@ -215,9 +215,6 @@ P.opts = {
 		hl.StatusLineNC = {
 			link = "StatusLine"
 		}
-		hl.StatusLineHl = {
-			bg = c.bg_dark
-		}
 		hl.StatusLineNormalMode = {
 			fg = c.blue,
 			bold = true,
@@ -331,27 +328,6 @@ P.opts = {
 		hl.TabLineFill = {
 		 	bg = c.bg_dark,
 			fg = c.fg
-		}
-		hl.TabLineActive = {
-			fg = c.fg,
-			bg = c.bg_highlight,
-			italic = true
-		}
-		hl.TabLineInactive = {
-			fg = c.fg_dark,
-			bg = c.bg,
-		}
-		hl.OerflowIndicatorRightActive = {
-			fg = c.bg,
-			bg = c.orange
-		}
-		hl.OerflowIndicatorInactive = {
-			fg = c.bg,
-			bg = c.orange
-		}
-		hl.OerflowIndicatorLeftActive = {
-			fg = c.bg,
-			bg = c.orange
 		}
 		hl.MiniFilesTitle = {
 			fg = c.blue,
