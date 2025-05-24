@@ -6,7 +6,7 @@ This is my personal Neovim config that I have developed throughout my journey of
 > If you encounter any problems or bugs, please raise an issue, I'll try to fix them as soon as possible. PRs are more than welcome!
 
 # SHOWCASE
-![image](https://github.com/user-attachments/assets/8178dcfe-1177-42b6-8cb0-91ab920addc7)
+![for all the startuptime freaks](https://github.com/user-attachments/assets/8178dcfe-1177-42b6-8cb0-91ab920addc7)
 ![image](https://github.com/user-attachments/assets/bf625347-6098-4033-8cac-7bd0c71a9aeb)
 ![image](https://github.com/user-attachments/assets/843ac2c7-1375-4c87-9197-f35bb2f543f2)
 ![image](https://github.com/user-attachments/assets/e39b5f40-885e-4259-8644-ba217f3b6f93)
