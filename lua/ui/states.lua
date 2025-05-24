@@ -2,7 +2,7 @@ local M = {}
 
 M.cache = { highlights = {}}
 
--- *** Tabline Cache ***
+--- *** Tabline Cache ***
 M.tabline_states = {}
 M.tabline_states.BufferStates = {
 	ACTIVE = 1,

@@ -14,7 +14,7 @@ M.get_folds = function(win, lnum)
 		local is_fold_closed = vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1
 		local is_fold_started = fold_level > foldlevel(lnum - 1)
 		if is_fold_closed then
-			return "  "
+			return " %#Folded# %*"
 		elseif is_fold_started then
 			return "  "
 		end
