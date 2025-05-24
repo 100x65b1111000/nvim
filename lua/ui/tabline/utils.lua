@@ -61,7 +61,7 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	elseif state == states.BufferStates.NONE then
 		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 0, -50
 	elseif state == states.BufferStates.MISC then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 10, 0
+		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 25, 0
 	end
 	return generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
 end
@@ -139,26 +139,26 @@ end
 local function get_close_button(bufnr)
 	local close_button_str = "%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X"
 	local close_btn_inactive_hl =
-		generate_tabline_highlight("MiniIconsRed", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
+		generate_tabline_highlight("PreProc", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
 
 	if nvim_get_mode().mode == "i" and bufnr == nvim_get_current_buf() then
 		local close_btn_insert_mode_hl =
-			generate_tabline_highlight("MiniIconsGreen", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
+			generate_tabline_highlight("String", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
 		return string.format(close_button_str, bufnr, close_btn_insert_mode_hl, states.icons.active_dot)
 	end
 	if nvim_get_option_value("modified", { buf = bufnr }) and bufnr == nvim_get_current_buf() then
 		local close_btn_modified_hl =
-			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.ACTIVE, {}, "TabLineModifiedActive")
+			generate_tabline_highlight("Constant", states.BufferStates.ACTIVE, {}, "TabLineModifiedActive")
 		return string.format(close_button_str, bufnr, close_btn_modified_hl, states.icons.active_dot)
 	end
 	if nvim_get_option_value("modified", { buf = bufnr }) then
 		local close_btn_modified_hl =
-			generate_tabline_highlight("MiniIconsOrange", states.BufferStates.MISC, {}, "TabLineModifiedInactive")
+			generate_tabline_highlight("Constant", states.BufferStates.MISC, {}, "TabLineModifiedInactive")
 		return string.format(close_button_str, bufnr, close_btn_modified_hl, states.icons.active_dot)
 	end
 	if bufnr == nvim_get_current_buf() then
 		local close_btn_active_hl =
-			generate_tabline_highlight("MiniIconsRed", states.BufferStates.ACTIVE, {}, "TabLineCloseButtonActive")
+			generate_tabline_highlight("PreProc", states.BufferStates.ACTIVE, {}, "TabLineCloseButtonActive")
 		return string.format(close_button_str, bufnr, close_btn_active_hl, states.icons.close)
 	end
 
@@ -415,6 +415,7 @@ M.tabline_update_tab_string = function(tabs)
 	local str = ""
 	for _, i in ipairs(tabs) do
 		local hl, close_hl = get_tabpage_hl(i)
+		-- str = string.format("%s%%%dX%s%%X%%%dT%s %d %%T%s", close_hl, i, states.icons.tabpage_close_icon, i, hl, i, str)
 		str = string.format("%s%%%dX%s%%X%%%dT%s %d %%T%s", close_hl, i, states.icons.tabpage_close_icon, i, hl, i, str)
 	end
 

@@ -21,7 +21,7 @@ function M.buf_status()
 		return { hl_group = "", string = "" }
 	end
 	local hl = generate_highlight(
-		"MiniIconsOrange",
+		"Constant",
 		"StatusLineNormalMode",
 		{},
 		-50,
@@ -338,7 +338,7 @@ end
 M.statusline_ts_info = function()
 	local ts_info = vim.treesitter.highlighter.active[nvim_get_current_buf()]
 	local hl_group = generate_highlight(
-		"MiniIconsGreen",
+		"Character",
 		"StatusLineNormalMode",
 		{ reverse = false },
 		-75,

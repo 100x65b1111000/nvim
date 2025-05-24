@@ -2,8 +2,8 @@
 This is my personal Neovim config that I have developed throughout my journey of daily driving neovim. It may or may not suit your needs but if it does, I'm happy to hear that.
 
 > [!Note]
-> This config is currently experimental but functional. As changes are made on the fly, the code is currently a bit messy (I'm doing my best to clean it up). I try to fix any issues I encounter as soon as possible.
-> If you encounter any problems or bugs, please raise an issue, and I'll try to fix them as soon as possible. PRs are more than welcome!
+> This config is currently experimental but functional. As changes are made on the fly, the code is a mess rn (I'm doing my best to clean it up). I try to fix any issues I encounter as soon as possible.
+> If you encounter any problems or bugs, please raise an issue, I'll try to fix them as soon as possible. PRs are more than welcome!
 
 # SHOWCASE
 ![image](https://github.com/user-attachments/assets/8178dcfe-1177-42b6-8cb0-91ab920addc7)

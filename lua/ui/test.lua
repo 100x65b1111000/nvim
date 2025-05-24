@@ -1,10 +1,19 @@
 local M = {}
 
-local test2 = function()
-	local var = string.format("%s %s %s %s", "This", "is", "a", "string")
-end
 local test1 = function()
-	local var = ("%s %s %s %s"):format("This", "is", "a", "string")
+      local utils = require("ui.statusline.utils")
+      if utils.buf_is_file() then
+           utils.fetch_diagnostics()
+      end
+end
+
+local test2 = function()
+      local utils = require("ui.statusline.utils")
+      local buf_is_file = utils.buf_is_file
+      local fetch_diagnostics = utils.fetch_diagnostics
+      if buf_is_file() then
+           fetch_diagnostics()
+      end
 end
 
 M.test = function(fn, iterations)
@@ -19,7 +28,7 @@ M.test = function(fn, iterations)
 end
 
 M.print_results = function()
-	print("time taken = %.6f sec", M.test(test1))
 	print("time taken = %.6f sec", M.test(test2))
+	print("time taken = %.6f sec", M.test(test1))
 end
 return M
