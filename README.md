@@ -124,8 +124,9 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 ```
 
 **Here's what the above setup results in**
+![image](https://github.com/user-attachments/assets/1c17926f-c2d8-430c-9197-72e3da7fcbab)
+> Notice that the middle and right modules are blank, once you define the left/middle/right modules, they would be overidden! and default to empty if empty table is passed to them.
 
-![image](https://github.com/user-attachments/assets/ad092c90-7016-44b5-8aff-741ca2d32dd9)
 
 
 # Things not done yet, but are planned
