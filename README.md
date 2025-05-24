@@ -47,7 +47,7 @@ nvim
 - [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
 - lsp setup via `vim.lsp.config`.
 
-There are many more plugins included by default, such as:
+Other plugins included, are:
 - [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim)
 - [mini.pairs](https://github.com/echasnovski/mini.nvim)
 - [helpview.nvim](https://github.com/OXY2DEV/helpview.nvim)
@@ -60,7 +60,7 @@ There are many more plugins included by default, such as:
 - [conform.nvim](https://github.com/stevearc/conform.nvim)
 - [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors)
 
-# You can also use the statusline/tabline/statuscolumn in your own config too !!
+# You can use the statusline/tabline/statuscolumn in your own config too !!
 Doing so is fairly easy, just grab the `ui` folder and place it inside your config, and call the setup functions for any of the statusline/tabline/statuscolumn inside your config and that's just it.
 
 
