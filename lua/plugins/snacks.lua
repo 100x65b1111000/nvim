@@ -32,23 +32,22 @@ P.opts = {
 					{
 						win = "input",
 						height = 1,
-						border = "rounded",
+						border = "solid",
 						title = "{title} {live} {flags}",
 						title_pos = "center",
 					},
 					{
 						win = "list",
 						title = " Results ",
-						wo = {
-						},
+						wo = {},
 						title_pos = "center",
-						border = "rounded",
+						border = "solid",
 						resize = true,
-						text = function ()
-							return "djfls"
-						end,
+						-- text = function ()
+						-- 	return "djfls"
+						-- end,
 						keys = {
-							["<M-j>"] = function (self)
+							["<M-j>"] = function(self)
 								self.action(self, "list_down")
 							end,
 						},
@@ -62,6 +61,15 @@ P.opts = {
 					title_pos = "center",
 				},
 			},
+		},
+		matcher = {
+			fuzzy = true,
+			cwd_bonus = true,
+			frecency = true,
+			history_bonus = false,
+			sort_empty = true,
+			smartcase = false,
+			ignorecase = true,
 		},
 	},
 	notifier = { enabled = true },

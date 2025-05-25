@@ -227,7 +227,7 @@ local calculate_buf_space = function(bufs)
 	return length
 end
 
-local update_overflow_info = function()
+M.update_overflow_info = function()
 	local left_dist = states.start_idx - 1
 	local bufs = states.buffers_list
 	local right_dist = #bufs - states.end_idx
@@ -257,8 +257,6 @@ local update_overflow_info = function()
 		states.right_overflow_idicator_length =
 			nvim_eval_statusline(states.right_overflow_str, { use_tabline = true }).width
 	end
-	M.update_tabline_buffer_info()
-	M.update_tabline_buffer_string()
 end
 
 M.calculate_buf_space = calculate_buf_space
@@ -377,7 +375,7 @@ end
 
 ---Updates the global tabline buffer string.
 local function update_tabline_buffer_string()
-	states.tabline_update_debounce_timer2 = timer_fn(states.tabline_update_debounce_timer2, 50, function()
+	states.tabline_update_buffer_string_timer = timer_fn(states.tabline_update_buffer_string_timer, 50, function()
 		local str = ""
 		local bufs = states.buffers_list
 		for _, bufnr in ipairs(states.visible_buffers) do
@@ -416,14 +414,15 @@ M.tabline_update_tab_string = function(tabs)
 	for _, i in ipairs(tabs) do
 		local hl, close_hl = get_tabpage_hl(i)
 		-- str = string.format("%s%%%dX%s%%X%%%dT%s %d %%T%s", close_hl, i, states.icons.tabpage_close_icon, i, hl, i, str)
-		str = string.format("%s%%%dX%s%%X%%%dT%s %d %%T%s", close_hl, i, states.icons.tabpage_close_icon, i, hl, i, str)
+		str = string.format("%%%dT%s %d%%T%s%%%dX%s%%X%s%%*", i, hl, i, close_hl, i, states.icons.tabpage_close_icon, str)
 	end
 
-	states.tabpages_str = string.format(" %s%s %s ", str, "%#TabLineTabPageIcon#", states.icons.tabpage_icon)
+	states.tabpages_str = string.format(" %s %s %s ", str, "%#TabLineTabPageIcon#", states.icons.tabpage_icon)
 end
 
 M.tabline_update_tabpages_info = function()
-	states.tabline_tabpage_debounce_timer = timer_fn(states.tabline_tabpage_debounce_timer, 50, function()
+	states.tabline_tabpage_timer = timer_fn(states.tabline_tabpage_timer, 50, function()
+		vim.notify('timer ran')
 		local tabs = nvim_list_tabpages() or {}
 		M.tabline_update_tab_string(tabs)
 		states.tabpages_str_length = nvim_eval_statusline(states.tabpages_str, { use_tabline = true }).width
@@ -436,18 +435,19 @@ M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
 
 M.update_tabline_buffer_info = function()
-	states.tabline_update_debounce_timer1 = timer_fn(states.tabline_update_debounce_timer1, 50, function()
+	states.tabline_update_buffer_info_timer= timer_fn(states.tabline_update_buffer_info_timer, 50, function()
 		local bufnr = nvim_get_current_buf()
 		if not buf_is_valid(bufnr) then
 			return
 		end
+		states.timer_count = states.timer_count + 1
 		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 		local bufs = states.buffers_list
 		local buf_specs = states.buffers_spec
-		states.buffer_count = states.buffer_count + 1
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
-		update_overflow_info()
+		M.update_overflow_info()
+		fetch_visible_buffers(bufnr, bufs, buf_specs) -- overflow indicators might cause the available width to decrease
 	end)
 end
 

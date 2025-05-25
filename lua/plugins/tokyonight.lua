@@ -396,10 +396,10 @@ P.opts = {
 			fg = c.yellow,
 			bg  = c.bg_visual
 		}
-		hl.TabLineTabpageIcon = {
+		hl.TabLineTabPageIcon = {
 			fg = c.magenta,
 			bg = c.blue7,
-			reverse = false
+			reverse = true
 		}
 	end,
 }

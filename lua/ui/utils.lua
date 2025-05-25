@@ -105,7 +105,7 @@ M.timer_fn = function(timer, timeout, callback)
 	end
 
 	timer = vim.uv.new_timer()
-	assert(timer, "Error creating timer")
+	assert(timer)
 	timer:start(timeout, 0, function()
 		vim.schedule(callback)
 	end)

@@ -48,7 +48,7 @@ M.tabline_states.left_overflow_idicator_length = 0
 M.tabline_states.right_overflow_idicator_length = 0
 
 M.tabline_states.buffer_map = {}
-M.tabline_states.buffer_count = 0
+M.tabline_states.timer_count = 0
 M.tabline_states.buffers_list = {}
 M.tabline_states.buffers_spec = {}
 M.tabline_states.highlight_gen_count = 0
@@ -56,6 +56,10 @@ M.tabline_states.available_width = vim.o.columns
 
 M.tabline_states.tabpages_str = ""
 M.tabline_states.tabpages_str_length = 0
+
+M.tabline_states.tabline_update_buffer_string_timer = nil
+M.tabline_states.tabline_update_buffer_info_timer = nil
+M.tabline_states.tabline_tabpage_timer = nil
 
 M.statusline_states = {}
 ---@class StatusLineDefaultConfig
