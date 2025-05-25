@@ -48,7 +48,7 @@ P.config = function()
 		keymap = {
 			preset = nil,
 			["<m-k>"] = { "select_prev", "fallback" },
-			["<m-j>"] = { "select_next", "fallback" },
+			["<m-j>"] = { "show", "select_next", "fallback" },
 			["<m-l>"] = {
 				function()
 					if cmp.snippet_active() then
@@ -290,18 +290,17 @@ P.config = function()
 			},
 		},
 		fuzzy = {
-			-- use_typo_resistance = true,
+			implementation = "rust",
 			use_frecency = true,
 			use_proximity = true,
-			-- max_items = 100,
 			sorts = {
-				"score",
+				"exact",
 				"sort_text",
-				"label",
-				"kind",
+				"score",
+				-- "kind",
 			},
 			max_typos = function(keyword)
-				return #keyword / 5
+				return #keyword / 10
 			end,
 			prebuilt_binaries = {
 				download = true,
@@ -349,13 +348,8 @@ P.config = function()
 					end
 					return {}
 				end
-				if vim.bo.filetype == "" then
+				if vim.bo.filetype == "" or vim.bo.filetype == "text" then
 					return { "buffer", "path" }
-				elseif vim.bo.filetype == "lua" then
-					return vim.list_extend(
-						{ "lsp", "path", "snippets", "buffer" },
-						providers_inside_comments(success, node)
-					)
 				else
 					return vim.list_extend(
 						{ "lsp", "path", "snippets", "buffer" },
@@ -374,8 +368,8 @@ P.config = function()
 					name = "Lsp",
 					module = "blink.cmp.sources.lsp",
 					enabled = true,
-					score_offset = 0,
-					fallbacks = { "buffer" },
+					score_offset = 2,
+					fallbacks = { "buffer", "snippets" },
 					override = {
 						get_trigger_characters = function(self)
 							local trigger_characters = self:get_trigger_characters()
@@ -388,7 +382,7 @@ P.config = function()
 					name = "path",
 					module = "blink.cmp.sources.path",
 					enabled = true,
-					score_offset = 3,
+					score_offset = 5,
 					opts = {
 						trailing_slash = true,
 						label_trailing_slash = true,
@@ -403,6 +397,7 @@ P.config = function()
 				snippets = {
 					name = "Snippets",
 					module = "blink.cmp.sources.snippets",
+					score_offset = 10,
 
 					-- For `snippets.preset == 'luasnip'`
 					opts = {

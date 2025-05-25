@@ -47,14 +47,15 @@ M.get_extmark_info = function(bufnr, lnum)
 
 	for _, extmark in pairs(extmarks) do
 		local line = extmark[2] + 1
-		signs[line] = {}
+		signs[line] = signs[line] or {}
 		local extmark_details = assert(extmark[4])
 		local name = extmark_details.sign_hl_group or extmark_details.sign_name
+		local type = M.get_sign_type(name)
 		table.insert(signs[line], {
 			name = name,
 			bufnr = bufnr,
 			text = extmark_details.sign_text,
-			type = M.get_sign_type(name),
+			type = type,
 			text_hl = extmark_details.sign_hl_group,
 			priority = extmark_details.priority,
 		})

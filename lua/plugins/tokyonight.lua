@@ -26,6 +26,7 @@ P.opts = {
 		colors.bg_float = colors.bg_dark
 		colors.bg_highlight = "#262840"
 		colors.fg = "#b8ceff"
+		colors.fg_dark = "#cad5ed"
 		colors.blue = "#7aa5ff"
 		colors.purple = "#fb93e5"
 		colors.magenta = "#ba8fff"
