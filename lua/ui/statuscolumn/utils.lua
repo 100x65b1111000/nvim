@@ -1,10 +1,9 @@
 local M = {}
 
-
-MAX_LEN = 3
 ---@param str string?
 M.get_sign_type = function(str)
-	return (str or ""):match("GitSign") or (str or ""):match("Diagnostic") or ""
+	str = str or ""
+	return str:match("GitSign") or str:match("Diagnostic")
 end
 
 M.get_folds = function(win, lnum)
@@ -14,9 +13,9 @@ M.get_folds = function(win, lnum)
 		local is_fold_closed = vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1
 		local is_fold_started = fold_level > foldlevel(lnum - 1)
 		if is_fold_closed then
-			return " %#Folded# %*"
+			return " %#Folded#%@v:lua.statuscolumn_click_fold_callback@ %T"
 		elseif is_fold_started then
-			return "  "
+			return "%@v:lua.statuscolumn_click_fold_callback@  %T"
 		end
 		return ""
 	end)
@@ -27,7 +26,6 @@ _G.statuscolumn_click_fold_callback = function()
 	local pos = vim.fn.getmousepos()
 	vim.api.nvim_win_set_cursor(pos.winid, { pos.line, 1 })
 	vim.api.nvim_win_call(pos.winid, function()
-		vim.notify("I am gettin touched")
 		if vim.fn.foldlevel(pos.line) > 0 then
 			vim.cmd("normal! za")
 		end

@@ -176,7 +176,6 @@ M.statusline_git_file_status = function()
 	local git_status = ""
 
 	local stat_output = stat_output_obj.stdout or ""
-	-- vim.notify(stat_output)
 
 	local first, second = stat_output:sub(1, 1), stat_output:sub(2, 2)
 	local changed = second == "M"

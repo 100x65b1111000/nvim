@@ -13,7 +13,7 @@ M.tabline_states.BufferStates = {
 M.tabline_states.tabline_buf_str_max_width = 18
 
 M.tabline_states.cache = {
-	tabline_buf_string = "",
+	tabline_string = "",
 	highlights = M.cache.highlights,
 	fileicons = {},
 	last_visible_buffers = {},
@@ -31,8 +31,9 @@ M.tabline_states.icons = {
 	separator = "▎",
 	left_overflow_indicator = "  ",
 	right_overflow_indicator = "  ",
-	tabpage_icon = "󰓩 ",
-	tabpage_close_icon = " 󰅗 "
+	tabpage_icon = " ",
+	tabpage_status_icon_active = "  ",
+	tabpage_status_icon_inactive = "  "
 }
 
 M.tabline_states.end_idx = 1
@@ -175,5 +176,6 @@ M.statusline_states.Modes = {
 }
 
 M.statusline_states.git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
+M.statusline_states.timer_count = 0
 
 return M

@@ -11,7 +11,7 @@ M.get_highlight = function(hl_name)
 	end
 	return hl
 end
- 
+
 ---Finds the index of a value in a table.
 ---@param tbl integer[] The table to search.
 ---@param n integer The value to find.

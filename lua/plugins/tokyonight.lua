@@ -397,8 +397,13 @@ P.opts = {
 			bg  = c.bg_visual
 		}
 		hl.TabLineTabPageIcon = {
+			fg = c.comment,
+			bg = c.none,
+			reverse = false
+		}
+		hl.TabLineTabPageActive = {
 			fg = c.magenta,
-			bg = c.blue7,
+			bg = c.bg,
 			reverse = true
 		}
 	end,

@@ -12,7 +12,7 @@ end
 -- keymaps for normal mode
 nmap("<leader>a", "maggVG", { desc = "Select all" })
 nmap("<leader>ay", "maggVGy`a", { desc = "Select all and copy" })
-nmap("<Esc>", ":nohlsearch<CR>:redraw<CR>")
+nmap("<Esc>", ":nohlsearch<CR>")
 nmap(";", ":")
 nmap('<Tab>', ":tabnext<CR>", {desc = "Switch to the next tab"})
 nmap('<S-Tab>', ":tabprev<CR>", {desc = "Switch to the next tab"})
@@ -57,3 +57,6 @@ vmap(";", ":")
 imap("<c-k>", "<Esc>:m .-2<CR>==gi")
 imap("<c-j>", "<Esc>:m .+1<CR>==gi")
 imap('<m-d>', '<cmd>normal! db<CR>')
+
+map('x', '/', '<C-\\><C-n>`</\\%V', { desc = 'Search forward within visual selection' })
+map('x', '?', '<C-\\><C-n>`>?\\%V', { desc = 'Search backward within visual selection' })

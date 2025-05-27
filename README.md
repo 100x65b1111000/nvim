@@ -35,7 +35,7 @@ nvim
 ```
 
 # Highlights
-- Manually created statusline (~500 LOC), statuscolumn (~150 LOC), and tabline (~500 LOC) with minimalism and aesthetics in mind. However, they are not highly configurable.
+- Manually created statusline (\~500 LOC), statuscolumn (\~150 LOC), and tabline (\~500 LOC) with minimalism and aesthetics in mind. However, they are not much configurable.
 ![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
 ![image](https://github.com/user-attachments/assets/e0f57119-ba19-4d1b-a8ba-e15b1e8d8f95)
 - Reasonable defaults.

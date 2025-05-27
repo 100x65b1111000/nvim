@@ -149,7 +149,7 @@ P.config = function()
 			menu = {
 				enabled = true,
 				min_width = 15,
-				max_height = 10,
+				max_height = 20,
 				border = "none",
 				winblend = 0,
 				winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
@@ -292,16 +292,14 @@ P.config = function()
 		fuzzy = {
 			implementation = "rust",
 			use_frecency = true,
-			use_proximity = true,
+			use_proximity = false,
 			sorts = {
 				"exact",
 				"sort_text",
 				"score",
-				-- "kind",
+				"kind",
 			},
-			max_typos = function(keyword)
-				return #keyword / 10
-			end,
+			max_typos = function() return 0 end,
 			prebuilt_binaries = {
 				download = true,
 			},

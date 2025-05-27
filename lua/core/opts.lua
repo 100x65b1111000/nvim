@@ -41,15 +41,17 @@ vim.o.cmdheight = 0
 vim.o.foldopen = "hor,insert,percent,search,undo"
 vim.o.foldminlines = 2
 vim.o.foldmethod = "manual"
+vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
 
 vim.o.undodir = vim.fn.stdpath("cache") .. "/undo"
 
 vim.api.nvim_create_augroup("AutoSave", {
 	clear = true,
 })
+
 vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
 	group = "AutoSave",
-	desc = "Replicate the auto save feature in some text editors",
+	desc = "AutoSave file",
 	callback = function(args)
 		if vim.bo.modified and vim.bo.modifiable and not vim.bo.readonly and vim.bo.buftype == "" then
 			vim.schedule(function()
@@ -130,7 +132,7 @@ end
 
 function _G.custom_foldtext()
 	local start = vim.api.nvim_buf_get_lines(0, vim.v.foldstart - 1, vim.v.foldstart, false)[1]
-	local end_str =vim.api.nvim_buf_get_lines(0, vim.v.foldend - 1, vim.v.foldend, false)[1]
+	local end_str = vim.api.nvim_buf_get_lines(0, vim.v.foldend - 1, vim.v.foldend, false)[1]
 	local end_ = vim.trim(end_str)
 	local result = {}
 	fold_virt_text(result, start, vim.v.foldstart - 1)
@@ -141,3 +143,12 @@ end
 
 vim.opt.fillchars = "fold: "
 vim.opt.foldtext = "v:lua.custom_foldtext()"
+
+-- vim.api.nvim_create_user_command("TabNew", function()
+-- 	local bufnr = vim.api.nvim_get_current_buf()
+-- 	if bufnr == -1 then
+-- 		vim.cmd("tabnew")
+-- 	else
+-- 		vim.cmd("tab split")
+-- 	end
+-- end, {})
