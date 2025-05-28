@@ -200,6 +200,12 @@ P.keys = {
 		end,
 		desc = "Find hl_groups",
 	},
+	{
+		"<leader>fG",
+		function()
+			Snacks.picker.git_diff({ cwd = require("config.lsp.lsputils").find_root({ ".git" }) })
+		end,
+	},
 }
 
 return P

@@ -24,7 +24,7 @@ P.opts = {
 		colors.bg = "#1e2033"
 		colors.bg_dark1 = "#151623"
 		colors.bg_float = colors.bg_dark
-		colors.bg_highlight = "#262840"
+		colors.bg_highlight = "#2e314e"
 		colors.fg = "#b8ceff"
 		colors.fg_dark = "#cad5ed"
 		colors.blue = "#7aa5ff"
@@ -326,6 +326,9 @@ P.opts = {
 		hl.StatusLineGitStaged = {
 			fg = c.blue2
 		}
+		hl.StatusLineGitUntracked = {
+			fg = c.orange
+		}
 		hl.TabLineFill = {
 		 	bg = c.bg_dark,
 			fg = c.fg
@@ -402,7 +405,7 @@ P.opts = {
 			reverse = false
 		}
 		hl.TabLineTabPageActive = {
-			fg = c.magenta,
+			fg = c.blue,
 			bg = c.bg,
 			reverse = true
 		}

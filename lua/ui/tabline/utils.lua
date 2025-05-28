@@ -2,6 +2,7 @@ local states = require("ui.states").tabline_states
 local utils = require("ui.utils")
 
 local api = vim.api
+local fn = vim.fn
 local nvim_buf_get_name = api.nvim_buf_get_name
 local nvim_get_option_value = api.nvim_get_option_value
 local nvim_list_bufs = api.nvim_list_bufs
@@ -13,11 +14,12 @@ local nvim_get_mode = api.nvim_get_mode
 local timer_fn = utils.timer_fn
 local generate_highlight = utils.generate_highlight
 local find_index = utils.find_index
-local fnamemodify = vim.fn.fnamemodify
+local fnamemodify = fn.fnamemodify
 local schedule = vim.schedule
 local tbl_contains = vim.tbl_contains
 local nvim_get_current_tabpage = api.nvim_get_current_tabpage
 local nvim_list_tabpages = api.nvim_list_tabpages
+local isdirectory = fn.isdirectory
 
 local M = {}
 
@@ -28,10 +30,8 @@ local function buf_is_valid(bufnr)
 	local listed = nvim_get_option_value("buflisted", { buf = bufnr }) or false
 	-- return nvim_buf_is_loaded(bufnr)
 	-- 	and nvim_buf_is_valid(bufnr)
-	-- 	and nvim_buf_get_name(bufnr) ~= ""
 	-- 	and (nvim_get_option_value("buftype", { buf = bufnr }) == "")
-	-- 	-- and isdirectory(nvim_buf_get_name(bufnr)) == 0
-	return listed
+	return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 -- and nvim_buf_get_name(bufnr) ~= ""
 end
 
 ---Filters a list of buffer numbers, returning only the valid ones.
@@ -404,9 +404,9 @@ end
 
 local get_tabpage_hl = function(tab)
 	local status_icon_active_hl =
-		generate_tabline_highlight("@keyword", states.BufferStates.ACTIVE, {}, "TablineTabPageStatusIcon")
+		generate_tabline_highlight("Directory", states.BufferStates.ACTIVE, {}, "TablineTabPageStatusIcon")
 	local status_icon_inactive_hl =
-		generate_tabline_highlight("@keyword", states.BufferStates.INACTIVE, {}, "TablineTabPageStatusIconInactive")
+		generate_tabline_highlight("Directory", states.BufferStates.INACTIVE, {}, "TablineTabPageStatusIconInactive")
 	local tabnr_inactive_hl = generate_tabline_highlight(
 		"TabLineTabPageActive",
 		states.BufferStates.INACTIVE,
@@ -427,22 +427,30 @@ M.tabline_update_tab_string = function(tabs)
 	local str = ""
 	for idx, tab in ipairs(tabs) do
 		local hl, close_hl, close_icon = get_tabpage_hl(tab)
-		str = string.format("%s%%%d@v:lua.tabline_click_tabpage_callback@%s%%T %s %d %s", close_hl, idx, close_icon, hl, idx, str)
+		str = string.format(
+			"%s%%%d@v:lua.tabline_click_tabpage_callback@%s%%T %s %d %s",
+			close_hl,
+			idx,
+			close_icon,
+			hl,
+			idx,
+			str
+		)
 	end
 
 	states.tabpages_str = string.format("%s %s%%* %s", "%#TabLineTabPageIcon#", states.icons.tabpage_icon, str)
 end
 
 _G.tabline_click_tabpage_callback = function(tabnr, n_clicks, type)
-	if type == 'r' then
+	if type == "r" then
 		if #(vim.api.nvim_list_tabpages()) <= 1 then
-			vim.notify("Cannot close the last tabpage !!", "error", { title = "Invalid Tabpage Action"})
+			vim.notify("Cannot close the last tabpage !!", "error", { title = "Invalid Tabpage Action" })
 			return
 		end
 		vim.cmd(string.format("tabclose %d", tabnr))
-	elseif type == 'l' and n_clicks == 2 then
+	elseif type == "l" and n_clicks == 2 then
 		vim.cmd("tabnew")
-	elseif type == 'l' and n_clicks == 1 then
+	elseif type == "l" and n_clicks == 1 then
 		vim.cmd(string.format("tabnext %s", tabnr))
 	end
 end

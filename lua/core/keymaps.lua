@@ -14,15 +14,45 @@ nmap("<leader>a", "maggVG", { desc = "Select all" })
 nmap("<leader>ay", "maggVGy`a", { desc = "Select all and copy" })
 nmap("<Esc>", ":nohlsearch<CR>")
 nmap(";", ":")
-nmap('<Tab>', ":tabnext<CR>", {desc = "Switch to the next tab"})
-nmap('<S-Tab>', ":tabprev<CR>", {desc = "Switch to the next tab"})
+nmap("<Tab>", ":tabnext<CR>", { desc = "Switch to the next tab" })
+nmap("<S-Tab>", ":tabprev<CR>", { desc = "Switch to the next tab" })
 
 -- bufffer mappings
-map({'n', 'v'}, "<leader>bh", ":bprevious<CR>", { desc = "Previous buffer" })
-map({'n', 'v'}, "<leader>bl", ":bnext<CR>", { desc = "Next buffer" })
-map({'n', 'v'}, "<leader>bd", ":bdelete<CR>", { desc = "Delete buffer" })
-map({'n', 'v'}, "<leader>bb", ":b#<CR>", { desc = "Switch with previous buffer" })
-map({'n', 'v'}, "<leader>bp", ":buffers<CR>", { desc = "List buffers" })
+
+local previous_buffer = function()
+	local states = require("ui.states").tabline_states
+	local utils = require("ui.utils")
+	local bufs = states.buffers_list
+	local buf = vim.api.nvim_get_current_buf()
+	local pos = utils.find_index(bufs, buf)
+	if pos - 1 >= 1 then
+		pos = pos - 1
+	else
+		pos = #bufs
+	end
+	vim.cmd(string.format("buffer %d", bufs[pos]))
+end
+
+local next_buffer = function()
+	local states = require("ui.states").tabline_states
+	local utils = require("ui.utils")
+	local bufs = states.buffers_list
+	local buf = vim.api.nvim_get_current_buf()
+	local pos = utils.find_index(bufs, buf)
+	if pos + 1 <= #bufs then
+		pos = pos + 1
+	else
+		pos = 1
+	end
+	vim.cmd(string.format("buffer %d", bufs[pos]))
+end
+
+map("n", "<leader>bh", previous_buffer, { desc = "Previous buffer" })
+map("n", "<leader>bl", next_buffer, { desc = "Next buffer" })
+
+map({ "n", "v" }, "<leader>bd", ":bdelete<CR>", { desc = "Delete buffer" })
+map({ "n", "v" }, "<leader>bb", ":b#<CR>", { desc = "Switch with previous buffer" })
+map({ "n", "v" }, "<leader>bp", ":buffers<CR>", { desc = "List buffers" })
 
 -- wincmds
 map({ "n", "v" }, "<leader>wh", ":wincmd h<CR>", { desc = "Focus window (left)" })
@@ -56,7 +86,7 @@ vmap(";", ":")
 
 imap("<c-k>", "<Esc>:m .-2<CR>==gi")
 imap("<c-j>", "<Esc>:m .+1<CR>==gi")
-imap('<m-d>', '<cmd>normal! db<CR>')
+imap("<m-d>", "<cmd>normal! db<CR>")
 
-map('x', '/', '<C-\\><C-n>`</\\%V', { desc = 'Search forward within visual selection' })
-map('x', '?', '<C-\\><C-n>`>?\\%V', { desc = 'Search backward within visual selection' })
+map("x", "/", "<C-\\><C-n>`</\\%V", { desc = "Search forward within visual selection" })
+map("x", "?", "<C-\\><C-n>`>?\\%V", { desc = "Search backward within visual selection" })

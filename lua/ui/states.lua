@@ -40,6 +40,7 @@ M.tabline_states.end_idx = 1
 M.tabline_states.start_idx = 1
 M.tabline_states.diff = 0
 M.tabline_states.offset = 0
+
 ---@type integer[]
 M.tabline_states.visible_buffers = {}
 

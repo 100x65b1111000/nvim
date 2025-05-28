@@ -32,12 +32,12 @@ vim.o.cursorline = true
 vim.o.list = true
 vim.o.listchars = "tab:  ,eol:,space: ,extends:"
 
--- vim.o.scrolloff = 10
--- vim.o.sidescrolloff = 10
+vim.o.scrolloff = 10
+vim.o.sidescrolloff = 10
 vim.o.ignorecase = true
 vim.o.smartcase = true
 vim.o.laststatus = 3
-vim.o.cmdheight = 0
+vim.o.cmdheight = 1
 vim.o.foldopen = "hor,insert,percent,search,undo"
 vim.o.foldminlines = 2
 vim.o.foldmethod = "manual"
@@ -52,7 +52,7 @@ vim.api.nvim_create_augroup("AutoSave", {
 vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
 	group = "AutoSave",
 	desc = "AutoSave file",
-	callback = function(args)
+	callback = function()
 		if vim.bo.modified and vim.bo.modifiable and not vim.bo.readonly and vim.bo.buftype == "" then
 			vim.schedule(function()
 				vim.cmd("w")
@@ -64,16 +64,6 @@ vim.api.nvim_create_autocmd({ "FocusLost", "InsertLeave" }, {
 vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
 		vim.highlight.on_yank({ higroup = "IncSearch", timeout = 250 })
-	end,
-})
-
-vim.api.nvim_create_autocmd("VimLeave", {
-	group = vim.api.nvim_create_augroup("SetCursor", {
-		clear = true,
-	}),
-	once = true,
-	callback = function()
-		vim.opt.guicursor = "a:hor20,a:blinkwait500-blinkoff400-blinkon250"
 	end,
 })
 

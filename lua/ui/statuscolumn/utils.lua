@@ -13,9 +13,9 @@ M.get_folds = function(win, lnum)
 		local is_fold_closed = vim.fn.foldclosed(lnum) == lnum and vim.fn.foldclosedend(lnum) ~= -1
 		local is_fold_started = fold_level > foldlevel(lnum - 1)
 		if is_fold_closed then
-			return " %#Folded#%@v:lua.statuscolumn_click_fold_callback@ %T"
+			return "%#Folded#%@v:lua.statuscolumn_click_fold_callback@ %T"
 		elseif is_fold_started then
-			return "%@v:lua.statuscolumn_click_fold_callback@  %T"
+			return "%@v:lua.statuscolumn_click_fold_callback@ %T"
 		end
 		return ""
 	end)
@@ -103,9 +103,8 @@ M.generate_extmark_string = function(win, lnum)
 	local bufnr = vim.api.nvim_win_get_buf(win)
 	local extmarks = M.get_extmark_info(bufnr, lnum)[lnum] or {}
 	local str = string.format(
-		"%s%s%s",
+		"%s%%l%s",
 		M.get_git_sign(extmarks, bufnr),
-		"%l%=",
 		M.right_sign(win, lnum, extmarks, bufnr)
 	)
 	return str
