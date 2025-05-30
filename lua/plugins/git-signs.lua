@@ -19,7 +19,6 @@ local P = {
 				changedelete = { text = "~" },
 				untracked = { text = "┆" },
 			},
-
 			signs_staged_enable = true,
 			signcolumn = true, -- Toggle with `:Gitsigns toggle_signs`
 			numhl = false, -- Toggle with `:Gitsigns toggle_numhl`

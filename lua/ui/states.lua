@@ -31,7 +31,7 @@ M.tabline_states.icons = {
 	separator = "▎",
 	left_overflow_indicator = "  ",
 	right_overflow_indicator = "  ",
-	tabpage_icon = " ",
+	tabpage_icon = "󰝜 ",
 	tabpage_status_icon_active = "  ",
 	tabpage_status_icon_inactive = "  "
 }

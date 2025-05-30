@@ -7,7 +7,7 @@ local P = {
 -- Define the toggle function for mini.files
 function ToggleMiniFiles()
 	local MiniFiles = require("mini.files")
-	local file_path = vim.fn.argv()[1]
+	local file_path = vim.api.nvim_buf_get_name(vim.api.nvim_get_current_buf())
 	local buftype = vim.api.nvim_get_option_value("buftype", { buf = vim.api.nvim_get_current_buf() })
 	if buftype ~= "" or "" == file_path or not vim.uv.fs_stat(file_path) then
 		if "" ~= file_path then

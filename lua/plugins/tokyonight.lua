@@ -20,7 +20,7 @@ P.opts = {
 	}, -- This is a fucking ugly comment
       ---@param colors ColorScheme
 	on_colors = function(colors)
-		colors.bg_dark = "#191b2b"
+		colors.bg_dark = "#181a29"
 		colors.bg = "#1e2033"
 		colors.bg_dark1 = "#151623"
 		colors.bg_float = colors.bg_dark
@@ -400,14 +400,17 @@ P.opts = {
 			bg  = c.bg_visual
 		}
 		hl.TabLineTabPageIcon = {
-			fg = c.comment,
+			fg = c.green,
 			bg = c.none,
-			reverse = false
+			reverse = true
 		}
 		hl.TabLineTabPageActive = {
-			fg = c.blue,
+			fg = c.orange,
 			bg = c.bg,
 			reverse = true
+		}
+		hl["@lsp.typemod.variable.global.lua"] = {
+			fg = c.red
 		}
 	end,
 }

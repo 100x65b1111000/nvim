@@ -16,16 +16,17 @@ local function checkTriggerChars(triggerChars)
 end
 
 local setup_signature_help = function(client, bufnr)
+	local cmp_menu = require('blink.cmp').is_menu_visible
 	local group = vim.api.nvim_create_augroup("LspSignature", { clear = true })
 	---@type vim.lsp.buf.signature_help.Opts
 	local signature_help_opts = {
 		border = nil,
-		anchor_bias = 'auto',
-		focusable = false,
+		anchor_bias = "above",
+		focusable = true,
+		max_width = 100,
 		max_height = 10,
-		max_width = 50,
-		offset_x = 1,
 		relative = "cursor",
+		focus = false,
 		-- zindex = 999,
 	}
 	vim.api.nvim_clear_autocmds({ group = group, buffer = bufnr })
@@ -33,8 +34,9 @@ local setup_signature_help = function(client, bufnr)
 	vim.api.nvim_create_autocmd("TextChangedI", {
 		group = group,
 		buffer = bufnr,
-		callback = function()
-			if checkTriggerChars(triggerChars) then
+		callback = function(args)
+
+			if checkTriggerChars(triggerChars) and not cmp_menu() then
 				vim.lsp.buf.signature_help(signature_help_opts)
 			end
 		end,
@@ -215,9 +217,9 @@ local on_attach = function(client, bufnr)
 		vim.diagnostic.open_float()
 	end, { desc = "Show float diagnostics" })
 
-	-- if client.server_capabilities.signatureHelpProvider then
-	-- setup_signature_help(client, bufnr)
-	-- end
+	if client.server_capabilities.signatureHelpProvider then
+		setup_signature_help(client, bufnr)
+	end
 
 	if client.server_capabilities.documentHighlightProvider then
 		setup_document_highlight(client)
@@ -227,9 +229,9 @@ local on_attach = function(client, bufnr)
 	-- 	client.server_capabilities.semanticTokensProvider = nil
 	-- end
 
-    -- if client:supports_method('textDocument/documentColor') then
-    --   vim.lsp.document_color.enable(true)
-    -- end
+	-- if client:supports_method('textDocument/documentColor') then
+	--   vim.lsp.document_color.enable(true)
+	-- end
 end
 
 local load_lsp_configs = function(dir)

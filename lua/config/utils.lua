@@ -1,49 +1,14 @@
 local M = {}
 
-M.borders = {
-	single = {
-		{ "┌", "FloatWinBorder" },
-		{ "─", "FloatWinBorder" },
-		{ "┐", "FloatWinBorder" },
-		{ "│", "FloatWinBorder" },
-		{ "┘", "FloatWinBorder" },
-		{ "─", "FloatWinBorder" },
-		{ "└", "FloatWinBorder" },
-		{ "│", "FloatWinBorder" },
-	},
-	padded = {
-		{ "", "FloatWinBorder" },
-		{ "", "FloatWinBorder" },
-		{ "", "FloatWinBorder" },
-		{ " ", "FloatWinBorder" },
-		{ " ", "FloatWinBorder" },
-		{ "", "FloatWinBorder" },
-		{ " ", "FloatWinBorder" },
-		{ " ", "FloatWinBorder" },
-	},
-	thick = {
-		{ "┏", "FloatWinBorder" },
-		{ "━", "FloatWinBorder" },
-		{ "┓", "FloatWinBorder" },
-		{ "┃", "FloatWinBorder" },
-		{ "┛", "FloatWinBorder" },
-		{ "━", "FloatWinBorder" },
-		{ "┗", "FloatWinBorder" },
-		{ "┃", "FloatWinBorder" },
-	},
-}
-
 ---@type vim.lsp.buf.signature_help.Opts
 M.float_win_opts = {
 	focusable = true,
 	focus = false,
-	title_pos = "left",
+	title_pos = "center",
 	relative = "cursor",
-	anchor_bias = "above",
-	wrap = true,
-	wrap_at = 90,
 	z_index = 1000,
-	max_height = 20,
+	anchor_bias = "above",
+	max_width = 100,
 }
 
 M.hl_search = function(blinktime)

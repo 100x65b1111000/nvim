@@ -43,7 +43,7 @@ P.config = function()
 	local luasnip = require("luasnip")
 	cmp.setup({
 		enabled = function()
-			return vim.tbl_contains({ "nofile", "prompt" }, vim.bo.buftype) == false
+			return vim.tbl_contains({ "nofile", "prompt" }, vim.bo.buftype) == false and not vim.b.signature_help_visible
 		end,
 		keymap = {
 			preset = nil,
@@ -266,7 +266,7 @@ P.config = function()
 			},
 		},
 		signature = {
-			enabled = true,
+			enabled = false,
 			trigger = {
 				enabled = true,
 				show_on_insert = true,

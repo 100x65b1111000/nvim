@@ -404,9 +404,9 @@ end
 
 local get_tabpage_hl = function(tab)
 	local status_icon_active_hl =
-		generate_tabline_highlight("Directory", states.BufferStates.ACTIVE, {}, "TablineTabPageStatusIcon")
+		generate_tabline_highlight("Constant", states.BufferStates.ACTIVE, {}, "TablineTabPageStatusIcon")
 	local status_icon_inactive_hl =
-		generate_tabline_highlight("Directory", states.BufferStates.INACTIVE, {}, "TablineTabPageStatusIconInactive")
+		generate_tabline_highlight("Constant", states.BufferStates.INACTIVE, {}, "TablineTabPageStatusIconInactive")
 	local tabnr_inactive_hl = generate_tabline_highlight(
 		"TabLineTabPageActive",
 		states.BufferStates.INACTIVE,
@@ -438,7 +438,12 @@ M.tabline_update_tab_string = function(tabs)
 		)
 	end
 
-	states.tabpages_str = string.format("%s %s%%* %s", "%#TabLineTabPageIcon#", states.icons.tabpage_icon, str)
+	states.tabpages_str = string.format(
+		"%s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T%%* %s",
+		"%#TabLineTabPageIcon#",
+		states.icons.tabpage_icon,
+		str
+	)
 end
 
 _G.tabline_click_tabpage_callback = function(tabnr, n_clicks, type)
@@ -453,6 +458,10 @@ _G.tabline_click_tabpage_callback = function(tabnr, n_clicks, type)
 	elseif type == "l" and n_clicks == 1 then
 		vim.cmd(string.format("tabnext %s", tabnr))
 	end
+end
+
+_G.tabline_click_tabpage_icon_callback = function()
+	vim.cmd([[tabnew]])
 end
 
 M.tabline_update_tabpages_info = function()

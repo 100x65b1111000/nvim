@@ -5,14 +5,6 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 	group = augroup,
 	callback = function()
 		d_config({
-			jump = {
-				count = 1,
-				float = true,
-				severity = {
-					max = "ERROR",
-					min = "WARN",
-				},
-			},
 			signs = {
 				text = {
 					[severity.ERROR] = " ",
