@@ -1,5 +1,3 @@
-local utils = require("config.lsp.lsputils")
-
 vim.lsp.config("clangd", {
 	cmd = { "clangd", "--clang-tidy", "--offset-encoding=utf-16", "--background-index" },
 	filetypes = { "c", "cpp" },

@@ -77,15 +77,14 @@ map({ "n", "v" }, "<leader>w=", ":wincmd =<CR>", { desc = "Equal height and widt
 nmap("<leader>hv", ":vert help ", { desc = "Open help (vertical split)" })
 nmap("<leader>hh", ":help ", { desc = "Open help (horizontal split)" })
 
-nmap("<c-j>", ":m .+1<CR>==")
-nmap("<c-k>", ":m .-2<CR>==")
-vmap("<c-j>", ":m >+1<CR>gv=gv")
-vmap("<Esc>", ":normal! <Esc>`a:setreg(a, [])")
-vmap("<c-k>", ":m <-2<CR>gv=gv ")
+nmap("<m-j>", ":m .+1<CR>==")
+nmap("<m-k>", ":m .-2<CR>==")
+vmap("<m-j>", ":m '>+1<CR>gv=gv")
+vmap("<m-k>", ":m '<-2<CR>gv=gv ")
 vmap(";", ":")
 
-imap("<c-k>", "<Esc>:m .-2<CR>==gi")
-imap("<c-j>", "<Esc>:m .+1<CR>==gi")
+imap("<m-k>", "<Esc>:m .-2<CR>==gi")
+imap("<m-j>", "<Esc>:m .+1<CR>==gi")
 imap("<m-d>", "<cmd>normal! db<CR>")
 
 map("x", "/", "<C-\\><C-n>`</\\%V", { desc = "Search forward within visual selection" })

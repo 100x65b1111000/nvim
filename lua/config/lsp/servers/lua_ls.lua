@@ -1,4 +1,3 @@
-local utils = require("config.lsp.lsputils")
 ---@type vim.lsp.Client
 vim.lsp.config("lua_ls",{
 	cmd = {

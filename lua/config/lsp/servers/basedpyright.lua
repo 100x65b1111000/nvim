@@ -1,5 +1,3 @@
-local utils = require("config.lsp.lsputils")
-
 vim.lsp.config("basedpyright", {
 	cmd = {
 		"basedpyright-langserver",

@@ -7,33 +7,7 @@ local P = {
 
 P.dependencies = {
 	"rafamadriz/friendly-snippets",
-	{
-		"L3MON4D3/LuaSnip",
-		-- version = "v2.3.0",
-		build = "make install_jsregexp",
-		opts = function()
-			local types = require("luasnip.util.types")
-			vim.keymap.set({ "i", "s" }, "<Tab>", function()
-				if require("luasnip").expandable() then
-					require("luasnip").expand()
-				else
-					vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Tab>", true, true, true), "n", true)
-				end
-			end)
-			return {
-				history = true,
-				update_events = { "TextChanged", "TextChangedI" },
-				enable_autosnippets = true,
-				ext_opts = {
-					[types.choiceNode] = {
-						active = {
-							virt_text = { { "<- ", "Error" } },
-						},
-					},
-				},
-			}
-		end,
-	},
+	"L3MON4D3/LuaSnip",
 	"echasnovski/mini.icons",
 	-- { "Saghen/blink.compat", opts = { impersonate_nvim_cmp = true } },
 }
@@ -43,20 +17,16 @@ P.config = function()
 	local luasnip = require("luasnip")
 	cmp.setup({
 		enabled = function()
-			return vim.tbl_contains({ "nofile", "prompt" }, vim.bo.buftype) == false and not vim.b.signature_help_visible
+			return vim.tbl_contains({ "nofile", "prompt" }, vim.bo.buftype) == false
+				and not vim.b.signature_help_visible
 		end,
 		keymap = {
 			preset = nil,
 			["<m-k>"] = { "select_prev", "fallback" },
 			["<m-j>"] = { "show", "select_next", "fallback" },
 			["<m-l>"] = {
-				function()
-					if cmp.snippet_active() then
-						return cmp.snippet_forward()
-					end
-					return cmp.select_and_accept()
-				end,
-				"fallback",
+				"select_and_accept",
+				"snippet_forward",
 			},
 			["<CR>"] = {
 				function()
@@ -71,11 +41,15 @@ P.config = function()
 			["<m-h>"] = {
 				"cancel",
 				"snippet_backward",
-				"fallback",
 			},
 			["<m-b>"] = { "scroll_documentation_down", "fallback" },
 			["<m-f>"] = { "scroll_documentation_up", "fallback" },
 			["<m-c>"] = { "show", "cancel", "fallback" },
+			["<tab>"] = {
+				"snippet_forward",
+				"fallback",
+			},
+			["<s-tab>"] = { "snippet_backward", "fallback" },
 			-- term = {
 			-- 	["<tab>"] = { "select_next" },
 			-- 	["<m-j>"] = { "select_next" },
@@ -86,13 +60,13 @@ P.config = function()
 		snippets = {
 			preset = "luasnip",
 			expand = function(snippet)
-				luasnip.lsp_expand(snippet)
+				luasnip.lsp_expand(snippet, { indent = true })
 			end,
 			active = function(filter)
 				if filter and filter.direction then
-					return luasnip.expandable() or luasnip.jumpable(filter.direction)
+					return luasnip.expandable() or luasnip.locally_jumpable(filter.direction) or false
 				end
-				return luasnip.in_snippet()
+				return luasnip.in_snippet() or false
 			end,
 			jump = function(direction)
 				if luasnip.jumpable(direction) then
@@ -299,7 +273,9 @@ P.config = function()
 				"score",
 				"kind",
 			},
-			max_typos = function() return 0 end,
+			max_typos = function()
+				return 0
+			end,
 			prebuilt_binaries = {
 				download = true,
 			},
@@ -366,8 +342,8 @@ P.config = function()
 					name = "Lsp",
 					module = "blink.cmp.sources.lsp",
 					enabled = true,
-					score_offset = 2,
-					fallbacks = { "buffer", "snippets" },
+					score_offset = 10,
+					fallbacks = { "buffer" },
 					override = {
 						get_trigger_characters = function(self)
 							local trigger_characters = self:get_trigger_characters()
@@ -395,7 +371,7 @@ P.config = function()
 				snippets = {
 					name = "Snippets",
 					module = "blink.cmp.sources.snippets",
-					score_offset = 10,
+					score_offset = 5,
 
 					-- For `snippets.preset == 'luasnip'`
 					opts = {

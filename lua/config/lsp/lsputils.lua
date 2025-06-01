@@ -16,7 +16,7 @@ local function checkTriggerChars(triggerChars)
 end
 
 local setup_signature_help = function(client, bufnr)
-	local cmp_menu = require('blink.cmp').is_menu_visible
+	local cmp_menu = require("blink.cmp").is_menu_visible
 	local group = vim.api.nvim_create_augroup("LspSignature", { clear = true })
 	---@type vim.lsp.buf.signature_help.Opts
 	local signature_help_opts = {
@@ -35,7 +35,6 @@ local setup_signature_help = function(client, bufnr)
 		group = group,
 		buffer = bufnr,
 		callback = function(args)
-
 			if checkTriggerChars(triggerChars) and not cmp_menu() then
 				vim.lsp.buf.signature_help(signature_help_opts)
 			end
@@ -73,32 +72,27 @@ end
 ---@param root_patterns table|nil
 ---@param fallback boolean|string|nil
 local find_root = function(root_patterns, fallback)
-	local start = vim.fn.expand("%:p")
-	if start == "" then
-		start = vim.uv.cwd() or ""
-	end
+	local start = vim.fn.expand("%:p") or vim.uv.cwd()
 
-	if root_patterns then
-		local matches = vim.fs.find(root_patterns or { ".git" }, {
-			path = start,
-			upward = true,
-			stop = vim.env.HOME,
-		})
+	local matches = vim.fs.find(root_patterns or ".git", {
+		path = start,
+		upward = true,
+		stop = vim.env.HOME,
+	})
 
-		if #matches > 0 then
-			local root = matches[1]
-			if vim.fn.isdirectory(root) then
-				root = root:match("(.*)/[^/]*$")
-			end
-			return vim.fn.fnamemodify(root, ":p:h")
+	if #matches > 0 then
+		local root = matches[1]
+		if vim.fn.isdirectory(root) then
+			root = root:match("(.*)/[^/]*$")
 		end
+		return vim.fn.fnamemodify(root, ":p:h")
 	end
 
 	if fallback then
 		return vim.fn.fnamemodify(start, ":p:h")
 	end
 
-	return start
+	return vim.uv.cwd()
 end
 
 local make_lsp_capabilities = function()
@@ -273,7 +267,6 @@ local load_lsp_configs = function(dir)
 end
 
 M.on_attach = on_attach
-M.lsp_capabilities = make_lsp_capabilities()
 M.find_root = find_root
 M.load_lsp_configs = load_lsp_configs
 M.default_server_config = {
