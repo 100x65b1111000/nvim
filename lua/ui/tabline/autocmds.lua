@@ -1,6 +1,6 @@
 local tabline_augroup_buffers = vim.api.nvim_create_augroup("TabLineBuffers", { clear = true })
 
-vim.api.nvim_create_autocmd({ "BufEnter", "BufUnload", "InsertEnter", "InsertLeave", "BufWrite", "VimResized" }, {
+vim.api.nvim_create_autocmd({ "BufEnter", "BufUnload", "InsertEnter", "InsertLeave", "BufWrite", "VimResized", "TextChanged" }, {
 	group = tabline_augroup_buffers,
 	callback = function()
 		local utils = require("ui.tabline.utils")

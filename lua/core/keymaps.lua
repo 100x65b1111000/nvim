@@ -76,7 +76,7 @@ map({ "n", "v" }, "<leader>w=", ":wincmd =<CR>", { desc = "Equal height and widt
 
 nmap("<leader>hv", ":vert help ", { desc = "Open help (vertical split)" })
 nmap("<leader>hh", ":help ", { desc = "Open help (horizontal split)" })
-
+nmap("<c-s-R>", ":restart<CR>", { desc = "Restart Neovim"})
 nmap("<m-j>", ":m .+1<CR>==")
 nmap("<m-k>", ":m .-2<CR>==")
 vmap("<m-j>", ":m '>+1<CR>gv=gv")

@@ -226,9 +226,8 @@ local calculate_buf_space = function(bufs)
 	return length
 end
 
-M.update_overflow_info = function()
+M.update_overflow_info = function(bufs)
 	local left_dist = states.start_idx - 1
-	local bufs = states.buffers_list
 	local right_dist = #bufs - states.end_idx
 	states.left_overflow_str = ""
 	states.right_overflow_str = ""
@@ -280,6 +279,7 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	local right = current_buf_index + 1
 	local left_space = 0
 	local right_space = 0
+
 	while occupied_space <= available_space do
 		local left_buf = bufs[left]
 		local right_buf = bufs[right]
@@ -304,6 +304,7 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 		end
 	end
 
+	states.occupied_space = occupied_space
 	states.start_idx = find_index(bufs, visible_buffers[1])
 	states.end_idx = find_index(bufs, visible_buffers[#visible_buffers])
 	states.visible_buffers = visible_buffers
@@ -437,7 +438,6 @@ M.tabline_update_tab_string = function(tabs)
 			str
 		)
 	end
-
 	states.tabpages_str = string.format(
 		"%s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T%%* %s",
 		"%#TabLineTabPageIcon#",
@@ -487,11 +487,13 @@ M.update_tabline_buffer_info = function()
 		states.timer_count = states.timer_count + 1
 		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
+		states.left_overflow_idicator_length = 0
+		states.right_overflow_idicator_length = 0
 		local bufs = states.buffers_list
 		local buf_specs = states.buffers_spec
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
-		M.update_overflow_info()
-		fetch_visible_buffers(bufnr, bufs, buf_specs) -- overflow indicators might cause the available width to decrease
+		M.update_overflow_info(bufs)
+		fetch_visible_buffers(bufnr, bufs, buf_specs) -- overflow indicators might shorten the available width
 	end)
 end
 

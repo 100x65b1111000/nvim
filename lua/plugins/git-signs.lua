@@ -1,7 +1,7 @@
 local P = {
 	"lewis6991/gitsigns.nvim",
 	event = "BufReadPost",
-	 config = function()
+	config = function()
 		require("gitsigns").setup({
 			signs = {
 				add = { text = "┃" },

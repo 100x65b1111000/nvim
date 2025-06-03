@@ -265,12 +265,12 @@ P.config = function()
 		},
 		fuzzy = {
 			implementation = "rust",
-			use_frecency = true,
+			use_frecency = false,
 			use_proximity = false,
 			sorts = {
 				"exact",
-				"sort_text",
 				"score",
+				"sort_text",
 				"kind",
 			},
 			max_typos = function()

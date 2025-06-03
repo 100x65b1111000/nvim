@@ -24,19 +24,15 @@ M.make_c_snippets = function(s, i, fmt)
 		),
 		s(
 			"ifelseif",
-			fmt(
-				"if (<>) {\n\t<>;\n} else if (<>) {\n\t<>;\n} else {\n\t<>;\n}",
-				{
-					i(1, "condition1"),
-					i(2, "// do something"),
-					i(3, "condition2"),
-					i(4, "//do something"),
-					i(4, "// do something"),
-				},
-				{ delimiters = "<>" }
-			)
+			fmt("if (<>) {\n\t<>;\n} else if (<>) {\n\t<>;\n} else {\n\t<>;\n}", {
+				i(1, "condition1"),
+				i(2, "// do something"),
+				i(3, "condition2"),
+				i(4, "//do something"),
+				i(5, "// do something"),
+			}, { delimiters = "<>" })
 		),
-		s("elseif", fmt("elsif () {\n\t<>;\n}", { i(1, "condition"), i(2, "// do this") }, { delimiters = "<>" })),
+		s("elseif", fmt("elsif (<>) {\n\t<>;\n}", { i(1, "condition"), i(2, "// do this") }, { delimiters = "<>" })),
 		s("while", fmt("while (<>) {\n\t<>\n}", { i(1, "expression"), i(2) }, { delimiters = "<>" })),
 		s("dowhile", fmt("do {\n\t<>\n} while (<>)", { i(1), i(2, "expression") }, { delimiters = "<>" })),
 		s("include", fmt("#include <{}.h>", { i(1) })),
