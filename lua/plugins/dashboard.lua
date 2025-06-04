@@ -37,7 +37,7 @@ P.config = function()
 				{ desc = " Updates", group = "@boolean", key = "u", action = "Lazy update" },
 				{
 					desc = "󰥨 Find",
-					group = "@comment.hint",
+					group = "Number",
 					key = "f",
 					action = function()
 						Snacks.picker.files({ cwd = "~/" })
@@ -59,7 +59,7 @@ P.config = function()
 						Snacks.picker.files({ cwd = path })
 					end,
 				},
-				{ desc = " Recents", group = "@constructor", key = "r", action = "lua Snacks.picker.recent()" },
+				{ desc = " Recents", group = "Keyword", key = "r", action = "lua Snacks.picker.recent()" },
 			},
 			project = {
 				action = function(path)

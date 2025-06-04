@@ -34,7 +34,7 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 					max = 1,
 					min = 4,
 				},
-				prefix = "󰹞 ",
+				prefix = "󰹞",
 				format = function(diagnostic)
 					return diagnostic.message
 				end,

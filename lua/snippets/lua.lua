@@ -54,7 +54,8 @@ M.make_lua_snippets = function(s, i, fmt, f)
 			)
 		),
 		s("lazypluginspec", fmt('local P = {\n\t"<>"\n}\n\nreturn P', { i(1, "author/plugin") }, { delimiters = "<>" })),
-		s("while", fmt("while {} do \n\t{}\nend\n", {i(1, "condition"), i(2, "-- do something")}))
+		s("whiledo", fmt("while {} do \n\t{}\nend\n", {i(1, "condition"), i(2, "-- do something")}))
 	}
+
 end
 return M

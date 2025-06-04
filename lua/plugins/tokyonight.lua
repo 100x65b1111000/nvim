@@ -1,7 +1,7 @@
 local P = {
 	"folke/tokyonight.nvim",
-	enabled = false,
-	priority = 1000,
+	enabled = true,
+	lazy = true,
 }
 
 -- P.opts =

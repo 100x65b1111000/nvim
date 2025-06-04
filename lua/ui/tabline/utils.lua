@@ -404,10 +404,18 @@ M.tab_info = function()
 end
 
 local get_tabpage_hl = function(tab)
-	local status_icon_active_hl =
-		generate_tabline_highlight("Constant", states.BufferStates.ACTIVE, {}, "TablineTabPageStatusIcon")
-	local status_icon_inactive_hl =
-		generate_tabline_highlight("Constant", states.BufferStates.INACTIVE, {}, "TablineTabPageStatusIconInactive")
+	local status_icon_active_hl = generate_tabline_highlight(
+		"TabLineTabPageActive",
+		states.BufferStates.ACTIVE,
+		{ reverse = false },
+		"TablineTabPageStatusIcon"
+	)
+	local status_icon_inactive_hl = generate_tabline_highlight(
+		"TabLineTabPageActive",
+		states.BufferStates.INACTIVE,
+		{ reverse = false },
+		"TablineTabPageStatusIconInactive"
+	)
 	local tabnr_inactive_hl = generate_tabline_highlight(
 		"TabLineTabPageActive",
 		states.BufferStates.INACTIVE,

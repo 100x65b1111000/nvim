@@ -89,6 +89,11 @@ P.config = function()
 				show_on_insert_on_trigger_character = true,
 				show_on_blocked_trigger_characters = {},
 				show_on_x_blocked_trigger_characters = { "(", "'", '"' },
+				show_on_backspace = false,
+				show_on_backspace_after_accept = true,
+				show_on_backspace_after_insert_enter = true,
+				show_on_backspace_in_keyword = true,
+				show_on_insert = false
 			},
 			list = {
 				max_items = 200,
