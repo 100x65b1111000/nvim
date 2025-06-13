@@ -57,7 +57,7 @@ P.opts = {
 					win = "preview",
 					title = "{preview:Preview}",
 					width = 0.5,
-					border = "rounded",
+					border = "solid",
 					title_pos = "center",
 				},
 			},
@@ -102,6 +102,7 @@ P.opts = {
 	words = { enabled = false },
 }
 
+---@type LazyKeysSpec[]
 P.keys = {
 	{
 		"<leader>sgb",
@@ -125,11 +126,12 @@ P.keys = {
 		desc = "Open lazygit",
 	},
 	{
-		"<leader>th",
+		"<m-`>",
 		function()
 			Snacks.terminal()
 		end,
 		desc = "Toggle Terminal(vsplit)",
+		mode = { "n", "i", "t" },
 	},
 	{
 		"<leader>fg",
@@ -147,6 +149,7 @@ P.keys = {
 		function()
 			Snacks.picker.files({
 				hidden = true,
+				-- cwd =
 			})
 		end,
 		desc = "Find Files",

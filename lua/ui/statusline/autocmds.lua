@@ -9,9 +9,9 @@ vim.api.nvim_create_autocmd(
 			local fetch_git_file_diff = utils.fetch_git_file_diff
 			local fetch_git_file_stat = utils.fetch_git_file_stat
 			if utils.buf_is_file() then
+				fetch_git_file_stat()
+				fetch_git_file_diff()
 				vim.schedule(function()
-					fetch_git_file_stat()
-					fetch_git_file_diff()
 					vim.cmd("redrawstatus")
 				end)
 			end
@@ -25,8 +25,8 @@ vim.api.nvim_create_autocmd({ "BufEnter", "CmdlineLeave" }, {
 		local utils = require("ui.statusline.utils")
 		local fetch_git_branch = utils.fetch_git_branch
 		if utils.buf_is_file() then
+			fetch_git_branch()
 			vim.schedule(function()
-				fetch_git_branch()
 				vim.cmd("redrawstatus")
 			end)
 		end
@@ -37,8 +37,8 @@ vim.api.nvim_create_autocmd({ "LspAttach", "LspDetach" }, {
 	group = statusline_fetchers,
 	callback = function()
 		local utils = require("ui.statusline.utils")
+		utils.fetch_lsp_info()
 		if utils.buf_is_file() then
-			utils.fetch_lsp_info()
 			vim.cmd("redrawstatus")
 		end
 	end,
@@ -50,8 +50,8 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 		local utils = require("ui.statusline.utils")
 		local fetch_diagnostics = utils.fetch_diagnostics
 		if utils.buf_is_file() then
+			fetch_diagnostics()
 			vim.schedule(function ()
-				fetch_diagnostics()
 				vim.cmd("redrawstatus")
 			end)
 		end

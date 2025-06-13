@@ -1,6 +1,7 @@
 local P = {
 	"folke/tokyonight.nvim",
 	enabled = true,
+	-- priority = 1000,
 	lazy = true,
 }
 
@@ -23,8 +24,8 @@ P.config = function(_, opts)
 		}, -- This is a fucking ugly comment
 		---@param colors ColorScheme
 		on_colors = function(colors)
-			colors.bg_dark = "#181a29"
-			colors.bg = "#1e2033"
+			colors.bg_dark = "#181928"
+			colors.bg = "#1c1e30"
 			colors.bg_dark1 = "#151623"
 			colors.bg_float = colors.bg_dark
 			colors.bg_highlight = "#2e314e"
@@ -59,6 +60,13 @@ P.config = function(_, opts)
 			hl.BlinkCmpKindFile = {
 				bg = "NONE",
 				fg = c.fg,
+			}
+			hl.BlinkCmpMenuBorder = {
+				fg = c.comment,
+				bg = c.none
+			}
+			hl.BlinkCmpMenuSelection = {
+				link = "CursorLine"
 			}
 			-- hl.BlinkCmpMenu = {
 			-- 	bg = c.bg_float,

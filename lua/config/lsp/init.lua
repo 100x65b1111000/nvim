@@ -44,5 +44,7 @@ vim.api.nvim_create_autocmd("LspProgress", {
 	end,
 })
 
-vim.lsp.config("*", utils.default_server_config)
-utils.load_lsp_configs("config/lsp/servers")
+vim.schedule(function ()
+	vim.lsp.config("*", utils.default_server_config)
+	utils.load_lsp_configs("config/lsp/servers")
+end)

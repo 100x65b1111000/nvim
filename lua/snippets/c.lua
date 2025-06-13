@@ -47,7 +47,7 @@ M.make_c_snippets = function(s, i, fmt)
 		s(
 			"intmain",
 			fmt(
-				"int main(int argc, char** argv) {\n\t<>;\n return <>;\n}",
+				"int main(int argc, char** argv) {\n\t<>;\n\treturn <>;\n}",
 				{ i(1, "// do something"), i(2, "0") },
 				{ delimiters = "<>" }
 			)

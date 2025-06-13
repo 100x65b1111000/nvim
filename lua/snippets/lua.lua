@@ -2,8 +2,8 @@ local M = {}
 
 ---@param s function snippet node
 ---@param i function insert node
----@param fmt function
----@param f function
+---@param fmt function format node
+---@param f function function node
 M.make_lua_snippets = function(s, i, fmt, f)
 	return {
 		s(
@@ -54,8 +54,13 @@ M.make_lua_snippets = function(s, i, fmt, f)
 			)
 		),
 		s("lazypluginspec", fmt('local P = {\n\t"<>"\n}\n\nreturn P', { i(1, "author/plugin") }, { delimiters = "<>" })),
-		s("whiledo", fmt("while {} do \n\t{}\nend\n", {i(1, "condition"), i(2, "-- do something")}))
+		s("whiledo", fmt("while {} do \n\t{}\nend\n", {i(1, "condition"), i(2, "-- do something")})),
+		s("then", fmt("then\n\t{}", { i(1, "-- do something")})),
+		s("thenend", fmt("then\n\t{}\nend", { i(1, "-- do something")})),
+		s("do", fmt("do\n\t{}", { i(1, "-- do something")})),
+		s("doend", fmt("do\n\t{}\nend", { i(1, "-- do something")}))
 	}
 
 end
+
 return M

@@ -182,7 +182,7 @@ local function get_buffer_info(bufnr, bufs)
 	icon = icon .. " "
 	icon_hl = generate_tabline_highlight(icon_hl, state, {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
-	buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
+	-- buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
 	local length = nvim_strwidth(buf_name)
 		+ nvim_strwidth(icon)
 		+ nvim_strwidth(left_padding)
@@ -267,38 +267,43 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 	states.visible_buffers = bufs
 	states.start_idx = 1
 	states.end_idx = #states.visible_buffers
+	states.available_space = available_space
 
 	if buf_space <= available_space then
 		return
 	end
 
+	local visible_buf_space = calculate_buf_space(states.visible_buffers)
+	if visible_buf_space <= available_space then
+		vim.notify("not doing shit")
+		return
+	end
 	local current_buf_index = find_index(bufs, bufnr)
 	local visible_buffers = { bufnr }
 	local occupied_space = buf_specs[bufnr].length
-	local left = current_buf_index - 1
-	local right = current_buf_index + 1
+	local left_idx = current_buf_index - 1
+	local right_idx = current_buf_index + 1
 	local left_space = 0
 	local right_space = 0
 
 	while occupied_space <= available_space do
-		local left_buf = bufs[left]
-		local right_buf = bufs[right]
-		local left_len = left_buf and buf_specs[left_buf].length or nil
-		local right_len = right_buf and buf_specs[right_buf].length or nil
+		local left_buf = bufs[left_idx]
+		local right_buf = bufs[right_idx]
+		local left_len = left_buf and buf_specs[left_buf].length or 0
+		local right_len = right_buf and buf_specs[right_buf].length or 0
 
-		local can_add_left = left_len and (occupied_space + left_len <= available_space)
-		local can_add_right = right_len and (occupied_space + right_len <= available_space)
-
+		local can_add_left = left_len > 1 and (occupied_space + left_len <= available_space)
+		local can_add_right = right_len > 1 and (occupied_space + right_len <= available_space)
 		if can_add_left and (not can_add_right or left_space <= right_space) then
 			table.insert(visible_buffers, 1, left_buf)
 			left_space = left_space + left_len
 			occupied_space = occupied_space + left_len
-			left = left - 1
+			left_idx = left_idx - 1
 		elseif can_add_right then
 			table.insert(visible_buffers, right_buf)
 			right_space = right_space + right_len
 			occupied_space = occupied_space + right_len
-			right = right + 1
+			right_idx = right_idx + 1
 		else
 			break
 		end
@@ -447,7 +452,7 @@ M.tabline_update_tab_string = function(tabs)
 		)
 	end
 	states.tabpages_str = string.format(
-		"%s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T%%* %s",
+		" %s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T%%* %s",
 		"%#TabLineTabPageIcon#",
 		states.icons.tabpage_icon,
 		str
@@ -502,6 +507,7 @@ M.update_tabline_buffer_info = function()
 		fetch_visible_buffers(bufnr, bufs, buf_specs)
 		M.update_overflow_info(bufs)
 		fetch_visible_buffers(bufnr, bufs, buf_specs) -- overflow indicators might shorten the available width
+		M.update_overflow_info(bufs)
 	end)
 end
 

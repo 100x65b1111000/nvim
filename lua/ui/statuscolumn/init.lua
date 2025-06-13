@@ -10,16 +10,27 @@ end
 M.setup = function()
 	vim.api.nvim_create_augroup("StatusColumnRefresh", { clear = true })
 	vim.api.nvim_create_autocmd(
-		{ "BufWrite", "BufEnter", "TextChanged", "TextChangedI", "FocusGained", "LspAttach", "DiagnosticChanged", "CursorHold" },
+		{
+			"BufWrite",
+			"BufEnter",
+			"TextChanged",
+			"TextChangedI",
+			"FocusGained",
+			"LspAttach",
+			"DiagnosticChanged",
+			"CursorHold",
+		},
 		{
 			group = "StatusColumnRefresh",
 			callback = function(args)
-					reset_cache(args.buf)
+				reset_cache(args.buf)
+				vim.schedule(function()
+					vim.cmd([[redrawstatus]])
+				end)
 			end,
 		}
 	)
 	vim.api.nvim_set_option_value("statuscolumn", "%!v:lua.require('ui.statuscolumn.utils').set_statuscolumn()", {})
 end
-
 
 return M

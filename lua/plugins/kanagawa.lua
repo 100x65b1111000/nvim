@@ -1,6 +1,6 @@
 local P = {
 	"rebelot/kanagawa.nvim",
-	priority = 1000,
+	-- lazy = true
 }
 
 P.config = function()
@@ -41,7 +41,7 @@ P.config = function()
 			return {
 				TabLineFill = {
 					bg = c.sumiInk1,
-					fg = c.oniViolet2,
+					fg = c.fujiWhite,
 				},
 				WinBarFill = {
 					bg = c.sumiInk2,
@@ -80,7 +80,7 @@ P.config = function()
 					bg = c.waveBlue1,
 				},
 				Pmenu = {
-					bg = c.sumiInk1,
+					bg = "none",
 				},
 				PmenuSel = {
 					bg = c.dragonBlue,
@@ -212,7 +212,7 @@ P.config = function()
 					reverse = true,
 				},
 				MiniFilesTitleFocused = {
-					fg = c.springBlue,
+					fg = c.springGreen,
 					bg = c.sumiInk0,
 					reverse = true,
 				},
@@ -279,6 +279,62 @@ P.config = function()
 				},
 				DashboardFooter = {
 					fg = c.springBlue
+				},
+				SnacksPickerInputTitle = {
+					fg = c.sakuraPink,
+					bg = c.sumiInk0,
+					reverse = true
+				},
+				SnacksPickerPreview = {
+					bg = c.sumiInk0,
+				},
+				SnacksPickerPreviewTitle = {
+					fg = c.springGreen,
+					bg = c.sumiInk0,
+					reverse = true
+				},
+				SnacksPickerPreviewBorder = {
+					bg = c.sumiInk0,
+					fg = c.sumiInk0
+				},
+				SnacksPickerInput = {
+					bg = c.sumiInk4,
+					fg = c.oniViolet2
+				},
+				SnacksPickerInputBorder = {
+					bg = c.sumiInk4,
+					-- fg = c.oniViolet2
+				},
+				SnacksPickerList = {
+					bg = c.sumiInk0,
+				},
+				SnacksPickerListTitle = {
+					bg = c.sumiInk0,
+					fg = c.springViolet1,
+					reverse = true
+				},
+				SnacksPickerListBorder = {
+					bg = c.sumiInk0,
+					fg = c.sumiInk0,
+				},
+				SnacksPickerListCursorLine = {
+					bg = c.sumiInk5,
+				},
+				WhichKeyNormal = {
+					bg = c.sumiInk0
+				},
+				WhichKeyBorder = {
+					bg = c.sumiInk0,
+					fg = c.sumiInk0
+				},
+				WhichKeyTitle = {
+					fg = c.sakuraPink,
+					bg = c.sumiInk0,
+					reverse = true
+				},
+				BlinkCmpMenuBorder = {
+					bg = "none",
+					fg = c.sumiInk6
 				}
 			}
 		end,

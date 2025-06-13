@@ -69,10 +69,11 @@ local setup_document_highlight = function(client)
 	})
 end
 
----@param root_patterns table|nil
+---@param root_patterns string|table|nil
 ---@param fallback boolean|string|nil
-local find_root = function(root_patterns, fallback)
-	local start = vim.fn.expand("%:p") or vim.uv.cwd()
+---@param path string|nil
+local find_root = function(root_patterns, fallback, path)
+	local start = path or vim.fn.expand("%:p") or vim.uv.cwd()
 
 	local matches = vim.fs.find(root_patterns or ".git", {
 		path = start,
@@ -230,8 +231,6 @@ end
 
 local load_lsp_configs = function(dir)
 	vim.env.PATH = vim.env.PATH .. ":" .. vim.fn.stdpath("data") .. "/mason/bin"
-	require("config.lsp.diagnostic")
-	require("config.utils")
 
 	local path = vim.fn.stdpath("config") .. "/lua/" .. dir
 
@@ -256,10 +255,12 @@ local load_lsp_configs = function(dir)
 		if not ok then
 			table.insert(failed_configs, serverconf)
 			vim.notify("Failed to load LSP config " .. serverconf .. ": " .. err, vim.log.levels.ERROR)
+			return
 		else
 			loaded = loaded + 1
 		end
 	end
+	require("config.lsp.diagnostic")
 	-- local load_lsp = vim.api.nvim_create_augroup('LspLoad', { clear = true })
 	-- vim.api.nvim_create_autocmd({ 'BufWritePost' }, {
 	--

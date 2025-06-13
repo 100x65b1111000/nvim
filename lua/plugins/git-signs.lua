@@ -1,4 +1,4 @@
-local P = {
+local P = { 
 	"lewis6991/gitsigns.nvim",
 	event = "BufReadPost",
 	config = function()

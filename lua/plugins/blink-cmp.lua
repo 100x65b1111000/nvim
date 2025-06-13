@@ -21,7 +21,7 @@ P.config = function()
 				and not vim.b.signature_help_visible
 		end,
 		keymap = {
-			preset = nil,
+			preset = "none",
 			["<m-k>"] = { "select_prev", "fallback" },
 			["<m-j>"] = { "show", "select_next", "fallback" },
 			["<m-l>"] = {
@@ -93,7 +93,7 @@ P.config = function()
 				show_on_backspace_after_accept = true,
 				show_on_backspace_after_insert_enter = true,
 				show_on_backspace_in_keyword = true,
-				show_on_insert = false
+				show_on_insert = false,
 			},
 			list = {
 				max_items = 200,
@@ -129,7 +129,7 @@ P.config = function()
 				enabled = true,
 				min_width = 15,
 				max_height = 20,
-				border = "none",
+				border = "single",
 				winblend = 0,
 				winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
 				scrollbar = true,
@@ -144,7 +144,7 @@ P.config = function()
 					columns = {
 						{ "kind_icon" },
 						{ "label", "label_description", gap = 1 },
-						{ "kind" },
+						{ "kind", gap = 1 },
 					},
 
 					components = {
@@ -224,7 +224,7 @@ P.config = function()
 					min_width = 20,
 					max_width = 75,
 					max_height = 15,
-					border = "padded",
+					border = "solid",
 					winblend = 0,
 					winhighlight = "Normal:BlinkCmpDoc,FloatBorder:BlinkCmpDocBorder,CursorLine:BlinkCmpDocCursorLine,Search:None",
 					scrollbar = true,
@@ -272,46 +272,48 @@ P.config = function()
 			implementation = "rust",
 			use_frecency = false,
 			use_proximity = false,
-			sorts = {
-				"exact",
-				"score",
-				"sort_text",
-				"kind",
-			},
+			-- sorts = {
+			-- 	"exact",
+			-- 	"sort_text",
+			-- 	"score",
+			-- 	-- "kind",
+			-- },
 			max_typos = function()
-				return 0
+				return 1
 			end,
 			prebuilt_binaries = {
-				download = true,
+				download = false,
 			},
 		},
 		sources = {
 			-- Stolen from https://github.com/saecki/dotfiles/blob/d384c5ba4b023253669a121c27a9749ab4a0b916/.config/nvim/lua/config/blink.lua#L30-L53
-			transform_items = function(ctx, items)
-				local line = ctx.cursor[1] - 1
-				local col = ctx.cursor[2]
-
-				for _, item in ipairs(items) do
-					if item.textEdit then
-						if item.textEdit.range then
-							-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textEdit
-							-- trim edit range after cursor
-							local range_end = item.textEdit.range["end"]
-							if range_end.line == line and range_end.character > col then
-								range_end.character = col
-							end
-						elseif item.textEdit.insert then
-							-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#insertReplaceEdit
-							-- always use insert range
-							item.textEdit.range = item.textEdit.insert
-							item.textEdit.replace = nil
-						end
-					end
-				end
-
-				return items
-			end,
+			-- transform_items = function(ctx, items)
+			-- 	local line = ctx.cursor[1] - 1
+			-- 	local col = ctx.cursor[2]
+			--
+			-- 	for _, item in ipairs(items) do
+			-- 		if item.textEdit then
+			-- 			if item.textEdit.range then
+			-- 				-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textEdit
+			-- 				-- trim edit range after cursor
+			-- 				local range_end = item.textEdit.range["end"]
+			-- 				if range_end.line == line and range_end.character > col then
+			-- 					range_end.character = col
+			-- 				end
+			-- 			elseif item.textEdit.insert then
+			-- 				-- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#insertReplaceEdit
+			-- 				-- always use insert range
+			-- 				item.textEdit.range = item.textEdit.insert
+			-- 				item.textEdit.replace = nil
+			-- 			end
+			-- 		end
+			-- 	end
+			--
+			-- 	return items
+			-- end,
+			--
 			min_keyword_length = 0,
+
 			default = function()
 				local success, node = pcall(vim.treesitter.get_node)
 				local providers_inside_comments = function(s, n)
@@ -323,23 +325,25 @@ P.config = function()
 							n:type()
 						)
 					then
-						return { "buffer", "path" }
+						return { "path", "buffer" }
 					end
 					return {}
 				end
 				if vim.bo.filetype == "" or vim.bo.filetype == "text" then
 					return { "buffer", "path" }
-				else
-					return vim.list_extend(
-						{ "lsp", "path", "snippets", "buffer" },
-						providers_inside_comments(success, node)
-					)
+				elseif vim.bo.filetype == "lua" then
+					return { "lsp", "path", "lazydev", "snippets", "buffer" }
 				end
+				return vim.list_extend(
+					{ "lsp", "path", "snippets", "buffer" },
+					providers_inside_comments(success, node)
+				)
 			end,
 			-- term = {
 			-- 	"buffer",
 			-- 	"path",
 			-- },
+
 			per_filetype = {},
 			providers = {
 				lsp = {
@@ -347,7 +351,7 @@ P.config = function()
 					name = "Lsp",
 					module = "blink.cmp.sources.lsp",
 					enabled = true,
-					score_offset = 10,
+					score_offset = 0,
 					fallbacks = { "buffer" },
 					override = {
 						get_trigger_characters = function(self)
@@ -356,6 +360,7 @@ P.config = function()
 							return trigger_characters
 						end,
 					},
+					min_keyword_length = 1
 				},
 				path = {
 					name = "path",
@@ -375,9 +380,10 @@ P.config = function()
 				},
 				snippets = {
 					name = "Snippets",
+					enabled = true,
 					module = "blink.cmp.sources.snippets",
-					score_offset = 5,
-
+					score_offset = 0,
+					-- preset = "luasnip",
 					-- For `snippets.preset == 'luasnip'`
 					opts = {
 						-- Whether to use show_condition for filtering snippets
