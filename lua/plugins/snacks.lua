@@ -21,6 +21,7 @@ P.opts = {
 	picker = {
 		prompt = " ",
 		layout = {
+			cycle = false,
 			layout = {
 				box = "horizontal",
 				backdrop = false,
