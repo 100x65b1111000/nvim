@@ -48,6 +48,9 @@ nvim
 - [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
 - lsp setup via `vim.lsp.config`.
 
+> [!NOTE]
+> There's a bug in Snacks.picker, which causes the picker to crash when resizing the neovim window
+
 Other plugins included, are:
 - [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim)
 - [mini.pairs](https://github.com/echasnovski/mini.nvim)
@@ -67,11 +70,11 @@ Doing so is fairly easy, just grab the `ui` folder and place it inside your conf
 
 > [!Note]
 > The statusline and tabline require the `mini.icons` plugin to generate some highlight groups and display file icons.
-> There are also some highlight groups you must define first, or else the colors will look off. You can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search for `/StatusLine` and `/TabLine` and define the highlight groups).
+> There are also some highlight groups you must define first, or else the colors will look off if you are using any other colorscheme. You can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search for `/StatusLine` and `/TabLine` and define the highlight groups).
 
 ### Adding Custom Modules to the Statusline
 
-You can extend the statusline with your own custom modules. The process involves defining a Lua function that returns information about what to display, and then adding this function to your statusline configuration.
+You can extend the statusline with your own custom modules(although its just bare bones). The process involves defining a Lua function that returns information about what to display, and then adding this function to your statusline configuration.
 
 **1. Define Your Module Function**
 
@@ -90,9 +93,9 @@ local function my_date_module()
   local date_str = os.date("%Y-%m-%d")
   return {
     string = date_str,
-    hl_group = "Comment", -- Example highlight group
-    icon = " ",          -- Example icon (requires a Nerd Font)
-    icon_hl = "Special"    -- Example highlight group for the icon
+    hl_group = "Comment", -- Example highlight group (optional, would use the `StatusLineNormal` group if not specified)
+    icon = " ",          -- Example icon (requires a Nerd Font) (optional)
+    icon_hl = "Special"    -- Example highlight group for the icon (optional)
   }
 end
 ```
