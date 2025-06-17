@@ -35,7 +35,7 @@ nvim
 ```
 
 # Highlights
-- Manually created statusline (\~500 LOC), statuscolumn (\~150 LOC), and tabline (\~500 LOC) with minimalism and aesthetics in mind. However, they are not much configurable.
+- Custom statusline (\~500 LOC, \~0.25ms), statuscolumn (\~150 LOC, \~0.03ms), and tabline (\~500 LOC, \~0.20ms) with minimalism and aesthetics in mind. However, not much configurable.
 ![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
 ![image](https://github.com/user-attachments/assets/e0f57119-ba19-4d1b-a8ba-e15b1e8d8f95)
 - Reasonable defaults.
@@ -49,7 +49,7 @@ nvim
 - lsp setup via `vim.lsp.config`.
 
 > [!NOTE]
-> There's a bug in Snacks.picker, which causes the picker to crash when resizing the neovim window
+> There's a bug in `snacks.picker`, which causes the picker to crash when resizing the neovim window with the specific layout config used in the dotfiles. Unfortunately this won't get fixed in the main any time soon. So, for now you can use my fork of `snacks.nvim`
 
 Other plugins included, are:
 - [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim)
