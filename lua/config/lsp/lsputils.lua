@@ -15,6 +15,16 @@ local function checkTriggerChars(triggerChars)
 	end
 end
 
+---@param client vim.lsp.Client
+local function lsp_restart(client)
+	local name = client.name
+	vim.notify("[LSP] Restarting " .. name, 1, { timeout_ms = 10 })
+	vim.schedule(function()
+		vim.lsp.enable(name, false)
+		vim.lsp.enable(name, true)
+	end)
+end
+
 local setup_signature_help = function(client, bufnr)
 	local cmp_menu = require("blink.cmp").is_menu_visible
 	local group = vim.api.nvim_create_augroup("LspSignature", { clear = true })
@@ -149,6 +159,9 @@ local make_lsp_capabilities = function()
 	})
 end
 
+---@param client vim.lsp.Client
+---@param bufnr integer
+---@param fun function?
 local on_attach = function(client, bufnr)
 	if client.server_capabilities.inlayHintProvider then
 		vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
@@ -196,6 +209,9 @@ local on_attach = function(client, bufnr)
 		":lua vim.lsp.buf.rename()<CR>",
 		{ desc = "Rename all the instances of the symbol in the current buffer", buffer = bufnr }
 	)
+	vim.keymap.set("n", "<leader>lR", function()
+		lsp_restart(client)
+	end, { desc = "Rename all the instances of the symbol in the current buffer", buffer = bufnr })
 	vim.keymap.set(
 		"n",
 		"<leader>ls",
@@ -212,10 +228,10 @@ local on_attach = function(client, bufnr)
 		vim.diagnostic.open_float()
 	end, { desc = "Show float diagnostics" })
 
-	if client.server_capabilities.signatureHelpProvider then
-		setup_signature_help(client, bufnr)
-	end
-
+	-- if client.server_capabilities.signatureHelpProvider then
+	-- 	setup_signature_help(client, bufnr)
+	-- end
+	--
 	if client.server_capabilities.documentHighlightProvider then
 		setup_document_highlight(client)
 	end

@@ -55,8 +55,8 @@ M.make_c_snippets = function(s, i, fmt)
 		s(
 			"func",
 			fmt(
-				"void fun(<>){\n\t<>;\n\treturn <>;\n}",
-				{ i(1, "..."), i(2, "// do something"), i(3, "") },
+				"<> <>(<>){\n\t<>;\n\treturn <>;\n}",
+				{ i(1, "void"), i(2, "func"), i(3, "..."), i(4, "// do something"), i(5, "") },
 				{ delimiters = "<>" }
 			)
 		),

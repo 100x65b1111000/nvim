@@ -400,7 +400,7 @@ M.statusline_file_percent = function()
 	return {
 		string = " %P ",
 		hl_group = "StatusLineFilePerc",
-		icon = "  ",
+		icon = "   ",
 		icon_hl = "StatusLineFilePercIcon",
 		reverse = true,
 	}

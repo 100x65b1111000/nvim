@@ -1,5 +1,5 @@
 vim.lsp.config("clangd", {
-	cmd = { "clangd", "--clang-tidy", "--offset-encoding=utf-16", "--background-index" },
+	cmd = { "clangd", "--offset-encoding=utf-16" },
 	filetypes = { "c", "cpp" },
 	settings = {},
 })

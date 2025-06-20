@@ -18,7 +18,6 @@ P.config = function()
 	cmp.setup({
 		enabled = function()
 			return vim.tbl_contains({ "nofile", "prompt" }, vim.bo.buftype) == false
-				and not vim.b.signature_help_visible
 		end,
 		keymap = {
 			preset = "none",
@@ -245,7 +244,7 @@ P.config = function()
 			},
 		},
 		signature = {
-			enabled = false,
+			enabled = true,
 			trigger = {
 				enabled = true,
 				show_on_insert = true,
@@ -347,20 +346,13 @@ P.config = function()
 			per_filetype = {},
 			providers = {
 				lsp = {
-					async = true,
+					-- async = true,
 					name = "Lsp",
 					module = "blink.cmp.sources.lsp",
 					enabled = true,
 					score_offset = 0,
 					fallbacks = { "buffer" },
-					override = {
-						get_trigger_characters = function(self)
-							local trigger_characters = self:get_trigger_characters()
-							vim.list_extend(trigger_characters, { "\n", "\t", " " })
-							return trigger_characters
-						end,
-					},
-					min_keyword_length = 1
+					override = {},
 				},
 				path = {
 					name = "path",
