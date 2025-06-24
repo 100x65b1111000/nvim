@@ -150,17 +150,32 @@ P.config = function()
 						kind_icon = {
 							ellipsis = false,
 							text = function(ctx)
-								-- local kind = ctx.kind
-								-- dl
-								-- local kind_icon, _, _ = require("mini.icons").get("lsp", kind)
-								-- return kind_icon
-								ctx.icon_gap = " "
-								return ctx.kind_icon .. ctx.icon_gap
+								local icon = ctx.kind_icon
+								if ctx.item.source_name == "LSP" then
+									local color_item = require("nvim-highlight-colors").format(
+										ctx.item.documentation,
+										{ kind = ctx.kind }
+									)
+									if color_item and color_item.abbr ~= "" then
+										icon = color_item.abbr
+									end
+								end
+								return icon .. ctx.icon_gap
 							end,
 							highlight = function(ctx)
-								return ctx.kind_hl
-								-- local _, hl, _ = require('mini.icons').get('lsp', ctx.kind)
-								-- return hl
+								-- default highlight group
+								local highlight = ctx.kind_hl
+								-- if LSP source, check for color derived from documentation
+								if ctx.item.source_name == "LSP" then
+									local color_item = require("nvim-highlight-colors").format(
+										ctx.item.documentation,
+										{ kind = ctx.kind }
+									)
+									if color_item and color_item.abbr_hl_group then
+										highlight = color_item.abbr_hl_group
+									end
+								end
+								return highlight
 							end,
 						},
 						kind = {

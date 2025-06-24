@@ -32,6 +32,7 @@ P.config = function()
 			palette = {
 				sumiInk0 = "#16161c",
 				sumiInk3 = "#1d1d26",
+				sumiInk5 = "#30303f"
 			},
 		},
 		---@param colors KanagawaColors Kanagwa colors
@@ -217,8 +218,8 @@ P.config = function()
 					reverse = true,
 				},
 				MiniFilesBorder = {
-					fg = c.sumiInk1,
-					bg = c.sumiInk1,
+					fg = c.sumiInk0,
+					bg = c.sumiInk0,
 				},
 				MiniFilesBorderModified = {
 					fg = c.surimiOrange,
@@ -335,6 +336,11 @@ P.config = function()
 				BlinkCmpMenuBorder = {
 					bg = "none",
 					fg = c.sumiInk6
+				},
+				["@markup.link.label.markdown_inline"] = {
+					underline = false,
+					bold = true,
+					fg = c.sakuraPink
 				}
 			}
 		end,

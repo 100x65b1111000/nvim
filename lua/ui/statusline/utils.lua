@@ -39,7 +39,7 @@ end
 --- Display the current mode
 ---@return StatusLineModuleFnTable
 function M.statusline_mode()
-	local mode = nvim_get_mode().mode or "nn"
+	local mode = nvim_get_mode().mode or "n"
 	statusline_states.cache.mode_string = statusline_states.Modes[mode or "n"].name or "NA"
 	local hl = statusline_states.Modes[mode or "n"].hl
 	return {
@@ -60,7 +60,7 @@ M.buf_is_file = buf_is_file
 ---@return StatusLineModuleFnTable
 function M.statusline_bufinfo()
 	local buf_hl = generate_highlight(
-		"StatusLine",
+		"@variable.parameter",
 		"StatusLineNormalMode",
 		{},
 		-65,
@@ -191,7 +191,7 @@ M.statusline_git_file_status = function()
 	elseif up_to_date then
 		git_status = "%#StatusLineGitUptodate# %*"
 	elseif untracked then
-		git_status = "%#StatusLineGitUntracked# %*"
+		git_status = "%#StatusLineGitUntracked# %*"
 	end
 
 	return { hl_group = "", string = git_status .. git_diff }
@@ -248,7 +248,7 @@ M.statusline_filetype_info = function()
 		return {
 			string = filetype,
 			hl_group = generate_highlight(
-				"StatusLine",
+				"@variable.parameter",
 				"StatusLineNormalMode",
 				{},
 				-75,
@@ -265,8 +265,8 @@ M.statusline_filetype_info = function()
 	if statusline_states.cache.filetype_icons[filetype_] then
 		local icon_hl = statusline_states.cache.filetype_icons[filetype_].icon_hl
 			or generate_highlight(
-				"statuslineinsertmode",
-				"statuslinenormalmode",
+				"@variable.parameter",
+				"StatusLineNormalMode",
 				{},
 				-75,
 				0,
@@ -279,7 +279,7 @@ M.statusline_filetype_info = function()
 		return {
 			string = filetype,
 			hl_group = generate_highlight(
-				"StatusLine",
+				"@variable.parameter",
 				"StatusLineNormalMode",
 				{},
 				-75,
@@ -440,9 +440,9 @@ M.fetch_diagnostics = function()
 		local bufnr = nvim_get_current_buf()
 		statusline_states.cache.severity_map = {
 			["ERROR"] = { hl = "%#DiagnosticError#", icon = "  ", count = vim.diagnostic.count(bufnr)[1] or 0 },
-			["WARN"] = { hl = "%#DiagnosticWarn#", icon = "  ", count = vim.diagnostic.count(bufnr)[2] or 0 },
+			["WARN"] = { hl = "%#DiagnosticWarn#", icon = "  ", count = vim.diagnostic.count(bufnr)[2] or 0 },
 			["INFO"] = { hl = "%#DiagnosticInfo#", icon = "  ", count = vim.diagnostic.count(bufnr)[3] or 0 },
-			["HINT"] = { hl = "%#DiagnosticHint#", icon = "  ", count = vim.diagnostic.count(bufnr)[4] or 0 },
+			["HINT"] = { hl = "%#DiagnosticHint#", icon = "  ", count = vim.diagnostic.count(bufnr)[4] or 0 },
 		}
 
 		local diagnostic_str = string.format(

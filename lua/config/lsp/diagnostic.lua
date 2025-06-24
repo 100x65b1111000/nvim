@@ -26,8 +26,8 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 				},
 				underline = {
 					severity = {
-						max = "ERROR",
-						min = "HINT",
+						max = severity.ERROR,
+						min = severity.HINT,
 					},
 				},
 				virtual_text = {
@@ -62,8 +62,8 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 					header = { " Diagnostics: ", "FloatTitle" },
 					severity_sort = true,
 					severity = {
-						min = "HINT",
-						max = "ERROR",
+						min = severity.HINT,
+						max = severity.ERROR,
 					},
 					border = "none",
 				},

@@ -110,7 +110,7 @@ M.generate_extmark_string = function(win, lnum)
 	return str
 end
 
-M.set_statuscolumn = function(winid)
+M.set_statuscolumn = function()
 	local lnum = vim.v.lnum
 	local win = vim.g.statusline_winid
 	return M.generate_extmark_string(win, lnum)

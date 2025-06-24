@@ -18,7 +18,6 @@ end
 ---@param client vim.lsp.Client
 local function lsp_restart(client)
 	local name = client.name
-	vim.notify("[LSP] Restarting " .. name, 1, { timeout_ms = 10 })
 	vim.schedule(function()
 		vim.lsp.enable(name, false)
 		vim.lsp.enable(name, true)
@@ -243,6 +242,7 @@ local on_attach = function(client, bufnr)
 	-- if client:supports_method('textDocument/documentColor') then
 	--   vim.lsp.document_color.enable(true)
 	-- end
+	--do
 end
 
 local load_lsp_configs = function(dir)
@@ -286,6 +286,9 @@ end
 M.on_attach = on_attach
 M.find_root = find_root
 M.load_lsp_configs = load_lsp_configs
+
+---@type vim.lsp.Client
+---@diagnostic disable-next-line: missing-fields
 M.default_server_config = {
 	on_attach = function(client, bufnr)
 		on_attach(client, bufnr)
@@ -295,13 +298,8 @@ M.default_server_config = {
 	on_error = function(code, err)
 		vim.notify("[LSP Error " .. code .. "]: " .. err, "error")
 	end,
+	-- handlers = {
+	-- },
 }
-
--- vim.diagnostic.config({
---     jump = {
---         wrap = true,
---
---     }
--- }, namespace?)
 
 return M

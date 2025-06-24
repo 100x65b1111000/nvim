@@ -22,7 +22,7 @@ vim.o.wildignore =
 	"*.docx,*.png,*.jpg,*.jpeg,*.gif,*.pdf,*.svg,*.mp4,*.mkv,*.avi,*.mp3,*.wav,*.ogg,*.zip,*.tar.gz,*.tar.bz2,*.tar.xz,*.tar.zst,*.rar,*.7z,*.exe,*.msi,*.apk,*.iso,*.img,*.bin,*.db,*.sqlite,*.db3,*.sql,*.dbf,*.mdb,*.log,*.cache,*.tmp,*.temp,*.o,*.obj,*.dll,*.class,*.pyc,*.pyo,*.rbc,*.jar,*.war,*.ear,*.sar"
 vim.o.splitright = true -- Vertical splits will automatically be to the right
 vim.o.background = "dark" -- tell vim what the background color looks like
-vim.o.wrap = false
+vim.o.wrap = true
 vim.o.title = true
 vim.o.spell = false
 vim.o.cursorlineopt = "line,number"
