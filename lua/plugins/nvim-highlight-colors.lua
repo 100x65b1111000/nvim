@@ -3,7 +3,7 @@ local P = {
     cmd = 'HighlightColors',
     config = function ()
         require('nvim-highlight-colors').setup({
-            render = 'virtual',
+            render = 'background',
 			virtual_symbol = "",
 			virtual_symbol_position = "eow",
 			virtual_symbol_prefix = " ",

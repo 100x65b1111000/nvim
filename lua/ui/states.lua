@@ -1,6 +1,6 @@
 local M = {}
 
-M.cache = { highlights = {}}
+M.cache = { highlights = {} }
 
 --- *** Tabline Cache ***
 M.tabline_states = {}
@@ -33,7 +33,7 @@ M.tabline_states.icons = {
 	right_overflow_indicator = "  ",
 	tabpage_icon = "󰝜 ",
 	tabpage_status_icon_active = "  ",
-	tabpage_status_icon_inactive = "  "
+	tabpage_status_icon_inactive = "  ",
 }
 
 M.tabline_states.end_idx = 1
@@ -70,14 +70,20 @@ M.statusline_states = {}
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
 ---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"
+---@alias StatusLineSeparator { left: string, right: string }
 
 ---@class StatusLineModulesConfig
 ---@field left StatusLineBuiltinModules[]|nil
 ---@field middle StatusLineBuiltinModules[]|nil
 ---@field right StatusLineBuiltinModules[]|nil
+---@field sep StatusLineSeparator|nil
 
 ---@type StatusLineDefaultConfig
 M.statusline_states.default_config = {
+	sep = {
+		left = "",
+		right = "",
+	},
 	modules = {
 		left = {
 			"mode",
@@ -101,7 +107,7 @@ M.statusline_states.default_config = {
 }
 
 ---@type StatusLineConfig
-M.statusline_states.current_config = {}
+M.statusline_states.current_config = M.statusline_states.default_config or {}
 
 M.statusline_states.cache = {
 	highlights = M.cache.highlights,
