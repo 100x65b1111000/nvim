@@ -14,6 +14,9 @@ P.config = function()
 		-- 	enabled = true,
 		-- 	icon_provider = "mini",
 		-- },
+		experimental = {
+			check_rtp = false
+		}
 	})
 end
 

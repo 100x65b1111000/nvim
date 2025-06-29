@@ -1,5 +1,6 @@
 local P = {
 	"nvim-treesitter/nvim-treesitter",
+	lazy = true,
 	event = "BufAdd",
 	build = ":TSUpdate",
 	config = function()
