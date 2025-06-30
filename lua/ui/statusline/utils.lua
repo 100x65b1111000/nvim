@@ -16,9 +16,9 @@ local M = {}
 --- Display readonly and modified status of the current file
 ---@return StatusLineModuleFnTable
 function M.buf_status()
-	if not M.buf_is_file() then
-		return { hl_group = "", string = "" }
-	end
+	-- if not M.buf_is_file() then
+	-- 	return { hl_group = "", string = "" }
+	-- end
 	local hl = generate_highlight(
 		"Constant",
 		"StatusLineNormalMode",
@@ -30,9 +30,20 @@ function M.buf_status()
 		"StatusLineBufStatus",
 		{ use_bg_for_fg = false, use_fg_for_bg = true }
 	)
-	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and "%m " or ""
-	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or " "
-	return { hl_group = hl, string = ro_string .. mo_string }
+	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and " %m " or ""
+	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or ""
+	local sephl = generate_highlight(
+		hl,
+		"StatusLineNormalMode",
+		{},
+		-65,
+		0,
+		"",
+		"",
+		"StatusLineBufStatusSep",
+		{ use_bg_for_fg = true, use_fg_for_bg = true }
+	)
+	return { hl_group = hl, string = ro_string .. mo_string, sep = states.current_config.sep.right, sep_hl = sephl }
 end
 
 --- Display the current mode
@@ -41,10 +52,22 @@ function M.statusline_mode()
 	local mode = nvim_get_mode().mode or "n"
 	states.cache.mode_string = states.Modes[mode or "n"].name or ""
 	local hl = states.Modes[mode].hl or ""
-	-- local sephl = generate_highlight(hl, )
+	local sephl = generate_highlight(
+		hl,
+		"StatusLineNormalMode",
+		{},
+		-50,
+		0,
+		"",
+		"",
+		"StatusLineModeSep" .. mode,
+		{ use_fg_for_bg = true }
+	)
 	return {
 		hl_group = hl,
 		string = states.cache.mode_string,
+		sep = states.current_config.sep.right,
+		sep_hl = sephl,
 	}
 end
 
@@ -70,7 +93,18 @@ function M.statusline_bufinfo()
 		"StatusLineBufname",
 		{ use_bg_for_fg = false, use_fg_for_bg = true }
 	)
-	return { string = " %t ", hl_group = buf_hl }
+	local sephl = generate_highlight(
+		buf_hl,
+		"StatusLineNormalMode",
+		{},
+		-75,
+		0,
+		"",
+		"",
+		"StatusLineBufNameSep",
+		{ use_bg_for_fg = true, use_fg_for_bg = true }
+	)
+	return { string = " %t ", hl_group = buf_hl, sep = states.current_config.sep.right, sep_hl = sephl }
 end
 
 --- Returns the root dir if the current file is in a git repo
@@ -199,30 +233,26 @@ end
 
 --- Fetch the gir branch of the current file (if inside a git repo)
 M.fetch_git_branch = function()
-	states.statusline_git_branch_timer = timer_fn(
-		states.statusline_git_branch_timer,
-		50,
-		function()
-			local file_path = expand("%:p")
-			local parent = find_parent(file_path)
-			if not parent then
-				-- nvim_buf_set_var(0, "statusline_git_branch_obj", nil)
-				return
-			end
-
-			local git_diff_cmd = string.format("%s%s%s", states.git_cmd, parent, " branch --show-current ")
-			vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-				vim.schedule(function()
-					nvim_buf_set_var(
-						0,
-						"statusline_git_branch_obj",
-						{ code = out.code, stdout = out.stdout, stderr = out.stderr }
-					)
-					vim.cmd("redrawstatus")
-				end)
-			end)
+	states.statusline_git_branch_timer = timer_fn(states.statusline_git_branch_timer, 50, function()
+		local file_path = expand("%:p")
+		local parent = find_parent(file_path)
+		if not parent then
+			-- nvim_buf_set_var(0, "statusline_git_branch_obj", nil)
+			return
 		end
-	)
+
+		local git_diff_cmd = string.format("%s%s%s", states.git_cmd, parent, " branch --show-current ")
+		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
+			vim.schedule(function()
+				nvim_buf_set_var(
+					0,
+					"statusline_git_branch_obj",
+					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
+				)
+				vim.cmd("redrawstatus")
+			end)
+		end)
+	end)
 end
 
 --- Display the git diff status (insertions + deletions)
@@ -243,6 +273,18 @@ M.statusline_filetype_info = function()
 	-- if states.cache.filetype_icons[nvim_get_option_value('buftype', { buf = 0 })] and not states.cache.filetype_icons[filetype_] then
 	-- 	filetype_ = nvim_get_option_value('buftype', { buf = 0 })
 	-- end
+	--
+	local sephl = generate_highlight(
+		"StatusLineNormalMode",
+		"StatusLine",
+		{},
+		0,
+		-75,
+		"",
+		"",
+		"StatusLineFiletypeSep",
+		{}
+	)
 
 	if not package.loaded["mini.icons"] then
 		return {
@@ -260,6 +302,8 @@ M.statusline_filetype_info = function()
 			),
 			icon = "  ",
 			icon_hl = "StatusLineFiletype",
+			sep = states.current_config.sep.right,
+			sep_hl = sephl,
 		}
 	end
 	if states.cache.filetype_icons[filetype_] then
@@ -291,6 +335,8 @@ M.statusline_filetype_info = function()
 			),
 			icon = states.cache.filetype_icons[filetype_].icon,
 			icon_hl = icon_hl,
+			sep = states.current_config.sep.right,
+			sep_hl = sephl,
 		}
 	end
 	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
@@ -312,6 +358,8 @@ M.statusline_filetype_info = function()
 		hl_group = "StatusLineFiletype",
 		icon = icon,
 		icon_hl = icon_hl,
+		sep = states.current_config.sep.right,
+		sep_hl = sephl,
 	}
 end
 
@@ -507,11 +555,13 @@ local generate_module_string = function(modules)
 				error("module fn not callable")
 			end
 			module_string = string.format(
-				"%s%s%s%s",
+				"%s%s%s%s%%*%s%s%%*",
 				format_hl_string(module_info.icon_hl or ""),
 				module_info.icon or "",
 				format_hl_string(module_info.hl_group or ""),
-				module_info.string or ""
+				module_info.string or "",
+				format_hl_string(module_info.sep_hl or ""),
+				module_info.sep or ""
 			)
 			modules_string = modules_string .. module_string
 		else
@@ -520,19 +570,23 @@ local generate_module_string = function(modules)
 			module_string = (
 				module_info.reverse
 				and string.format(
-					"%s%s%%*%s%s%%*",
+					"%s%s%%*%s%s%%*%s%s%%*",
 					format_hl_string(module_info.hl_group or ""),
 					module_info.string or "",
 					format_hl_string(module_info.icon_hl or ""),
-					module_info.icon or ""
+					module_info.icon or "",
+					format_hl_string(module_info.sep_hl or ""),
+					module_info.sep or ""
 				)
 			)
 				or string.format(
-					"%s%s%%*%s%s%%*",
+					"%s%s%%*%s%s%%*%s%s%%*",
 					format_hl_string(module_info.icon_hl or ""),
 					module_info.icon or "",
 					format_hl_string(module_info.hl_group or ""),
-					module_info.string or ""
+					module_info.string or "",
+					format_hl_string(module_info.sep_hl or ""),
+					module_info.sep or ""
 				)
 			modules_string = string.format("%s%s%s", modules_string, module_string, "%#StatusLine#")
 		end

@@ -64,9 +64,10 @@ M.tabline_states.tabline_tabpage_timer = nil
 
 M.statusline_states = {}
 ---@class StatusLineDefaultConfig
----@field modules StatusLineModulesConfig | nil
+---@field modules StatusLineModulesConfig|nil
+---@field sep StatusLineSeparator|nil
 
----@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer }
+---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer, sep: string, sep_hl: string }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
 ---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"
@@ -76,7 +77,8 @@ M.statusline_states = {}
 ---@field left StatusLineBuiltinModules[]|nil
 ---@field middle StatusLineBuiltinModules[]|nil
 ---@field right StatusLineBuiltinModules[]|nil
----@field sep StatusLineSeparator|nil
+
+---
 
 ---@type StatusLineDefaultConfig
 M.statusline_states.default_config = {
@@ -107,7 +109,7 @@ M.statusline_states.default_config = {
 }
 
 ---@type StatusLineConfig
-M.statusline_states.current_config = M.statusline_states.default_config or {}
+M.statusline_states.current_config = M.statusline_states.default_config
 
 M.statusline_states.cache = {
 	highlights = M.cache.highlights,
@@ -131,7 +133,7 @@ M.statusline_states.cache = {
 }
 ---@return StatusLineModuleFnTable
 local fallback_fn = function()
-	return { hl_group = "", string = "", icon = "", icon_hl = "" }
+	return { hl_group = "", string = "", icon = "", icon_hl = "", sep = "", sep_hl = "" }
 end
 
 ---@type StatusLineModuleFn[]
