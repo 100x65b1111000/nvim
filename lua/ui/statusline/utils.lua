@@ -43,7 +43,7 @@ function M.buf_status()
 		"StatusLineBufStatusSep",
 		{ use_bg_for_fg = true, use_fg_for_bg = true }
 	)
-	return { hl_group = hl, string = ro_string .. mo_string, sep = states.current_config.sep.right, sep_hl = sephl }
+	return { hl_group = hl, string = ro_string .. mo_string, right_sep_hl = sephl }
 end
 
 --- Display the current mode
@@ -66,8 +66,7 @@ function M.statusline_mode()
 	return {
 		hl_group = hl,
 		string = states.cache.mode_string,
-		sep = states.current_config.sep.right,
-		sep_hl = sephl,
+		right_sep_hl = sephl,
 	}
 end
 
@@ -104,7 +103,7 @@ function M.statusline_bufinfo()
 		"StatusLineBufNameSep",
 		{ use_bg_for_fg = true, use_fg_for_bg = true }
 	)
-	return { string = " %t ", hl_group = buf_hl, sep = states.current_config.sep.right, sep_hl = sephl }
+	return { string = " %t ", hl_group = buf_hl, right_sep_hl = sephl }
 end
 
 --- Returns the root dir if the current file is in a git repo
@@ -302,8 +301,7 @@ M.statusline_filetype_info = function()
 			),
 			icon = "  ",
 			icon_hl = "StatusLineFiletype",
-			sep = states.current_config.sep.right,
-			sep_hl = sephl,
+			right_sep_hl = sephl,
 		}
 	end
 	if states.cache.filetype_icons[filetype_] then
@@ -335,8 +333,7 @@ M.statusline_filetype_info = function()
 			),
 			icon = states.cache.filetype_icons[filetype_].icon,
 			icon_hl = icon_hl,
-			sep = states.current_config.sep.right,
-			sep_hl = sephl,
+			right_sep_hl = sephl,
 		}
 	end
 	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
@@ -358,8 +355,7 @@ M.statusline_filetype_info = function()
 		hl_group = "StatusLineFiletype",
 		icon = icon,
 		icon_hl = icon_hl,
-		sep = states.current_config.sep.right,
-		sep_hl = sephl,
+		right_sep_hl = sephl,
 	}
 end
 
@@ -519,18 +515,18 @@ function M.initialize_stl(opts)
 	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
 	states.current_config = config
 
-	states.modules_map["buf-status"] = M.buf_status
-	states.modules_map["mode"] = M.statusline_mode
-	states.modules_map["bufinfo"] = M.statusline_bufinfo
-	states.modules_map["git-status"] = M.statusline_git_file_status
-	states.modules_map["git-branch"] = M.statusline_git_branch
-	states.modules_map["root-dir"] = M.statusline_root_dir
-	states.modules_map["filetype"] = M.statusline_filetype_info
-	states.modules_map["ts-info"] = M.statusline_ts_info
-	states.modules_map["lsp-info"] = M.statusline_lsp_info
-	states.modules_map["cursor-pos"] = M.statusline_cursor_pos
-	states.modules_map["file-percent"] = M.statusline_file_percent
-	states.modules_map["diagnostic"] = M.statusline_diagnostics
+	states.modules_map["mode"].init = M.statusline_mode
+	states.modules_map["buf-status"].init = M.buf_status
+	states.modules_map["bufinfo"].init = M.statusline_bufinfo
+	states.modules_map["git-status"].init = M.statusline_git_file_status
+	states.modules_map["git-branch"].init = M.statusline_git_branch
+	states.modules_map["root-dir"].init = M.statusline_root_dir
+	states.modules_map["filetype"].init = M.statusline_filetype_info
+	-- states.modules_map["ts-info"].init = M.statusline_ts_info
+	states.modules_map["lsp-info"].init = M.statusline_lsp_info
+	states.modules_map["cursor-pos"].init = M.statusline_cursor_pos
+	states.modules_map["file-percent"].init = M.statusline_file_percent
+	states.modules_map["diagnostic"].init = M.statusline_diagnostics
 end
 
 --- Takes the hl_group string and returns the formmatted string that can be evaluated by the statusline
@@ -544,8 +540,48 @@ local function format_hl_string(hl_group)
 end
 
 --- Converts the module information to string
----@param modules StatusLineBuiltinModules[]|StatusLineModuleFn[] A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
-local generate_module_string = function(modules)
+---@param module_type StatusLineBuiltinModules[]|string A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
+local generate_module_string = function(module_type)
+	local modules = module_type.modules
+	local meta_string = ""
+	---@diagnostic disable-next-line: param-type-mismatch
+	for _, module in ipairs(modules) do
+		local module_string = ""
+		---@diagnostic disable-next-line: cast-local-type
+		module = states.modules_map[module]
+		local status, module_info = pcall(module.init)
+		if not status then
+			error("An error occurred, sorry its not your fault, please report to upstream [ERR]: " .. module_info, 4)
+		end
+		module_string = module_info.reverse
+				and string.format(
+					"%s%s%s%s%s%s%s%s%%*",
+					format_hl_string(module_info.left_sep_hl),
+					module_type.separator.left,
+					format_hl_string(module_info.hl_group),
+					module_info.string or "",
+					format_hl_string(module_info.icon_hl),
+					module_info.icon,
+					format_hl_string(module_info.right_sep_hl),
+					module_type.separator.right
+				)
+			or string.format(
+				"%s%s%s%s%s%s%s%s%%*",
+				format_hl_string(module_info.left_sep_hl),
+				module_type.separator.left,
+				format_hl_string(module_info.icon_hl),
+				module_info.icon or "",
+				format_hl_string(module_info.hl_group),
+				module_info.string or "",
+				format_hl_string(module_info.right_sep_hl),
+				module_type.separator.right
+			)
+		meta_string = string.format("%s%s%s", meta_string, module_string, "%#StatusLine#")
+	end
+	return meta_string
+end
+
+local _generate_module_string = function(modules)
 	local modules_string = ""
 	for _, i in ipairs(modules) do
 		local module_string = ""
@@ -597,9 +633,9 @@ end
 --- Meta function to set the statusline
 M.set_statusline = function()
 	local config = states.current_config
-	local left_modules_string = generate_module_string(config.modules.left)
-	local middle_modules_string = generate_module_string(config.modules.middle)
-	local right_modules_string = generate_module_string(config.modules.right)
+	local left_modules_string = generate_module_string(config.left)
+	local middle_modules_string = generate_module_string(config.middle)
+	local right_modules_string = generate_module_string(config.right)
 
 	states.cache.statusline_string = string.format(
 		"%s%s%s%s%s",

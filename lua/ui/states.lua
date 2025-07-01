@@ -63,10 +63,6 @@ M.tabline_states.tabline_update_buffer_info_timer = nil
 M.tabline_states.tabline_tabpage_timer = nil
 
 M.statusline_states = {}
----@class StatusLineDefaultConfig
----@field modules StatusLineModulesConfig|nil
----@field sep StatusLineSeparator|nil
-
 ---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer, sep: string, sep_hl: string }
 
 ---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
@@ -78,28 +74,40 @@ M.statusline_states = {}
 ---@field middle StatusLineBuiltinModules[]|nil
 ---@field right StatusLineBuiltinModules[]|nil
 
+---@alias StatusLineModules StatusLineBuiltinModules
 ---
+---@class StatusLineModuleTypeConfig
+---@field separator StatusLineSeparator
+---@field modules StatusLineModules[]|nil
 
----@type StatusLineDefaultConfig
+---@class StatusLineConfig
+---@field left StatusLineModuleTypeConfig
+---@field middle StatusLineModuleTypeConfig
+---@field right StatusLineModuleTypeConfig
+
+---@type StatusLineConfig
 M.statusline_states.default_config = {
-	sep = {
-		left = "",
-		right = "",
-	},
-	modules = {
-		left = {
+	left = {
+		separator = { left = "", right = "" },
+		modules = {
 			"mode",
 			"buf-status",
 			-- "ts-info",
 			"bufinfo",
 			"filetype",
 		},
-		middle = {
+	},
+	middle = {
+		separator = { left = "", right = "" },
+		modules = {
 			"root-dir",
 			"git-branch",
 			"git-status",
 		},
-		right = {
+	},
+	right = {
+		separator = { left = "", right = "" },
+		modules = {
 			"diagnostic",
 			"lsp-info",
 			"cursor-pos",
@@ -109,7 +117,34 @@ M.statusline_states.default_config = {
 }
 
 ---@type StatusLineConfig
-M.statusline_states.current_config = M.statusline_states.default_config
+M.statusline_states.active_config = M.statusline_states.default_config
+
+---@class StatusLineDefaultModuleConfig
+---@field init fun(): StatusLineModuleFn
+
+---@return {left_sep: table, right_sep: table, init: fun(): StatusLineModuleFn}
+local default_module_config = function()
+	return {
+		init = function() end,
+	}
+end
+
+---@type table<string, StatusLineDefaultModuleConfig>
+M.statusline_states.modules_map = {
+	["mode"] = default_module_config(),
+	["buf-status"] = default_module_config(),
+	["bufinfo"] = default_module_config(),
+	["root-dir"] = default_module_config(),
+	["git-status"] = default_module_config(),
+	["git-branch"] = default_module_config(),
+	["diagnostic-info"] = default_module_config(),
+	["lsp-info"] = default_module_config(),
+	["cursor-pos"] = default_module_config(),
+	["scroll-pos"] = default_module_config(),
+	["file-percent"] = default_module_config(),
+	["filetype"] = default_module_config(),
+	["diagnostic"] = default_module_config(),
+}
 
 M.statusline_states.cache = {
 	highlights = M.cache.highlights,
@@ -131,26 +166,6 @@ M.statusline_states.cache = {
 		["minifiles"] = { icon = " 󰙅 " },
 	},
 }
----@return StatusLineModuleFnTable
-local fallback_fn = function()
-	return { hl_group = "", string = "", icon = "", icon_hl = "", sep = "", sep_hl = "" }
-end
-
----@type StatusLineModuleFn[]
-M.statusline_states.modules_map = {
-	["mode"] = fallback_fn,
-	["buf-status"] = fallback_fn,
-	["bufinfo"] = fallback_fn,
-	["root-dir"] = fallback_fn,
-	["git-status"] = fallback_fn,
-	["git-branch"] = fallback_fn,
-	["diagnostic-info"] = fallback_fn,
-	["lsp-info"] = fallback_fn,
-	["cursor-pos"] = fallback_fn,
-	["scroll-pos"] = fallback_fn,
-	["filetype"] = fallback_fn,
-}
-
 M.statusline_states.Modes = {
 	["n"] = { name = "  NORMAL ", hl = "StatusLineNormalMode" },
 	["no"] = { name = "  OPERATOR ", hl = "StatusLineMode" },

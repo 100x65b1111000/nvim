@@ -38,7 +38,6 @@ P.config = function()
 		---@param colors KanagawaColors Kanagwa colors
 		overrides = function(colors)
 			local c = colors.palette
-			local bg = colors.palette.sumiInk1
 			return {
 				TabLineFill = {
 					bg = c.sumiInk1,
@@ -47,6 +46,13 @@ P.config = function()
 				WinBarFill = {
 					bg = c.sumiInk2,
 					fg = c.oniViolet2,
+				},
+				WinSeparator = {
+					bg = c.sumiInk3,
+					fg = c.sumiInk6
+				},
+				WinBar = {
+					bg = c.sumiInk1
 				},
 				CursorLineNr = {
 					-- winblend = 50
@@ -110,7 +116,7 @@ P.config = function()
 					bg = c.sumiInk0,
 				},
 				StatusLineOperatorMode = {
-					fg = c.oniViolet,
+					fg = c.oniViolet2,
 					bold = true,
 					reverse = true,
 					bg = c.sumiInk0,
@@ -140,13 +146,13 @@ P.config = function()
 					bg = c.sumiInk0,
 				},
 				StatusLineCommandMode = {
-					fg = c.springBlue,
+					fg = c.roninYellow,
 					bold = true,
 					reverse = true,
 					bg = c.sumiInk0,
 				},
 				StatusLineInsertMode = {
-					fg = c.springGreen,
+					fg = c.springBlue,
 					bold = true,
 					reverse = true,
 					bg = c.sumiInk0,
