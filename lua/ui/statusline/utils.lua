@@ -19,54 +19,45 @@ function M.buf_status()
 	-- if not M.buf_is_file() then
 	-- 	return { hl_group = "", string = "" }
 	-- end
-	local hl = generate_highlight(
-		"Constant",
-		"StatusLineNormalMode",
-		{},
-		-50,
-		0,
-		"",
-		"",
-		"StatusLineBufStatus",
-		{ use_bg_for_fg = false, use_fg_for_bg = true }
-	)
+	local hl = generate_highlight("Constant", "StatusLine", {}, 50, 0, "", "", "StatusLineBufStatus" .. states.cache.mode)
 	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and " %m " or ""
 	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or ""
 	local sephl = generate_highlight(
 		hl,
-		"StatusLineNormalMode",
+		"StatusLine",
 		{},
-		-65,
+		75,
 		0,
 		"",
 		"",
 		"StatusLineBufStatusSep",
-		{ use_bg_for_fg = true, use_fg_for_bg = true }
+		{ use_bg_for_fg = true }
 	)
-	return { hl_group = hl, string = ro_string .. mo_string, right_sep_hl = sephl }
+	return { hl_group = hl, string = ro_string .. mo_string, right_sep_hl = sephl, show_right_sep = true }
 end
 
 --- Display the current mode
 ---@return StatusLineModuleFnTable
 function M.statusline_mode()
 	local mode = nvim_get_mode().mode or "n"
-	states.cache.mode_string = states.Modes[mode or "n"].name or ""
-	local hl = states.Modes[mode].hl or ""
+	local mode_string = states.Modes[mode or "n"].name or ""
+	states.cache.mode = mode
+	states.cache.current_mode_hl = states.Modes[mode].hl or ""
 	local sephl = generate_highlight(
-		hl,
-		"StatusLineNormalMode",
+		states.cache.current_mode_hl,
+		"StatusLine",
 		{},
-		-50,
+		65,
 		0,
 		"",
 		"",
-		"StatusLineModeSep" .. mode,
-		{ use_fg_for_bg = true }
+		"StatusLineModeSep" .. mode
 	)
 	return {
-		hl_group = hl,
-		string = states.cache.mode_string,
+		hl_group = states.cache.current_mode_hl,
+		string = mode_string,
 		right_sep_hl = sephl,
+		show_right_sep = true,
 	}
 end
 
@@ -81,29 +72,20 @@ M.buf_is_file = buf_is_file
 --- Display the filename
 ---@return StatusLineModuleFnTable
 function M.statusline_bufinfo()
-	local buf_hl = generate_highlight(
-		"@variable.parameter",
-		"StatusLineNormalMode",
-		{},
-		-65,
-		0,
-		"",
-		"",
-		"StatusLineBufname",
-		{ use_bg_for_fg = false, use_fg_for_bg = true }
-	)
+	local buf_hl =
+		generate_highlight("@variable.parameter", "StatusLine", { italic = true }, 75, 0, "", "", "StatusLineBufname")
 	local sephl = generate_highlight(
 		buf_hl,
-		"StatusLineNormalMode",
+		"StatusLine",
 		{},
-		-75,
+		100,
 		0,
 		"",
 		"",
 		"StatusLineBufNameSep",
-		{ use_bg_for_fg = true, use_fg_for_bg = true }
+		{ use_bg_for_fg = true }
 	)
-	return { string = " %t ", hl_group = buf_hl, right_sep_hl = sephl }
+	return { string = " %t ", hl_group = buf_hl, right_sep_hl = sephl, show_right_sep = true }
 end
 
 --- Returns the root dir if the current file is in a git repo
@@ -269,93 +251,50 @@ end
 M.statusline_filetype_info = function()
 	local filetype_ = nvim_get_option_value("filetype", { buf = 0 })
 	local filetype = (filetype_ == "" and "") or filetype_ .. " "
-	-- if states.cache.filetype_icons[nvim_get_option_value('buftype', { buf = 0 })] and not states.cache.filetype_icons[filetype_] then
-	-- 	filetype_ = nvim_get_option_value('buftype', { buf = 0 })
-	-- end
-	--
 	local sephl = generate_highlight(
-		"StatusLineNormalMode",
+		"StatusLine",
 		"StatusLine",
 		{},
 		0,
-		-75,
+		100,
 		"",
 		"",
-		"StatusLineFiletypeSep",
-		{}
+		"StatusLinefileTypeSep",
+		{ use_bg_for_fg = true }
 	)
 
 	if not package.loaded["mini.icons"] then
 		return {
 			string = filetype,
-			hl_group = generate_highlight(
-				"@variable.parameter",
-				"StatusLineNormalMode",
-				{},
-				-75,
-				0,
-				"",
-				"",
-				"StatusLineFiletype",
-				{ use_bg_for_fg = false, use_fg_for_bg = true }
-			),
+			hl_group = generate_highlight("@variable.parameter", "StatusLine", {}, 0, 0, "", "", "StatusLineFiletype"),
 			icon = "  ",
 			icon_hl = "StatusLineFiletype",
-			right_sep_hl = sephl,
+			show_right_sep = false,
 		}
 	end
 	if states.cache.filetype_icons[filetype_] then
 		local icon_hl = states.cache.filetype_icons[filetype_].icon_hl
-			or generate_highlight(
-				"@variable.parameter",
-				"StatusLineNormalMode",
-				{},
-				-75,
-				0,
-				"",
-				"",
-				"StatusLineFiletypeIcon",
-				{ use_bg_for_fg = false, use_fg_for_bg = true }
-			)
+			or generate_highlight("@variable.parameter", "StatusLine", {}, 100, 0, "", "", "StatusLineFiletypeIcon")
 		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
 		return {
 			string = filetype,
-			hl_group = generate_highlight(
-				"@variable.parameter",
-				"StatusLineNormalMode",
-				{},
-				-75,
-				0,
-				"",
-				"",
-				"StatusLineFiletype",
-				{ use_bg_for_fg = false, use_fg_for_bg = true }
-			),
+			hl_group = generate_highlight("@variable.parameter", "StatusLine", {}, 100, 0, "", "", "StatusLineFiletype"),
 			icon = states.cache.filetype_icons[filetype_].icon,
 			icon_hl = icon_hl,
 			right_sep_hl = sephl,
+			show_right_sep = true,
 		}
 	end
 	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
 	icon = string.format(" %s ", icon)
-	icon_hl = generate_highlight(
-		icon_hl,
-		"StatusLineNormalMode",
-		{},
-		-75,
-		0,
-		"StatusLine",
-		"",
-		nil,
-		{ use_fg_for_bg = true }
-	)
+	icon_hl = generate_highlight(icon_hl, "StatusLine", {}, 100, 0, "StatusLine", "", nil)
 	states.cache.filetype_icons[filetype_] = { icon = icon, icon_hl = icon_hl }
 	return {
 		string = filetype,
 		hl_group = "StatusLineFiletype",
 		icon = icon,
 		icon_hl = icon_hl,
-		right_sep_hl = sephl,
+		show_right_sep = false,
 	}
 end
 
@@ -540,7 +479,7 @@ local function format_hl_string(hl_group)
 end
 
 --- Converts the module information to string
----@param module_type StatusLineBuiltinModules[]|string A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
+---@param module_type StatusLineModuleTypeConfig A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
 local generate_module_string = function(module_type)
 	local modules = module_type.modules
 	local meta_string = ""
@@ -557,77 +496,28 @@ local generate_module_string = function(module_type)
 				and string.format(
 					"%s%s%s%s%s%s%s%s%%*",
 					format_hl_string(module_info.left_sep_hl),
-					module_type.separator.left,
+					module_info.show_left_sep and module_type.separator.left or "",
 					format_hl_string(module_info.hl_group),
 					module_info.string or "",
 					format_hl_string(module_info.icon_hl),
 					module_info.icon,
 					format_hl_string(module_info.right_sep_hl),
-					module_type.separator.right
+					module_info.show_right_sep and module_type.separator.right or ""
 				)
 			or string.format(
 				"%s%s%s%s%s%s%s%s%%*",
 				format_hl_string(module_info.left_sep_hl),
-				module_type.separator.left,
+				module_info.show_left_sep and module_type.separator.left or "",
 				format_hl_string(module_info.icon_hl),
 				module_info.icon or "",
 				format_hl_string(module_info.hl_group),
 				module_info.string or "",
 				format_hl_string(module_info.right_sep_hl),
-				module_type.separator.right
+				module_info.show_right_sep and module_type.separator.right or ""
 			)
 		meta_string = string.format("%s%s%s", meta_string, module_string, "%#StatusLine#")
 	end
 	return meta_string
-end
-
-local _generate_module_string = function(modules)
-	local modules_string = ""
-	for _, i in ipairs(modules) do
-		local module_string = ""
-		if type(i) == "function" then
-			local status, module_info = pcall(i)
-			if not status then
-				error("module fn not callable")
-			end
-			module_string = string.format(
-				"%s%s%s%s%%*%s%s%%*",
-				format_hl_string(module_info.icon_hl or ""),
-				module_info.icon or "",
-				format_hl_string(module_info.hl_group or ""),
-				module_info.string or "",
-				format_hl_string(module_info.sep_hl or ""),
-				module_info.sep or ""
-			)
-			modules_string = modules_string .. module_string
-		else
-			local module_fun = states.modules_map[i] or states.modules_map["fallback"]
-			local module_info = module_fun()
-			module_string = (
-				module_info.reverse
-				and string.format(
-					"%s%s%%*%s%s%%*%s%s%%*",
-					format_hl_string(module_info.hl_group or ""),
-					module_info.string or "",
-					format_hl_string(module_info.icon_hl or ""),
-					module_info.icon or "",
-					format_hl_string(module_info.sep_hl or ""),
-					module_info.sep or ""
-				)
-			)
-				or string.format(
-					"%s%s%%*%s%s%%*%s%s%%*",
-					format_hl_string(module_info.icon_hl or ""),
-					module_info.icon or "",
-					format_hl_string(module_info.hl_group or ""),
-					module_info.string or "",
-					format_hl_string(module_info.sep_hl or ""),
-					module_info.sep or ""
-				)
-			modules_string = string.format("%s%s%s", modules_string, module_string, "%#StatusLine#")
-		end
-	end
-	return modules_string
 end
 
 --- Meta function to set the statusline

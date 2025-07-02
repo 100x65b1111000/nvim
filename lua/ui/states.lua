@@ -63,9 +63,9 @@ M.tabline_states.tabline_update_buffer_info_timer = nil
 M.tabline_states.tabline_tabpage_timer = nil
 
 M.statusline_states = {}
----@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer, sep: string, sep_hl: string }
 
----@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
+---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer, left_sep_hl: string, right_sep_hl: string, show_right_sep: boolean, show_left_sep: boolean }
+
 ---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"
 ---@alias StatusLineSeparator { left: string, right: string }
 
@@ -78,7 +78,7 @@ M.statusline_states = {}
 ---
 ---@class StatusLineModuleTypeConfig
 ---@field separator StatusLineSeparator
----@field modules StatusLineModules[]|nil
+---@field modules StatusLineModules[]
 
 ---@class StatusLineConfig
 ---@field left StatusLineModuleTypeConfig
@@ -120,9 +120,9 @@ M.statusline_states.default_config = {
 M.statusline_states.active_config = M.statusline_states.default_config
 
 ---@class StatusLineDefaultModuleConfig
----@field init fun(): StatusLineModuleFn
+---@field init fun(): StatusLineModuleFnTable
 
----@return {left_sep: table, right_sep: table, init: fun(): StatusLineModuleFn}
+---@return {init: fun(): StatusLineModuleFnTable}
 local default_module_config = function()
 	return {
 		init = function() end,
