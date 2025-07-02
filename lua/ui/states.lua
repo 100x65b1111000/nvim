@@ -64,7 +64,7 @@ M.tabline_states.tabline_tabpage_timer = nil
 
 M.statusline_states = {}
 
----@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, max_len: integer, left_sep_hl: string, right_sep_hl: string, show_right_sep: boolean, show_left_sep: boolean }
+---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, left_sep_hl: string, right_sep_hl: string, show_right_sep: boolean, show_left_sep: boolean }
 
 ---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"
 ---@alias StatusLineSeparator { left: string, right: string }
@@ -119,31 +119,30 @@ M.statusline_states.default_config = {
 ---@type StatusLineConfig
 M.statusline_states.active_config = M.statusline_states.default_config
 
----@class StatusLineDefaultModuleConfig
----@field init fun(): StatusLineModuleFnTable
-
----@return {init: fun(): StatusLineModuleFnTable}
+---@return StatusLineModuleFnTable
 local default_module_config = function()
 	return {
-		init = function() end,
+		string = ""
 	}
 end
 
----@type table<string, StatusLineDefaultModuleConfig>
+---@alias StatusLineModuleFn fun(): StatusLineModuleFnTable
+
+---@type table<string, StatusLineModuleFn>
 M.statusline_states.modules_map = {
-	["mode"] = default_module_config(),
-	["buf-status"] = default_module_config(),
-	["bufinfo"] = default_module_config(),
-	["root-dir"] = default_module_config(),
-	["git-status"] = default_module_config(),
-	["git-branch"] = default_module_config(),
-	["diagnostic-info"] = default_module_config(),
-	["lsp-info"] = default_module_config(),
-	["cursor-pos"] = default_module_config(),
-	["scroll-pos"] = default_module_config(),
-	["file-percent"] = default_module_config(),
-	["filetype"] = default_module_config(),
-	["diagnostic"] = default_module_config(),
+	["mode"] = default_module_config,
+	["buf-status"] = default_module_config,
+	["bufinfo"] = default_module_config,
+	["root-dir"] = default_module_config,
+	["git-status"] = default_module_config,
+	["git-branch"] = default_module_config,
+	["diagnostic-info"] = default_module_config,
+	["lsp-info"] = default_module_config,
+	["cursor-pos"] = default_module_config,
+	["scroll-pos"] = default_module_config,
+	["file-percent"] = default_module_config,
+	["filetype"] = default_module_config,
+	["diagnostic"] = default_module_config,
 }
 
 M.statusline_states.cache = {

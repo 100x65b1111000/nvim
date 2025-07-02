@@ -19,7 +19,8 @@ function M.buf_status()
 	-- if not M.buf_is_file() then
 	-- 	return { hl_group = "", string = "" }
 	-- end
-	local hl = generate_highlight("Constant", "StatusLine", {}, 50, 0, "", "", "StatusLineBufStatus" .. states.cache.mode)
+	local hl =
+		generate_highlight("Constant", "StatusLine", {}, 50, 0, "", "", "StatusLineBufStatus" .. states.cache.mode)
 	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and " %m " or ""
 	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or ""
 	local sephl = generate_highlight(
@@ -43,16 +44,8 @@ function M.statusline_mode()
 	local mode_string = states.Modes[mode or "n"].name or ""
 	states.cache.mode = mode
 	states.cache.current_mode_hl = states.Modes[mode].hl or ""
-	local sephl = generate_highlight(
-		states.cache.current_mode_hl,
-		"StatusLine",
-		{},
-		65,
-		0,
-		"",
-		"",
-		"StatusLineModeSep" .. mode
-	)
+	local sephl =
+		generate_highlight(states.cache.current_mode_hl, "StatusLine", {}, 65, 0, "", "", "StatusLineModeSep" .. mode)
 	return {
 		hl_group = states.cache.current_mode_hl,
 		string = mode_string,
@@ -278,7 +271,16 @@ M.statusline_filetype_info = function()
 		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
 		return {
 			string = filetype,
-			hl_group = generate_highlight("@variable.parameter", "StatusLine", {}, 100, 0, "", "", "StatusLineFiletype"),
+			hl_group = generate_highlight(
+				"@variable.parameter",
+				"StatusLine",
+				{},
+				100,
+				0,
+				"",
+				"",
+				"StatusLineFiletype"
+			),
 			icon = states.cache.filetype_icons[filetype_].icon,
 			icon_hl = icon_hl,
 			right_sep_hl = sephl,
@@ -454,18 +456,18 @@ function M.initialize_stl(opts)
 	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
 	states.current_config = config
 
-	states.modules_map["mode"].init = M.statusline_mode
-	states.modules_map["buf-status"].init = M.buf_status
-	states.modules_map["bufinfo"].init = M.statusline_bufinfo
-	states.modules_map["git-status"].init = M.statusline_git_file_status
-	states.modules_map["git-branch"].init = M.statusline_git_branch
-	states.modules_map["root-dir"].init = M.statusline_root_dir
-	states.modules_map["filetype"].init = M.statusline_filetype_info
-	-- states.modules_map["ts-info"].init = M.statusline_ts_info
-	states.modules_map["lsp-info"].init = M.statusline_lsp_info
-	states.modules_map["cursor-pos"].init = M.statusline_cursor_pos
-	states.modules_map["file-percent"].init = M.statusline_file_percent
-	states.modules_map["diagnostic"].init = M.statusline_diagnostics
+	states.modules_map["mode"] = M.statusline_mode
+	states.modules_map["buf-status"] = M.buf_status
+	states.modules_map["bufinfo"] = M.statusline_bufinfo
+	states.modules_map["git-status"] = M.statusline_git_file_status
+	states.modules_map["git-branch"] = M.statusline_git_branch
+	states.modules_map["root-dir"] = M.statusline_root_dir
+	states.modules_map["filetype"] = M.statusline_filetype_info
+	-- states.modules_map["ts-info"] = M.statusline_ts_info
+	states.modules_map["lsp-info"] = M.statusline_lsp_info
+	states.modules_map["cursor-pos"] = M.statusline_cursor_pos
+	states.modules_map["file-percent"] = M.statusline_file_percent
+	states.modules_map["diagnostic"] = M.statusline_diagnostics
 end
 
 --- Takes the hl_group string and returns the formmatted string that can be evaluated by the statusline
@@ -483,38 +485,73 @@ end
 local generate_module_string = function(module_type)
 	local modules = module_type.modules
 	local meta_string = ""
-	---@diagnostic disable-next-line: param-type-mismatch
 	for _, module in ipairs(modules) do
 		local module_string = ""
 		---@diagnostic disable-next-line: cast-local-type
-		module = states.modules_map[module]
-		local status, module_info = pcall(module.init)
-		if not status then
-			error("An error occurred, sorry its not your fault, please report to upstream [ERR]: " .. module_info, 4)
-		end
-		module_string = module_info.reverse
-				and string.format(
+		if type(module) == "function" then
+			local status, module_info = pcall(module)
+			if not status then
+				error(
+					"an error occurred, sorry its not your fault, please report to upstream [err]: " .. module_info,
+					4
+				)
+			end
+			module_string = module_info.reverse
+					and string.format(
+						"%s%s%s%s%s%s%s%s%%*",
+						format_hl_string(module_info.left_sep_hl),
+						module_info.show_left_sep and module_type.separator.left or "",
+						format_hl_string(module_info.hl_group),
+						module_info.string or "",
+						format_hl_string(module_info.icon_hl),
+						module_info.icon,
+						format_hl_string(module_info.right_sep_hl),
+						module_info.show_right_sep and module_type.separator.right or ""
+					)
+				or string.format(
 					"%s%s%s%s%s%s%s%s%%*",
 					format_hl_string(module_info.left_sep_hl),
 					module_info.show_left_sep and module_type.separator.left or "",
+					format_hl_string(module_info.icon_hl),
+					module_info.icon or "",
 					format_hl_string(module_info.hl_group),
 					module_info.string or "",
-					format_hl_string(module_info.icon_hl),
-					module_info.icon,
 					format_hl_string(module_info.right_sep_hl),
 					module_info.show_right_sep and module_type.separator.right or ""
 				)
-			or string.format(
-				"%s%s%s%s%s%s%s%s%%*",
-				format_hl_string(module_info.left_sep_hl),
-				module_info.show_left_sep and module_type.separator.left or "",
-				format_hl_string(module_info.icon_hl),
-				module_info.icon or "",
-				format_hl_string(module_info.hl_group),
-				module_info.string or "",
-				format_hl_string(module_info.right_sep_hl),
-				module_info.show_right_sep and module_type.separator.right or ""
-			)
+		else
+			module = states.modules_map[module] or module
+			local status, module_info = pcall(module)
+			if not status then
+				error(
+					"an error occurred, sorry its not your fault, please report to upstream [err]: " .. module_info,
+					4
+				)
+			end
+			module_string = module_info.reverse
+					and string.format(
+						"%s%s%s%s%s%s%s%s%%*",
+						format_hl_string(module_info.left_sep_hl),
+						module_info.show_left_sep and module_type.separator.left or "",
+						format_hl_string(module_info.hl_group),
+						module_info.string or "",
+						format_hl_string(module_info.icon_hl),
+						module_info.icon,
+						format_hl_string(module_info.right_sep_hl),
+						module_info.show_right_sep and module_type.separator.right or ""
+					)
+				or string.format(
+					"%s%s%s%s%s%s%s%s%%*",
+					format_hl_string(module_info.left_sep_hl),
+					module_info.show_left_sep and module_type.separator.left or "",
+					format_hl_string(module_info.icon_hl),
+					module_info.icon or "",
+					format_hl_string(module_info.hl_group),
+					module_info.string or "",
+					format_hl_string(module_info.right_sep_hl),
+					module_info.show_right_sep and module_type.separator.right or ""
+				)
+		end
 		meta_string = string.format("%s%s%s", meta_string, module_string, "%#StatusLine#")
 	end
 	return meta_string

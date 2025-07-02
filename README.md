@@ -81,10 +81,14 @@ You can extend the statusline with your own custom modules(although its just bar
 A custom module is a Lua function that returns a table with specific keys. The main keys are:
 
 *   `string`: (Required) The text content you want the module to display.
-*   `hl_group`: (Optional) The highlight group to apply to the `string`. If omitted, it will likely use a default statusline highlight.
-*   `icon`: (Optional) An icon to display for the module.
+*   `hl_group`: (Optional) The highlight group to apply to the `string`. If omitted, it will likely use the default highlight group.
+*   `icon`: (Optional) An icon to display in the module.
 *   `icon_hl`: (Optional) The highlight group for the `icon`.
-*   `reverse`: (Optional) A boolean. If `true`, the `string` and `hl_group` are displayed first, then the `icon` and `icon_hl`. Defaults to `false` (icon first).
+*   `reverse`: (Optional) A boolean. If `true`, the `string` is displayed first, then the `icon`. Defaults to `false` (icon first).
+*   `show_right_sep`: (Optional) A boolean that defines whether to show the right seperator for the module or not. (Does not show the separator by default).
+*   `show_left_sep`: (Optional) Same as `show_right_sep` but for the left separator (useful for modules at right).
+*   `right_sep_hl`: (Optional) Highlight group for right separator.
+*   `left_sep_hl`: (Optional) Same as `right_sep_hl`, but for the left seperator.
 
 Here's an example of a simple custom module that displays the current date:
 
