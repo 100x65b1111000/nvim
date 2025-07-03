@@ -1,5 +1,5 @@
 local M = {}
-local states  = require('ui.states')
+local states = require("ui.states")
 
 ---Retrieves highlight information for a given highlight group.
 ---@param hl_name string The name of the highlight group.
@@ -25,29 +25,169 @@ M.find_index = function(tbl, n)
 	return 1
 end
 
----Alters a color value.
----@param c integer The color value (0-255).
----@param val integer The percentage to alter the color by.
----@return integer The altered color value.
-M.alter_color = function(c, val)
-	return math.min(255, math.max(0, c * (1 + val / 100)))
+--------------------------------------------------------------------------------
+-- Color Space Conversion Helpers
+--------------------------------------------------------------------------------
+
+--- Converts RGB color values to HSL.
+-- @local
+-- @param r integer Red component (0-255).
+-- @param g integer Green component (0-255).
+-- @param b integer Blue component (0-255).
+-- @return number Hue (0-360), Saturation (0-1), Lightness (0-1).
+local function rgb_to_hsl(r, g, b)
+    r, g, b = r / 255, g / 255, b / 255
+    local max, min = math.max(r, g, b), math.min(r, g, b)
+    local h, s, l
+
+    l = (max + min) / 2
+
+    if max == min then
+        h, s = 0, 0 -- achromatic (grayscale)
+    else
+        local d = max - min
+        s = l > 0.5 and d / (2 - max - min) or d / (max + min)
+        if max == r then
+            h = (g - b) / d + (g < b and 6 or 0)
+        elseif max == g then
+            h = (b - r) / d + 2
+        else -- max == b
+            h = (r - g) / d + 4
+        end
+        h = h * 60
+    end
+
+    return h, s, l
 end
 
----Alters the color of a hex string.
+--- Converts HSL color values to RGB.
+-- @local
+-- @param h number Hue (0-360).
+-- @param s number Saturation (0-1).
+-- @param l number Lightness (0-1).
+-- @return integer Red, Green, and Blue components (0-255).
+local function hsl_to_rgb(h, s, l)
+    local r, g, b
+
+    if s == 0 then
+        r, g, b = l, l, l -- achromatic
+    else
+        local function hue_to_rgb(p, q, t)
+            if t < 0 then t = t + 1 end
+            if t > 1 then t = t - 1 end
+            if t < 1/6 then return p + (q - p) * 6 * t end
+            if t < 1/2 then return q end
+            if t < 2/3 then return p + (q - p) * (2/3 - t) * 6 end
+            return p
+        end
+
+        local q = l < 0.5 and l * (1 + s) or l + s - l * s
+        local p = 2 * l - q
+        h = h / 360
+        r = hue_to_rgb(p, q, h + 1/3)
+        g = hue_to_rgb(p, q, h)
+        b = hue_to_rgb(p, q, h - 1/3)
+    end
+
+    -- Round to nearest integer
+    return math.floor(r * 255 + 0.5), math.floor(g * 255 + 0.5), math.floor(b * 255 + 0.5)
+end
+
+
+--------------------------------------------------------------------------------
+-- Core Logic
+--------------------------------------------------------------------------------
+
+--- Alters the lightness of a hex color string by a given percentage.
+-- @local
+-- @param hex string The hex color string (e.g., "#rrggbb", "#rgb", "#rrggbbaa").
+-- @param percentage number The percentage to alter the lightness by.
+-- @return string|nil The altered hex color string, or nil if an error occurred.
+-- @return string|nil An error message if the input was invalid.
+local function alter_hex(hex, brightness, saturation)
+    -- 1. --- Input Validation ---
+    if type(hex) ~= "string" or type(brightness) ~= "number" then
+        return nil, "Invalid argument types: expected (string, number)."
+    end
+
+    -- 2. --- Parsing and Normalization ---
+    local clean_hex = hex:gsub("#", "")
+    local len = #clean_hex
+    local r_hex, g_hex, b_hex, a_hex
+
+    if len == 3 then -- Shorthand hex: #rgb -> #rrggbb
+        r_hex, g_hex, b_hex = clean_hex:sub(1,1):rep(2), clean_hex:sub(2,2):rep(2), clean_hex:sub(3,3):rep(2)
+    elseif len == 4 then -- Shorthand hex with alpha: #rgba -> #rrggbbaa
+        r_hex, g_hex, b_hex, a_hex = clean_hex:sub(1,1):rep(2), clean_hex:sub(2,2):rep(2), clean_hex:sub(3,3):rep(2), clean_hex:sub(4,4):rep(2)
+    elseif len == 6 then -- Standard hex: #rrggbb
+        r_hex, g_hex, b_hex = clean_hex:sub(1,2), clean_hex:sub(3,4), clean_hex:sub(5,6)
+    elseif len == 8 then -- Standard hex with alpha: #rrggbbaa
+        r_hex, g_hex, b_hex, a_hex = clean_hex:sub(1,2), clean_hex:sub(3,4), clean_hex:sub(5,6), clean_hex:sub(7,8)
+    else
+        error("Invalid hex string format. Must be 3, 4, 6, or 8 characters (excluding '#').")
+    end
+
+    local r, g, b = tonumber(r_hex, 16), tonumber(g_hex, 16), tonumber(b_hex, 16)
+    if not (r and g and b) then
+        error("Invalid characters found in hex string.")
+    end
+
+    -- 3. --- Color Alteration via HSL ---
+    -- Convert to HSL, modify lightness, and convert back to RGB.
+    local h, s, l = rgb_to_hsl(r, g, b)
+
+    -- Adjust lightness by the percentage.
+    if brightness > 0 then
+        l = l + (1 - l) * (brightness / 100)
+		s = saturation and s + (1 - s) * (saturation / 100) or s
+    else
+        l = l + l * (brightness / 100)
+		s = saturation and s + s * (saturation / 100) or s
+    end
+
+    l = math.max(0, math.min(1, l)) -- Clamp lightness between 0 and 1.
+
+    local new_r, new_g, new_b = hsl_to_rgb(h, s, l)
+
+    -- 4. --- Reformatting ---
+    if a_hex then
+        return string.format("#%02x%02x%02x%s", new_r, new_g, new_b, a_hex)
+    else
+        return string.format("#%02x%02x%02x", new_r, new_g, new_b)
+    end
+end
+
+--------------------------------------------------------------------------------
+-- Public API
+--------------------------------------------------------------------------------
+
+--- Darkens a hex color by a given percentage.
 ---@param hex string The hex color string (e.g., "#rrggbb").
----@param val integer The percentage to alter the color by.
----@return string The altered hex color string.
-M.alter_hex_color = function(hex, val)
-	hex = hex:gsub("#", "")
-	local r = tonumber(hex:sub(1, 2), 16)
-	local g = tonumber(hex:sub(3, 4), 16)
-	local b = tonumber(hex:sub(5, 6), 16)
-
-	r, g, b = M.alter_color(r, val), M.alter_color(g, val), M.alter_color(b, val)
-
-	return string.format("#%02x%02x%02x", r, g, b)
+---@param percentage number The percentage to darken by (0-100).
+---@return string|nil The darkened hex color string, or nil on error.
+---@return string|nil An error message if the input was invalid.
+M.darken = function(hex, percentage)
+    return alter_hex(hex, -math.abs(percentage))
 end
 
+--- Lightens a hex color by a given percentage.
+---@param hex string The hex color string (e.g., "#rrggbb").
+---@param percentage number The percentage to lighten by (0-100).
+---@return string|nil The lightened hex color string, or nil on error.
+---@return string|nil An error message if the input was invalid.
+M.lighten = function(hex, percentage)
+    return alter_hex(hex, math.abs(percentage))
+end
+
+--- Alters the color of a hex string by a given percentage.
+-- A positive `val` lightens the color, a negative `val` darkens it.
+---@param hex string The hex color string (e.g., "#rrggbb").
+---@param brightness integer The percentage to alter the color by.
+---@return string|nil The altered hex color string, or nil on error.
+---@return string|nil An error message if the input was invalid.
+M.alter_hex_color = function(hex, brightness, saturation)
+    return alter_hex(hex, brightness, saturation)
+end
 ---Generates a highlight group.
 ---@param source_fg string The source highlight group for fg.
 ---@param source_bg string The source highlight group for bg.
@@ -83,7 +223,7 @@ M.generate_highlight = function(
 	local bg = "#" .. string.format("%06x", source_hl_bg or fallback_hl.bg)
 
 	bg = M.alter_hex_color(bg, brightness_bg)
-	fg = M.alter_hex_color(fg, brightness_fg)
+	fg = M.alter_hex_color(fg, brightness_fg, brightness_fg)
 	suffix = suffix or ""
 	prefix = prefix or ""
 	local hl_opts = vim.tbl_extend("force", { fg = fg, bg = bg }, opts)

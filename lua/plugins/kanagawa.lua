@@ -186,7 +186,7 @@ P.config = function()
 				},
 				StatusLineFilePercIcon = {
 					fg = c.sumiInk0,
-					bg = c.waveAqua2
+					bg = c.autumnGreen
 				},
 				StatusLineCursorPos = {
 					fg = c.sakuraPink,

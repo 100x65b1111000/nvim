@@ -54,13 +54,13 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	end
 	local suffix, prefix, brightness_bg, brightness_fg = nil, nil, 0, 0
 	if state == states.BufferStates.ACTIVE then
-		suffix, prefix, brightness_bg, brightness_fg = "Active", "TabLine", 75, 0
+		suffix, prefix, brightness_bg, brightness_fg = "Active", "TabLine", 10, 0
 	elseif state == states.BufferStates.INACTIVE then
-		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "TabLine", 25, -55
+		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "TabLine", 5, -55
 	elseif state == states.BufferStates.NONE then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 0, -50
+		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 0, -25
 	elseif state == states.BufferStates.MISC then
-		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 25, 0
+		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 6, 0
 	end
 	return generate_highlight(source, "TabLineFill", opts, brightness_bg, brightness_fg, prefix, suffix, new_name)
 end

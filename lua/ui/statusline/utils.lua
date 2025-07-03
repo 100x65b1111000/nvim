@@ -20,14 +20,14 @@ function M.buf_status()
 	-- 	return { hl_group = "", string = "" }
 	-- end
 	local hl =
-		generate_highlight("Constant", "StatusLine", {}, 50, 0, "", "", "StatusLineBufStatus" .. states.cache.mode)
+		generate_highlight("Constant", "StatusLine", {}, 25, 0, "", "", "StatusLineBufStatus" .. states.cache.mode)
 	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and " %m " or ""
 	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or ""
 	local sephl = generate_highlight(
 		hl,
 		"StatusLine",
 		{},
-		75,
+		15,
 		0,
 		"",
 		"",
@@ -45,7 +45,7 @@ function M.statusline_mode()
 	states.cache.mode = mode
 	states.cache.current_mode_hl = states.Modes[mode].hl or ""
 	local sephl =
-		generate_highlight(states.cache.current_mode_hl, "StatusLine", {}, 65, 0, "", "", "StatusLineModeSep" .. mode)
+		generate_highlight(states.cache.current_mode_hl, "StatusLine", {}, 25, 0, "", "", "StatusLineModeSep" .. mode)
 	return {
 		hl_group = states.cache.current_mode_hl,
 		string = mode_string,
@@ -66,12 +66,12 @@ M.buf_is_file = buf_is_file
 ---@return StatusLineModuleFnTable
 function M.statusline_bufinfo()
 	local buf_hl =
-		generate_highlight("@variable.parameter", "StatusLine", { italic = true }, 75, 0, "", "", "StatusLineBufname")
+		generate_highlight("@variable.parameter", "StatusLine", { italic = true }, 15, 0, "", "", "StatusLineBufname")
 	local sephl = generate_highlight(
 		buf_hl,
 		"StatusLine",
 		{},
-		100,
+		10,
 		0,
 		"",
 		"",
@@ -79,6 +79,67 @@ function M.statusline_bufinfo()
 		{ use_bg_for_fg = true }
 	)
 	return { string = " %t ", hl_group = buf_hl, right_sep_hl = sephl, show_right_sep = true }
+end
+
+--- Display the filetype information about the buffers
+---@return StatusLineModuleFnTable
+M.statusline_filetype_info = function()
+	local filetype_ = nvim_get_option_value("filetype", { buf = 0 })
+	local filetype = (filetype_ == "" and "") or filetype_ .. " "
+	local sephl = generate_highlight(
+		"StatusLine",
+		"StatusLine",
+		{},
+		0,
+		10,
+		"",
+		"",
+		"StatusLinefileTypeSep",
+		{ use_bg_for_fg = true }
+	)
+
+	if not package.loaded["mini.icons"] then
+		return {
+			string = filetype,
+			hl_group = generate_highlight("@variable.parameter", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletype"),
+			icon = "  ",
+			icon_hl = "StatusLineFiletype",
+			show_right_sep = false,
+		}
+	end
+	if states.cache.filetype_icons[filetype_] then
+		local icon_hl = states.cache.filetype_icons[filetype_].icon_hl
+			or generate_highlight("@variable.parameter", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletypeIcon")
+		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
+		return {
+			string = filetype,
+			hl_group = generate_highlight(
+				"@variable.parameter",
+				"StatusLine",
+				{},
+				10,
+				0,
+				"",
+				"",
+				"StatusLineFiletype"
+			),
+			icon = states.cache.filetype_icons[filetype_].icon,
+			icon_hl = icon_hl,
+			right_sep_hl = sephl,
+			show_right_sep = true,
+		}
+	end
+	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
+	icon = string.format(" %s ", icon)
+	icon_hl = generate_highlight(icon_hl, "StatusLine", {}, 10, 0, "StatusLine", "", nil)
+	states.cache.filetype_icons[filetype_] = { icon = icon, icon_hl = icon_hl }
+	return {
+		string = filetype,
+		hl_group = "StatusLineFiletype",
+		icon = icon,
+		icon_hl = icon_hl,
+		show_right_sep = false,
+	}
 end
 
 --- Returns the root dir if the current file is in a git repo
@@ -237,67 +298,6 @@ M.statusline_root_dir = function()
 		return { hl_group = "StatusLine", string = parent, icon_hl = "StatusLineCwdIcon", icon = "  " }
 	end
 	return { hl_group = "StatusLine", string = vim.uv.cwd(), icon_hl = "StatusLineCwdIcon", icon = "  " }
-end
-
---- Display the filetype information about the buffers
----@return StatusLineModuleFnTable
-M.statusline_filetype_info = function()
-	local filetype_ = nvim_get_option_value("filetype", { buf = 0 })
-	local filetype = (filetype_ == "" and "") or filetype_ .. " "
-	local sephl = generate_highlight(
-		"StatusLine",
-		"StatusLine",
-		{},
-		0,
-		100,
-		"",
-		"",
-		"StatusLinefileTypeSep",
-		{ use_bg_for_fg = true }
-	)
-
-	if not package.loaded["mini.icons"] then
-		return {
-			string = filetype,
-			hl_group = generate_highlight("@variable.parameter", "StatusLine", {}, 0, 0, "", "", "StatusLineFiletype"),
-			icon = "  ",
-			icon_hl = "StatusLineFiletype",
-			show_right_sep = false,
-		}
-	end
-	if states.cache.filetype_icons[filetype_] then
-		local icon_hl = states.cache.filetype_icons[filetype_].icon_hl
-			or generate_highlight("@variable.parameter", "StatusLine", {}, 100, 0, "", "", "StatusLineFiletypeIcon")
-		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
-		return {
-			string = filetype,
-			hl_group = generate_highlight(
-				"@variable.parameter",
-				"StatusLine",
-				{},
-				100,
-				0,
-				"",
-				"",
-				"StatusLineFiletype"
-			),
-			icon = states.cache.filetype_icons[filetype_].icon,
-			icon_hl = icon_hl,
-			right_sep_hl = sephl,
-			show_right_sep = true,
-		}
-	end
-	local icon, icon_hl = MiniIcons.get("filetype", filetype_)
-	icon = string.format(" %s ", icon)
-	icon_hl = generate_highlight(icon_hl, "StatusLine", {}, 100, 0, "StatusLine", "", nil)
-	states.cache.filetype_icons[filetype_] = { icon = icon, icon_hl = icon_hl }
-	return {
-		string = filetype,
-		hl_group = "StatusLineFiletype",
-		icon = icon,
-		icon_hl = icon_hl,
-		show_right_sep = false,
-	}
 end
 
 --- Display the git branch for the current buffer ( if inside a git directory )
