@@ -20,7 +20,7 @@ function M.buf_status()
 	-- 	return { hl_group = "", string = "" }
 	-- end
 	local hl =
-		generate_highlight("Constant", "StatusLine", {}, 25, 0, "", "", "StatusLineBufStatus" .. states.cache.mode)
+		generate_highlight("Constant", "StatusLine", {}, 25, 0, "", "", "StatusLineBufStatus")
 	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and " %m " or ""
 	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or ""
 	local sephl = generate_highlight(
@@ -42,12 +42,12 @@ end
 function M.statusline_mode()
 	local mode = nvim_get_mode().mode or "n"
 	local mode_string = states.Modes[mode or "n"].name or ""
-	states.cache.mode = mode
-	states.cache.current_mode_hl = states.Modes[mode].hl or ""
+	local mode_name = states.Modes[mode or "n"].mode_name or ""
+	local hl_string = "StatusLine" .. mode_name
 	local sephl =
-		generate_highlight(states.cache.current_mode_hl, "StatusLine", {}, 25, 0, "", "", "StatusLineModeSep" .. mode)
+		generate_highlight(hl_string, "StatusLine", {}, 25, 0, "", "", "StatusLineModeSep" .. mode_name)
 	return {
-		hl_group = states.cache.current_mode_hl,
+		hl_group = hl_string,
 		string = mode_string,
 		right_sep_hl = sephl,
 		show_right_sep = true,
