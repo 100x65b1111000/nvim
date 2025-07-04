@@ -453,8 +453,8 @@ end
 --- Initialize all the things needed to set the statusline
 ---@param opts StatusLineConfig
 function M.initialize_stl(opts)
-	local config = vim.tbl_deep_extend("force", states.default_config, opts or {})
-	states.current_config = config
+	states.current_config = vim.tbl_deep_extend("force", states.default_config, opts or {})
+	vim.print(states.current_config)
 
 	states.modules_map["mode"] = M.statusline_mode
 	states.modules_map["buf-status"] = M.buf_status
@@ -487,7 +487,6 @@ local generate_module_string = function(module_type)
 	local meta_string = ""
 	for _, module in ipairs(modules) do
 		local module_string = ""
-		---@diagnostic disable-next-line: cast-local-type
 		if type(module) == "function" then
 			local status, module_info = pcall(module)
 			if not status then

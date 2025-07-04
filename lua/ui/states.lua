@@ -81,12 +81,14 @@ M.statusline_states = {}
 ---@field modules StatusLineModules[]
 
 ---@class StatusLineConfig
+---@field enabled boolean
 ---@field left StatusLineModuleTypeConfig
 ---@field middle StatusLineModuleTypeConfig
 ---@field right StatusLineModuleTypeConfig
 
 ---@type StatusLineConfig
 M.statusline_states.default_config = {
+	enabled = false,
 	left = {
 		separator = { left = "", right = "" },
 		modules = {

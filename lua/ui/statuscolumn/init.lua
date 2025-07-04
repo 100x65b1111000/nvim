@@ -25,46 +25,51 @@ local function debounce(fn, ms)
 	end
 end
 
-M.setup = function()
-	vim.api.nvim_create_augroup("StatusColumnRefresh", { clear = true })
+M.setup = function(opts)
+	opts = opts or {}
+	if not opts.enabled then
+		vim.api.nvim_set_option_value("statuscolumn", "", {})
+	else
+		vim.api.nvim_create_augroup("StatusColumnRefresh", { clear = true })
 
-	local immediate_refresh_callback = function(args)
-		reset_cache(args.buf)
-		vim.schedule(function()
-			vim.cmd([[redrawstatus]])
-		end)
+		local immediate_refresh_callback = function(args)
+			reset_cache(args.buf)
+			vim.schedule(function()
+				vim.cmd([[redrawstatus]])
+			end)
+		end
+
+		local debounced_refresh_callback = debounce(function(args)
+			reset_cache(args.buf)
+			vim.schedule(function()
+				vim.cmd([[redrawstatus]])
+			end)
+		end, 200) -- 200ms debounce delay
+
+		-- Events that should trigger immediate refresh
+		vim.api.nvim_create_autocmd({
+			"BufWrite",
+			"BufEnter",
+			"FocusGained",
+			"LspAttach",
+			"DiagnosticChanged",
+			"CursorHold",
+		}, {
+			group = "StatusColumnRefresh",
+			callback = immediate_refresh_callback,
+		})
+
+		-- Events that should trigger debounced refresh
+		vim.api.nvim_create_autocmd({
+			"TextChanged",
+			"TextChangedI",
+		}, {
+			group = "StatusColumnRefresh",
+			callback = debounced_refresh_callback,
+		})
+
+		vim.api.nvim_set_option_value("statuscolumn", "%!v:lua.require('ui.statuscolumn.utils').set_statuscolumn()", {})
 	end
-
-	local debounced_refresh_callback = debounce(function(args)
-		reset_cache(args.buf)
-		vim.schedule(function()
-			vim.cmd([[redrawstatus]])
-		end)
-	end, 200) -- 200ms debounce delay
-
-	-- Events that should trigger immediate refresh
-	vim.api.nvim_create_autocmd({
-		"BufWrite",
-		"BufEnter",
-		"FocusGained",
-		"LspAttach",
-		"DiagnosticChanged",
-		"CursorHold",
-	}, {
-		group = "StatusColumnRefresh",
-		callback = immediate_refresh_callback,
-	})
-
-	-- Events that should trigger debounced refresh
-	vim.api.nvim_create_autocmd({
-		"TextChanged",
-		"TextChangedI",
-	}, {
-		group = "StatusColumnRefresh",
-		callback = debounced_refresh_callback,
-	})
-
-	vim.api.nvim_set_option_value("statuscolumn", "%!v:lua.require('ui.statuscolumn.utils').set_statuscolumn()", {})
 end
 
 return M
