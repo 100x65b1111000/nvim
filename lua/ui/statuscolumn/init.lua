@@ -43,32 +43,26 @@ M.setup = function()
 	end, 200) -- 200ms debounce delay
 
 	-- Events that should trigger immediate refresh
-	vim.api.nvim_create_autocmd(
-		{
-			"BufWrite",
-			"BufEnter",
-			"FocusGained",
-			"LspAttach",
-			"DiagnosticChanged",
-			"CursorHold",
-		},
-		{
-			group = "StatusColumnRefresh",
-			callback = immediate_refresh_callback,
-		}
-	)
+	vim.api.nvim_create_autocmd({
+		"BufWrite",
+		"BufEnter",
+		"FocusGained",
+		"LspAttach",
+		"DiagnosticChanged",
+		"CursorHold",
+	}, {
+		group = "StatusColumnRefresh",
+		callback = immediate_refresh_callback,
+	})
 
 	-- Events that should trigger debounced refresh
-	vim.api.nvim_create_autocmd(
-		{
-			"TextChanged",
-			"TextChangedI",
-		},
-		{
-			group = "StatusColumnRefresh",
-			callback = debounced_refresh_callback,
-		}
-	)
+	vim.api.nvim_create_autocmd({
+		"TextChanged",
+		"TextChangedI",
+	}, {
+		group = "StatusColumnRefresh",
+		callback = debounced_refresh_callback,
+	})
 
 	vim.api.nvim_set_option_value("statuscolumn", "%!v:lua.require('ui.statuscolumn.utils').set_statuscolumn()", {})
 end

@@ -122,7 +122,7 @@ M.statusline_states.active_config = M.statusline_states.default_config
 ---@return StatusLineModuleFnTable
 local default_module_config = function()
 	return {
-		string = ""
+		string = "",
 	}
 end
 
