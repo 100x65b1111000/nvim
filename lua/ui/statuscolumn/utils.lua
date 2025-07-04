@@ -34,7 +34,7 @@ _G.statuscolumn_click_fold_callback = function()
 			vim.cmd("normal! za")
 		end
 	end)
-end
+end 
 
 M.get_extmark_info = function(bufnr, lnum)
 	local extmark_cache = vim.b[bufnr]._extmark_cache
