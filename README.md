@@ -180,7 +180,7 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>w_`| Max height                      |
 | `<leader>w>`| Increase width                  |
 | `<leader>w<`| Decrease width                  |
-| `<leader>w\|`| Max width                       |
+| `<leader>w|`| Max width                       |
 | `<leader>w=`| Equal height and width          |
 | `<leader>hv`| Open help (vertical split)      |
 | `<leader>hh`| Open help (horizontal split)    |
@@ -210,7 +210,7 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>w_`| Max height                           |
 | `<leader>w>`| Increase width                       |
 | `<leader>w<`| Decrease width                       |
-| `<leader>w\|`| Max width                            |
+| `<leader>w|`| Max width                            |
 | `<leader>w=`| Equal height and width               |
 | `<c-j>`     | Move selected lines down             |
 | `<c-k>`     | Move selected lines up               |
@@ -223,6 +223,53 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<c-k>` | Move current line up    |
 | `<c-j>` | Move current line down  |
 | `<c-d>` | Delete previous word    |
+
+**Plugin: `mini.files` Keybindings**
+*(Note: `g.`, `g/`, `go`, `gy` are active when the MiniFiles buffer is open)*
+
+| Key         | Description                |
+|-------------|----------------------------|
+| `<leader>e` | Toggle mini-files explorer |
+| `g.`        | Toggle hidden files        |
+| `g/`        | Set cwd                    |
+| `go`        | OS open                    |
+| `gy`        | Yank path                  |
+
+**Plugin: `snacks.nvim` Keybindings**
+
+| Key         | Description                        |
+|-------------|------------------------------------|
+| `<leader>sgb`| Open git blame for current line    |
+| `<leader>sgB`| Git browse active file             |
+| `<leader>sgl`| Open lazygit                       |
+| `<m-`>`       | Toggle Terminal (vsplit) (N,I,T) |
+| `<leader>fg` | Live Grep                          |
+| `<leader>ff` | Find Files                         |
+| `<leader>fb` | Find Buffers                       |
+| `<leader>fli`| Find LSP Implementations           |
+| `<leader>fls`| Find LSP Symbols                   |
+| `<leader>fd` | Diagnostics picker (buffer)        |
+| `<leader>fh` | Find Help Pages                    |
+| `<leader>fc` | Pick Colorschemes                  |
+| `<leader>fH` | Find hl_groups                     |
+| `<leader>fG` | Git diff                           |
+
+**LSP Keybindings (Normal Mode, buffer-specific)**
+
+| Key         | Description                                           |
+|-------------|-------------------------------------------------------|
+| `<leader>ld`| Jump to definition                                    |
+| `<leader>lD`| Jump to type definition                               |
+| `<leader>lh`| Show hover information                                |
+| `<leader>lc`| Show code actions                                     |
+| `<leader>lF`| Format the code (also Visual mode)                    |
+| `<leader>lI`| Toggle lsp inlay hints                                |
+| `<leader>li`| Show implementations of the current word              |
+| `<leader>lr`| Rename all the instances of the symbol in the current buffer |
+| `<leader>lR`| Restart LSP client                                    |
+| `<leader>ls`| Open Signature Help                                   |
+| `<leader>ll`| Jump to declaration                                   |
+| `<leader>lf`| Show float diagnostics                                |
 
 # Things not done yet, but are planned
 - [ ] Better error handling for statusline/tabline/statuscolumn.
