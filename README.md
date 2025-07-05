@@ -139,16 +139,6 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 
 This section outlines the keybindings configured in this Neovim setup.
 
-**Dashboard Keybindings**
-
-| Key | Description |
-|-----|-------------|
-| u   |  Updates   |
-| f   | 󰥨 Find      |
-| d   |  Dotfiles  |
-| c   |  Config    |
-| r   |  Recents   |
-
 **Core Keybindings**
 
 **Normal Mode**
