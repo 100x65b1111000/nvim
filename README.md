@@ -135,10 +135,99 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 ![image](https://github.com/user-attachments/assets/1c17926f-c2d8-430c-9197-72e3da7fcbab)
 > Notice that the middle and right modules are blank, once you define the left/middle/right modules, they would be overidden! and default to empty if empty table is passed to them.
 
+# Keybindings
 
+This section outlines the keybindings configured in this Neovim setup.
+
+**Dashboard Keybindings (`lua/plugins/dashboard.lua`)**
+
+| Key | Description | Action                                      |
+|-----|-------------|---------------------------------------------|
+| u   |  Updates   | Lazy update                                 |
+| f   | 󰥨 Find      | `Snacks.picker.files({ cwd = "~/" })`        |
+| d   |  Dotfiles  | `Snacks.picker.files({ cwd = "~/.config" })` |
+| c   |  Config    | `Snacks.picker.files({ cwd = path })`       |
+| r   |  Recents   | `lua Snacks.picker.recent()`                |
+
+**Core Keybindings (`lua/core/keymaps.lua`)**
+
+**Normal Mode**
+| Key         | Description                     | Action                               |
+|-------------|---------------------------------|--------------------------------------|
+| `<leader>a` | Select all                      | `maggVG`                             |
+| `<leader>ay`| Select all and copy             | `maggVGy`a`                         |
+| `<Esc>`     | Clear search highlight          | `:nohlsearch<CR>`                    |
+| `;`         | Enter command mode              | `:`                                  |
+| `<Tab>`     | Switch to the next tab          | `:tabnext<CR>`                       |
+| `<S-Tab>`   | Switch to the previous tab      | `:tabprev<CR>`                       |
+| `<leader>bh`| Previous buffer                 | `previous_buffer` (custom function)  |
+| `<leader>bl`| Next buffer                     | `next_buffer` (custom function)    |
+| `<leader>bd`| Delete buffer                   | `:bdelete<CR>`                       |
+| `<leader>bb`| Switch with previous buffer     | `:b#<CR>`                            |
+| `<leader>bp`| List buffers                    | `:buffers<CR>`                       |
+| `<leader>wh`| Focus window (left)             | `:wincmd h<CR>`                      |
+| `<leader>wj`| Focus window (right)            | `:wincmd j<CR>`                      |
+| `<leader>wk`| Focus window (up)               | `:wincmd k<CR>`                      |
+| `<leader>wl`| Focus window (down)             | `:wincmd l<CR>`                      |
+| `<leader>wo`| Close all other windows         | `:wincmd o<CR>`                      |
+| `<leader>ws`| Split window(horizontally)      | `:wincmd s<CR>`                      |
+| `<leader>wv`| Split window(vertically)        | `:wincmd v<CR>`                      |
+| `<leader>wq`| Quit window                     | `:wincmd q<CR>`                      |
+| `<leader>wT`| Break out to a new tab          | `:wincmd T<CR>`                      |
+| `<leader>ww`| Switch windows                  | `:wincmd w<CR>`                      |
+| `<leader>wx`| Swap window with next           | `:wincmd x<CR>`                      |
+| `<leader>w+`| Increase height                 | `:wincmd +<CR>`                      |
+| `<leader>w-`| Decrease height                 | `:wincmd -<CR>`                      |
+| `<leader>w_`| Max height                      | `:wincmd _<CR>`                      |
+| `<leader>w>`| Increase width                  | `:wincmd ><CR>`                      |
+| `<leader>w<`| Decrease width                  | `:wincmd <<CR>`                      |
+| `<leader>w|`| Max width                       | `:wincmd |<CR>`                      |
+| `<leader>w=`| Equal height and width          | `:wincmd =<CR>`                      |
+| `<leader>hv`| Open help (vertical split)      | `:vert help `                        |
+| `<leader>hh`| Open help (horizontal split)    | `:help `                             |
+| `<c-s-R>`   | Restart Neovim                  | `:restart<CR>`                       |
+| `<c-j>`     | Move current line down          | `:m .+1<CR>==`                       |
+| `<c-k>`     | Move current line up            | `:m .-2<CR>==`                       |
+
+**Visual Mode**
+| Key         | Description                          | Action                               |
+|-------------|--------------------------------------|--------------------------------------|
+| `<leader>bd`| Delete buffer                        | `:bdelete<CR>`                       |
+| `<leader>bb`| Switch with previous buffer          | `:b#<CR>`                            |
+| `<leader>bp`| List buffers                         | `:buffers<CR>`                       |
+| `<leader>wh`| Focus window (left)                  | `:wincmd h<CR>`                      |
+| `<leader>wj`| Focus window (right)                 | `:wincmd j<CR>`                      |
+| `<leader>wk`| Focus window (up)                    | `:wincmd k<CR>`                      |
+| `<leader>wl`| Focus window (down)                  | `:wincmd l<CR>`                      |
+| `<leader>wo`| Close all other windows              | `:wincmd o<CR>`                      |
+| `<leader>ws`| Split window(horizontally)           | `:wincmd s<CR>`                      |
+| `<leader>wv`| Split window(vertically)             | `:wincmd v<CR>`                      |
+| `<leader>wq`| Quit window                          | `:wincmd q<CR>`                      |
+| `<leader>wT`| Break out to a new tab               | `:wincmd T<CR>`                      |
+| `<leader>ww`| Switch windows                       | `:wincmd w<CR>`                      |
+| `<leader>wx`| Swap window with next                | `:wincmd x<CR>`                      |
+| `<leader>w+`| Increase height                      | `:wincmd +<CR>`                      |
+| `<leader>w-`| Decrease height                      | `:wincmd -<CR>`                      |
+| `<leader>w_`| Max height                           | `:wincmd _<CR>`                      |
+| `<leader>w>`| Increase width                       | `:wincmd ><CR>`                      |
+| `<leader>w<`| Decrease width                       | `:wincmd <<CR>`                      |
+| `<leader>w|`| Max width                            | `:wincmd |<CR>`                      |
+| `<leader>w=`| Equal height and width               | `:wincmd =<CR>`                      |
+| `<c-j>`     | Move selected lines down             | `:m '>+1<CR>gv=gv`                   |
+| `<c-k>`     | Move selected lines up               | `:m '<-2<CR>gv=gv `                  |
+| `;`         | Enter command mode                   | `:`                                  |
+| `/`         | Search forward within visual selection | `<C-\><C-n>`</\%V`            |
+| `?`         | Search backward within visual selection| `<C-\><C-n>`>?\%V`           |
+
+**Insert Mode**
+| Key     | Description             | Action                  |
+|---------|-------------------------|-------------------------|
+| `<c-k>` | Move current line up    | `<Esc>:m .-2<CR>==gi`   |
+| `<c-j>` | Move current line down  | `<Esc>:m .+1<CR>==gi`   |
+| `<c-d>` | Delete previous word    | `<cmd>normal! db<CR>`   |
 
 # Things not done yet, but are planned
 - [ ] Better error handling for statusline/tabline/statuscolumn.
 - [ ] luasnip snippets (right now it just serves the purpose of completing lsp snippets via `blink.cmp`).
-- [ ] Add more keybindings.
+- [x] Document existing keybindings.
 - [ ] LSP configuration for more LSP servers.
