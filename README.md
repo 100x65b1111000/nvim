@@ -139,7 +139,7 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 
 This section outlines the keybindings configured in this Neovim setup.
 
-**Dashboard Keybindings (`lua/plugins/dashboard.lua`)**
+**Dashboard Keybindings**
 
 | Key | Description | Action                                      |
 |-----|-------------|---------------------------------------------|
@@ -149,7 +149,7 @@ This section outlines the keybindings configured in this Neovim setup.
 | c   |  Config    | `Snacks.picker.files({ cwd = path })`       |
 | r   |  Recents   | `lua Snacks.picker.recent()`                |
 
-**Core Keybindings (`lua/core/keymaps.lua`)**
+**Core Keybindings**
 
 **Normal Mode**
 | Key         | Description                     | Action                               |
