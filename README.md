@@ -211,7 +211,7 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>w_`| Max height                           | `:wincmd _<CR>`                      |
 | `<leader>w>`| Increase width                       | `:wincmd ><CR>`                      |
 | `<leader>w<`| Decrease width                       | `:wincmd <<CR>`                      |
-| `<leader>w|`| Max width                            | `:wincmd |<CR>`                      |
+| `<leader>w\|`| Max width                            | `:wincmd \|<CR>`                      |
 | `<leader>w=`| Equal height and width               | `:wincmd =<CR>`                      |
 | `<c-j>`     | Move selected lines down             | `:m '>+1<CR>gv=gv`                   |
 | `<c-k>`     | Move selected lines up               | `:m '<-2<CR>gv=gv `                  |
