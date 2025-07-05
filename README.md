@@ -180,7 +180,7 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>w_`| Max height                      |
 | `<leader>w>`| Increase width                  |
 | `<leader>w<`| Decrease width                  |
-| `<leader>w|`| Max width                       |
+| `<leader>w\|`| Max width                       |
 | `<leader>w=`| Equal height and width          |
 | `<leader>hv`| Open help (vertical split)      |
 | `<leader>hh`| Open help (horizontal split)    |
