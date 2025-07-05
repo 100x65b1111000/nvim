@@ -141,90 +141,88 @@ This section outlines the keybindings configured in this Neovim setup.
 
 **Dashboard Keybindings**
 
-| Key | Description | Action                                      |
-|-----|-------------|---------------------------------------------|
-| u   |  Updates   | Lazy update                                 |
-| f   | 󰥨 Find      | `Snacks.picker.files({ cwd = "~/" })`        |
-| d   |  Dotfiles  | `Snacks.picker.files({ cwd = "~/.config" })` |
-| c   |  Config    | `Snacks.picker.files({ cwd = path })`       |
-| r   |  Recents   | `lua Snacks.picker.recent()`                |
+| Key | Description |
+|-----|-------------|
+| u   |  Updates   |
+| f   | 󰥨 Find      |
+| d   |  Dotfiles  |
+| c   |  Config    |
+| r   |  Recents   |
 
 **Core Keybindings**
 
 **Normal Mode**
-| Key         | Description                     | Action                               |
-|-------------|---------------------------------|--------------------------------------|
-| `<leader>a` | Select all                      | `maggVG`                             |
-| `<leader>ay`| Select all and copy             | `maggVGy`a`                         |
-| `<Esc>`     | Clear search highlight          | `:nohlsearch<CR>`                    |
-| `;`         | Enter command mode              | `:`                                  |
-| `<Tab>`     | Switch to the next tab          | `:tabnext<CR>`                       |
-| `<S-Tab>`   | Switch to the previous tab      | `:tabprev<CR>`                       |
-| `<leader>bh`| Previous buffer                 | `previous_buffer` (custom function)  |
-| `<leader>bl`| Next buffer                     | `next_buffer` (custom function)    |
-| `<leader>bd`| Delete buffer                   | `:bdelete<CR>`                       |
-| `<leader>bb`| Switch with previous buffer     | `:b#<CR>`                            |
-| `<leader>bp`| List buffers                    | `:buffers<CR>`                       |
-| `<leader>wh`| Focus window (left)             | `:wincmd h<CR>`                      |
-| `<leader>wj`| Focus window (right)            | `:wincmd j<CR>`                      |
-| `<leader>wk`| Focus window (up)               | `:wincmd k<CR>`                      |
-| `<leader>wl`| Focus window (down)             | `:wincmd l<CR>`                      |
-| `<leader>wo`| Close all other windows         | `:wincmd o<CR>`                      |
-| `<leader>ws`| Split window(horizontally)      | `:wincmd s<CR>`                      |
-| `<leader>wv`| Split window(vertically)        | `:wincmd v<CR>`                      |
-| `<leader>wq`| Quit window                     | `:wincmd q<CR>`                      |
-| `<leader>wT`| Break out to a new tab          | `:wincmd T<CR>`                      |
-| `<leader>ww`| Switch windows                  | `:wincmd w<CR>`                      |
-| `<leader>wx`| Swap window with next           | `:wincmd x<CR>`                      |
-| `<leader>w+`| Increase height                 | `:wincmd +<CR>`                      |
-| `<leader>w-`| Decrease height                 | `:wincmd -<CR>`                      |
-| `<leader>w_`| Max height                      | `:wincmd _<CR>`                      |
-| `<leader>w>`| Increase width                  | `:wincmd ><CR>`                      |
-| `<leader>w<`| Decrease width                  | `:wincmd <<CR>`                      |
-| `<leader>w|`| Max width                       | `:wincmd |<CR>`                      |
-| `<leader>w=`| Equal height and width          | `:wincmd =<CR>`                      |
-| `<leader>hv`| Open help (vertical split)      | `:vert help `                        |
-| `<leader>hh`| Open help (horizontal split)    | `:help `                             |
-| `<c-s-R>`   | Restart Neovim                  | `:restart<CR>`                       |
-| `<c-j>`     | Move current line down          | `:m .+1<CR>==`                       |
-| `<c-k>`     | Move current line up            | `:m .-2<CR>==`                       |
+| Key         | Description                     |
+|-------------|---------------------------------|
+| `<leader>a` | Select all                      |
+| `<leader>ay`| Select all and copy             |
+| `<Esc>`     | Clear search highlight          |
+| `<Tab>`     | Switch to the next tab          |
+| `<S-Tab>`   | Switch to the previous tab      |
+| `<leader>bh`| Previous buffer                 |
+| `<leader>bl`| Next buffer                     |
+| `<leader>bd`| Delete buffer                   |
+| `<leader>bb`| Switch with previous buffer     |
+| `<leader>bp`| List buffers                    |
+| `<leader>wh`| Focus window (left)             |
+| `<leader>wj`| Focus window (right)            |
+| `<leader>wk`| Focus window (up)               |
+| `<leader>wl`| Focus window (down)             |
+| `<leader>wo`| Close all other windows         |
+| `<leader>ws`| Split window(horizontally)      |
+| `<leader>wv`| Split window(vertically)        |
+| `<leader>wq`| Quit window                     |
+| `<leader>wT`| Break out to a new tab          |
+| `<leader>ww`| Switch windows                  |
+| `<leader>wx`| Swap window with next           |
+| `<leader>w+`| Increase height                 |
+| `<leader>w-`| Decrease height                 |
+| `<leader>w_`| Max height                      |
+| `<leader>w>`| Increase width                  |
+| `<leader>w<`| Decrease width                  |
+| `<leader>w|`| Max width                       |
+| `<leader>w=`| Equal height and width          |
+| `<leader>hv`| Open help (vertical split)      |
+| `<leader>hh`| Open help (horizontal split)    |
+| `<c-s-R>`   | Restart Neovim                  |
+| `<c-j>`     | Move current line down          |
+| `<c-k>`     | Move current line up            |
 
 **Visual Mode**
-| Key         | Description                          | Action                               |
-|-------------|--------------------------------------|--------------------------------------|
-| `<leader>bd`| Delete buffer                        | `:bdelete<CR>`                       |
-| `<leader>bb`| Switch with previous buffer          | `:b#<CR>`                            |
-| `<leader>bp`| List buffers                         | `:buffers<CR>`                       |
-| `<leader>wh`| Focus window (left)                  | `:wincmd h<CR>`                      |
-| `<leader>wj`| Focus window (right)                 | `:wincmd j<CR>`                      |
-| `<leader>wk`| Focus window (up)                    | `:wincmd k<CR>`                      |
-| `<leader>wl`| Focus window (down)                  | `:wincmd l<CR>`                      |
-| `<leader>wo`| Close all other windows              | `:wincmd o<CR>`                      |
-| `<leader>ws`| Split window(horizontally)           | `:wincmd s<CR>`                      |
-| `<leader>wv`| Split window(vertically)             | `:wincmd v<CR>`                      |
-| `<leader>wq`| Quit window                          | `:wincmd q<CR>`                      |
-| `<leader>wT`| Break out to a new tab               | `:wincmd T<CR>`                      |
-| `<leader>ww`| Switch windows                       | `:wincmd w<CR>`                      |
-| `<leader>wx`| Swap window with next                | `:wincmd x<CR>`                      |
-| `<leader>w+`| Increase height                      | `:wincmd +<CR>`                      |
-| `<leader>w-`| Decrease height                      | `:wincmd -<CR>`                      |
-| `<leader>w_`| Max height                           | `:wincmd _<CR>`                      |
-| `<leader>w>`| Increase width                       | `:wincmd ><CR>`                      |
-| `<leader>w<`| Decrease width                       | `:wincmd <<CR>`                      |
-| `<leader>w\|`| Max width                            | `:wincmd \|<CR>`                      |
-| `<leader>w=`| Equal height and width               | `:wincmd =<CR>`                      |
-| `<c-j>`     | Move selected lines down             | `:m '>+1<CR>gv=gv`                   |
-| `<c-k>`     | Move selected lines up               | `:m '<-2<CR>gv=gv `                  |
-| `;`         | Enter command mode                   | `:`                                  |
-| `/`         | Search forward within visual selection | `<C-\><C-n>`</\%V`            |
-| `?`         | Search backward within visual selection| `<C-\><C-n>`>?\%V`           |
+| Key         | Description                          |
+|-------------|--------------------------------------|
+| `<leader>bd`| Delete buffer                        |
+| `<leader>bb`| Switch with previous buffer          |
+| `<leader>bp`| List buffers                         |
+| `<leader>wh`| Focus window (left)                  |
+| `<leader>wj`| Focus window (right)                 |
+| `<leader>wk`| Focus window (up)                    |
+| `<leader>wl`| Focus window (down)                  |
+| `<leader>wo`| Close all other windows              |
+| `<leader>ws`| Split window(horizontally)           |
+| `<leader>wv`| Split window(vertically)             |
+| `<leader>wq`| Quit window                          |
+| `<leader>wT`| Break out to a new tab               |
+| `<leader>ww`| Switch windows                       |
+| `<leader>wx`| Swap window with next                |
+| `<leader>w+`| Increase height                      |
+| `<leader>w-`| Decrease height                      |
+| `<leader>w_`| Max height                           |
+| `<leader>w>`| Increase width                       |
+| `<leader>w<`| Decrease width                       |
+| `<leader>w|`| Max width                            |
+| `<leader>w=`| Equal height and width               |
+| `<c-j>`     | Move selected lines down             |
+| `<c-k>`     | Move selected lines up               |
+| `/`         | Search forward within visual selection |
+| `?`         | Search backward within visual selection|
 
 **Insert Mode**
-| Key     | Description             | Action                  |
-|---------|-------------------------|-------------------------|
-| `<c-k>` | Move current line up    | `<Esc>:m .-2<CR>==gi`   |
-| `<c-j>` | Move current line down  | `<Esc>:m .+1<CR>==gi`   |
-| `<c-d>` | Delete previous word    | `<cmd>normal! db<CR>`   |
+| Key     | Description             |
+|---------|-------------------------|
+| `<c-k>` | Move current line up    |
+| `<c-j>` | Move current line down  |
+| `<c-d>` | Delete previous word    |
 
 # Things not done yet, but are planned
 - [ ] Better error handling for statusline/tabline/statuscolumn.
