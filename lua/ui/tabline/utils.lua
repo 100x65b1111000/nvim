@@ -399,10 +399,13 @@ local function update_tabline_buffer_string()
 	end)
 end
 
-M.get_tabline = function()
+
+M.initialize_tabline  = function ()
 	M.update_tabline_buffer_info()
-	M.tabline_update_tabpages_info()
 	M.update_tabline_buffer_string()
+end
+
+M.get_tabline = function()
 	return states.cache.tabline_string
 end
 

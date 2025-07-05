@@ -4,6 +4,6 @@ require("lazy-config")
 require("core.abbr")
 require("ui").setup({
 	enabled = true,
-	statusline = { left = { separator = { left = "", right = "" } } },
+	statusline = { enabled = true, left = { separator = { left = "", right = "" } } },
 })
 require("config.lsp")

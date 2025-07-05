@@ -4,6 +4,7 @@ M.setup = function(opts)
 	opts = opts or {}
 	if opts.enabled then
 		require("ui.tabline.autocmds")
+		require("ui.tabline.utils").initialize_tabline()
 		vim.api.nvim_set_option_value("tabline", [[%!v:lua.require('ui.tabline.utils').get_tabline()]], {})
 	else
 		vim.api.nvim_set_option_value("tabline", "", {})

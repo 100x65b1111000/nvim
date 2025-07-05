@@ -27,7 +27,7 @@ P.config = function()
 				"select_and_accept",
 				"snippet_forward",
 			},
-			["<CR>"] = {
+			["<m-CR>"] = {
 				function()
 					return cmp.select_and_accept({
 						callback = function()
