@@ -210,7 +210,7 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>w_`| Max height                           |
 | `<leader>w>`| Increase width                       |
 | `<leader>w<`| Decrease width                       |
-| `<leader>w|`| Max width                            |
+| `<leader>w\|`| Max width                            |
 | `<leader>w=`| Equal height and width               |
 | `<c-j>`     | Move selected lines down             |
 | `<c-k>`     | Move selected lines up               |
