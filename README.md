@@ -135,10 +135,134 @@ require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf
 ![image](https://github.com/user-attachments/assets/1c17926f-c2d8-430c-9197-72e3da7fcbab)
 > Notice that the middle and right modules are blank, once you define the left/middle/right modules, they would be overidden! and default to empty if empty table is passed to them.
 
+# Keybindings
 
+This section outlines the keybindings configured in this Neovim setup.
+
+**Core Keybindings**
+
+**Normal Mode**
+| Key         | Description                     |
+|-------------|---------------------------------|
+| `<leader>a` | Select all                      |
+| `<leader>ay`| Select all and copy             |
+| `<Esc>`     | Clear search highlight          |
+| `<Tab>`     | Switch to the next tab          |
+| `<S-Tab>`   | Switch to the previous tab      |
+| `<leader>bh`| Previous buffer                 |
+| `<leader>bl`| Next buffer                     |
+| `<leader>bd`| Delete buffer                   |
+| `<leader>bb`| Switch with previous buffer     |
+| `<leader>bp`| List buffers                    |
+| `<leader>wh`| Focus window (left)             |
+| `<leader>wj`| Focus window (right)            |
+| `<leader>wk`| Focus window (up)               |
+| `<leader>wl`| Focus window (down)             |
+| `<leader>wo`| Close all other windows         |
+| `<leader>ws`| Split window(horizontally)      |
+| `<leader>wv`| Split window(vertically)        |
+| `<leader>wq`| Quit window                     |
+| `<leader>wT`| Break out to a new tab          |
+| `<leader>ww`| Switch windows                  |
+| `<leader>wx`| Swap window with next           |
+| `<leader>w+`| Increase height                 |
+| `<leader>w-`| Decrease height                 |
+| `<leader>w_`| Max height                      |
+| `<leader>w>`| Increase width                  |
+| `<leader>w<`| Decrease width                  |
+| `<leader>w\|`| Max width                       |
+| `<leader>w=`| Equal height and width          |
+| `<leader>hv`| Open help (vertical split)      |
+| `<leader>hh`| Open help (horizontal split)    |
+| `<c-s-R>`   | Restart Neovim                  |
+| `<c-j>`     | Move current line down          |
+| `<c-k>`     | Move current line up            |
+
+**Visual Mode**
+| Key         | Description                          |
+|-------------|--------------------------------------|
+| `<leader>bd`| Delete buffer                        |
+| `<leader>bb`| Switch with previous buffer          |
+| `<leader>bp`| List buffers                         |
+| `<leader>wh`| Focus window (left)                  |
+| `<leader>wj`| Focus window (right)                 |
+| `<leader>wk`| Focus window (up)                    |
+| `<leader>wl`| Focus window (down)                  |
+| `<leader>wo`| Close all other windows              |
+| `<leader>ws`| Split window(horizontally)           |
+| `<leader>wv`| Split window(vertically)             |
+| `<leader>wq`| Quit window                          |
+| `<leader>wT`| Break out to a new tab               |
+| `<leader>ww`| Switch windows                       |
+| `<leader>wx`| Swap window with next                |
+| `<leader>w+`| Increase height                      |
+| `<leader>w-`| Decrease height                      |
+| `<leader>w_`| Max height                           |
+| `<leader>w>`| Increase width                       |
+| `<leader>w<`| Decrease width                       |
+| `<leader>w\|`| Max width                            |
+| `<leader>w=`| Equal height and width               |
+| `<c-j>`     | Move selected lines down             |
+| `<c-k>`     | Move selected lines up               |
+| `/`         | Search forward within visual selection |
+| `?`         | Search backward within visual selection|
+
+**Insert Mode**
+| Key     | Description             |
+|---------|-------------------------|
+| `<c-k>` | Move current line up    |
+| `<c-j>` | Move current line down  |
+| `<c-d>` | Delete previous word    |
+
+**Plugin: `mini.files` Keybindings**
+*(Note: `g.`, `g/`, `go`, `gy` are active when the MiniFiles buffer is open)*
+
+| Key         | Description                |
+|-------------|----------------------------|
+| `<leader>e` | Toggle mini-files explorer |
+| `g.`        | Toggle hidden files        |
+| `g/`        | Set cwd                    |
+| `go`        | OS open                    |
+| `gy`        | Yank path                  |
+
+**Plugin: `snacks.nvim` Keybindings**
+
+| Key         | Description                        |
+|-------------|------------------------------------|
+| `<leader>sgb`| Open git blame for current line    |
+| `<leader>sgB`| Git browse active file             |
+| `<leader>sgl`| Open lazygit                       |
+| `<m-`>`       | Toggle Terminal (vsplit) (N,I,T) |
+| `<leader>fg` | Live Grep                          |
+| `<leader>ff` | Find Files                         |
+| `<leader>fb` | Find Buffers                       |
+| `<leader>fli`| Find LSP Implementations           |
+| `<leader>fls`| Find LSP Symbols                   |
+| `<leader>fd` | Diagnostics picker (buffer)        |
+| `<leader>fh` | Find Help Pages                    |
+| `<leader>fc` | Pick Colorschemes                  |
+| `<leader>fH` | Find hl_groups                     |
+| `<leader>fG` | Git diff                           |
+
+**LSP Keybindings (Normal Mode, buffer-specific)**
+
+| Key         | Description                                           |
+|-------------|-------------------------------------------------------|
+| `<leader>ld`| Jump to definition                                    |
+| `<leader>lD`| Jump to type definition                               |
+| `<leader>lh`| Show hover information                                |
+| `<leader>lc`| Show code actions                                     |
+| `<leader>lF`| Format the code (also Visual mode)                    |
+| `<leader>lI`| Toggle lsp inlay hints                                |
+| `<leader>li`| Show implementations of the current word              |
+| `<leader>lr`| Rename all the instances of the symbol in the current buffer |
+| `<leader>lR`| Restart LSP client                                    |
+| `<leader>ls`| Open Signature Help                                   |
+| `<leader>ll`| Jump to declaration                                   |
+| `<leader>lf`| Show float diagnostics                                |
 
 # Things not done yet, but are planned
 - [ ] Better error handling for statusline/tabline/statuscolumn.
 - [ ] luasnip snippets (right now it just serves the purpose of completing lsp snippets via `blink.cmp`).
-- [ ] Add more keybindings.
+- [x] Document existing keybindings.
 - [ ] LSP configuration for more LSP servers.
