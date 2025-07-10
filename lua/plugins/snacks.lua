@@ -14,7 +14,9 @@ P.opts = {
 	bigfile = { enabled = true },
 	image = { enabled = true },
 	dashboard = { enabled = false },
-	explorer = { enabled = false },
+	explorer = {
+		enabled = false,
+	},
 	---@type snacks.indent.Config
 	indent = { enabled = false },
 	input = { enabled = true },

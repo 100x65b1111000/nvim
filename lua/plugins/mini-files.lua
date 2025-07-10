@@ -2,7 +2,7 @@
 local P = {
 	"echasnovski/mini.files",
 	lazy = true,
-	enabled = true,
+	-- enabled = false,
 }
 -- Define the toggle function for mini.files
 function ToggleMiniFiles()

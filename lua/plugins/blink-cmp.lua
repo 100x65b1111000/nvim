@@ -347,6 +347,8 @@ P.config = function()
 					return { "buffer", "path" }
 				elseif vim.bo.filetype == "lua" then
 					return { "lsp", "path", "lazydev", "snippets", "buffer" }
+				elseif vim.bo.filetype == "toml" then
+					return { "lsp", "buffer" }
 				end
 				return vim.list_extend(
 					{ "lsp", "path", "snippets", "buffer" },
@@ -361,12 +363,12 @@ P.config = function()
 			per_filetype = {},
 			providers = {
 				lsp = {
-					-- async = true,
+					async = true,
 					name = "Lsp",
 					module = "blink.cmp.sources.lsp",
 					enabled = true,
 					score_offset = 0,
-					fallbacks = { "buffer" },
+					fallbacks = {  },
 					override = {},
 				},
 				path = {
@@ -402,7 +404,7 @@ P.config = function()
 				buffer = {
 					name = "buffer",
 					module = "blink.cmp.sources.buffer",
-					score_offset = -5,
+					score_offset = -20,
 					opts = {
 						get_bufnrs = function()
 							return vim.tbl_filter(function(bufnr)

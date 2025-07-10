@@ -66,7 +66,7 @@ M.buf_is_file = buf_is_file
 ---@return StatusLineModuleFnTable
 function M.statusline_bufinfo()
 	local buf_hl =
-		generate_highlight("@variable.parameter", "StatusLine", { italic = true }, 15, 0, "", "", "StatusLineBufname")
+		generate_highlight("Normal", "StatusLine", { italic = true }, 15, 0, "", "", "StatusLineBufname")
 	local sephl = generate_highlight(
 		buf_hl,
 		"StatusLine",
@@ -101,7 +101,7 @@ M.statusline_filetype_info = function()
 	if not package.loaded["mini.icons"] then
 		return {
 			string = filetype,
-			hl_group = generate_highlight("@variable.parameter", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletype"),
+			hl_group = generate_highlight("Normal", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletype"),
 			icon = "  ",
 			icon_hl = "StatusLineFiletype",
 			show_right_sep = false,
@@ -109,12 +109,12 @@ M.statusline_filetype_info = function()
 	end
 	if states.cache.filetype_icons[filetype_] then
 		local icon_hl = states.cache.filetype_icons[filetype_].icon_hl
-			or generate_highlight("@variable.parameter", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletypeIcon")
+			or generate_highlight("Normal", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletypeIcon")
 		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
 		return {
 			string = filetype,
 			hl_group = generate_highlight(
-				"@variable.parameter",
+				"Normal",
 				"StatusLine",
 				{},
 				10,

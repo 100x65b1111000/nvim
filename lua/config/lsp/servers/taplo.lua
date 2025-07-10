@@ -1,7 +1,7 @@
 local utils = require("config.lsp.lsputils")
 
 vim.lsp.config("taplo", {
-    cmd = { 'taplo', 'lsp', 'stdio' },
+    cmd = { 'taplo', 'lsp', 'stdio', '--log-spans' },
 	filetypes = { "toml" },
     root_dir = utils.find_root(nil, true)
 })
