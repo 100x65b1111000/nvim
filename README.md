@@ -6,16 +6,43 @@ This is my personal Neovim config that I have developed throughout my journey of
 > If you encounter any problems or bugs, please raise an issue, I'll try to fix them as soon as possible. PRs are more than welcome!
 
 # SHOWCASE
-## StartupTime: ~17ms 
-![for all the startuptime freaks](https://github.com/user-attachments/assets/8178dcfe-1177-42b6-8cb0-91ab920addc7)
-![image](https://github.com/user-attachments/assets/bf625347-6098-4033-8cac-7bd0c71a9aeb)
-![image](https://github.com/user-attachments/assets/843ac2c7-1375-4c87-9197-f35bb2f543f2)
-![image](https://github.com/user-attachments/assets/e39b5f40-885e-4259-8644-ba217f3b6f93)
-![image](https://github.com/user-attachments/assets/70ce54dc-72dc-4e0b-956f-285e6729257e)
-![image](https://github.com/user-attachments/assets/31c683c3-74c1-4a03-9245-8fac62587c19)
-![image](https://github.com/user-attachments/assets/59c74c96-f067-4ee1-98b8-d0250183eb7b)
-![image](https://github.com/user-attachments/assets/258eadf4-8ce0-4337-805f-20084439f0ed)
-
+<table>
+    <th colspan=2>StartupTime: ~20ms</th>
+    <tr>
+        <td align="center" colspan=2>
+            <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0892bed6-d315-40dc-ab99-21b5c8b2b01d" />
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c7e422c9-84af-46fa-b925-604a2dd2a53b" />
+        </td>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/200577fd-fdbb-494d-a4c1-44bee36b1d07" />
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4107f082-533a-4e47-876d-2f8c6967839f" />
+        </td>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a800fcfb-c145-4f98-a2ad-138e2c44928c" />
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/85565852-cff8-4ddf-9492-2e9d76467230" />
+        </td>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7db2dfec-d207-4fbd-88d0-a12ab77c4bed" />
+        </td>
+    </tr>
+    <tr>
+        <td align="center" colspan=2>
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ecfd9674-0a62-4cf4-a03d-46455761981b" />
+        </td>
+    </tr>
+</table>
 
 # Install Instructions
 
@@ -48,9 +75,6 @@ nvim
 - [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
 - lsp setup via `vim.lsp.config`.
 
-> [!NOTE]
-> There's a bug in `snacks.picker`, which causes the picker to crash when resizing the neovim window with the specific layout config used in the dotfiles. Unfortunately this won't get fixed in the main any time soon. So, for now you can use my fork of `snacks.nvim`
-
 Other plugins included, are:
 - [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim)
 - [mini.pairs](https://github.com/echasnovski/mini.nvim)
@@ -64,15 +88,59 @@ Other plugins included, are:
 - [conform.nvim](https://github.com/stevearc/conform.nvim)
 - [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors)
 
-# You can use the statusline/tabline/statuscolumn in your own config too !!
-Doing so is fairly easy, just grab the `ui` folder and place it inside your config, and call the setup functions for any of the statusline/tabline/statuscolumn inside your config and that's just it.
+# How to's
+
+## Add an lsp configuration for your lsp server.
+Here's a step by step guide (with an example setup to configure the `basedpyright` language-server ) to add a new lsp server configuration:
+1. Create a file inside the `~/.config/nvim/lua/config/lsp/servers/` directory, say `lua-ls.lua`.
+2. Define the lsp configuration spec like this:
+```lua
+
+vim.lsp.config("basedpyright", {
+	cmd = {
+		"basedpyright-langserver", -- filetypes to attach the lsp server to
+
+		"--stdio",
+	},
+	filetypes = { "python" },
+	settings = { -- extra options you might want to pass to the lsp server (visit the lsp server documentation to see which options to include here)
+		basedpyright = {
+			analysis = {
+				logLevel = "Error",
+				inlayHints = {
+					genericTypes = true,
+				},
+				useLibraryForCodeTypes = true,
+				autoImportCompletions = true,
+				diagnosticMode = "workspace",
+				typeCheckingMode = "standard",
+			},
+			python = {},
+		},
+	},
+})
+
+vim.lsp.enable("basedpyright")
+```
+3. Save the file.
+4. And that's it. The setup will automatically define and add `capabilities` and `on_attach` options to your configuration and include it.
+
+
+## Using the tabline/statusline/statuscolumn in your personal config
+Doing so is fairly easy, just grab the `ui` folder and place it inside your config, and call the setup function to enable the UI elements. Here is a simple example:
+
+```lua
+require('ui').setup({ enable = true }) -- enables all the ui elements
+
+require('ui').setup({enable = true, statusline = { enabled = false }}) -- enables all the ui modules expect the statusline
+```
 
 
 > [!Note]
 > The statusline and tabline require the `mini.icons` plugin to generate some highlight groups and display file icons.
 > There are also some highlight groups you must define first, or else the colors will look off if you are using any other colorscheme. You can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search for `/StatusLine` and `/TabLine` and define the highlight groups).
 
-### Adding Custom Modules to the Statusline
+### Adding Custom Modules to the Statusline.
 
 You can extend the statusline with your own custom modules(although its just bare bones). The process involves defining a Lua function that returns information about what to display, and then adding this function to your statusline configuration.
 
@@ -94,13 +162,13 @@ Here's an example of a simple custom module that displays the current date:
 
 ```lua
 local function my_date_module()
-  local date_str = os.date("%Y-%m-%d")
-  return {
-    string = date_str,
-    hl_group = "Comment", -- Example highlight group (optional, would use the `StatusLineNormal` group if not specified)
-    icon = " ",          -- Example icon (requires a Nerd Font) (optional)
-    icon_hl = "Special"    -- Example highlight group for the icon (optional)
-  }
+    local date_str = os.date("%Y-%m-%d")
+    return {
+        string = date_str,
+        hl_group = "Comment", -- Example highlight group (optional, would use the `StatusLineNormal` group if not specified)
+        icon = " ",          -- Example icon (requires a Nerd Font) (optional)
+        icon_hl = "Special"    -- Example highlight group for the icon (optional)
+    }
 end
 ```
 
@@ -113,13 +181,13 @@ For example, to add `my_date_module` to the left section of the statusline:
 ```lua
 -- Define your custom module function 
 local function my_date_module()
-  local date_str = os.date("%Y-%m-%d")
-  return {
-    string = date_str,
-    hl_group = "Comment",
-    icon = " ",
-    icon_hl = "Special"
-  }
+    local date_str = os.date("%Y-%m-%d")
+    return {
+        string = date_str,
+        hl_group = "Comment",
+        icon = " ",
+        icon_hl = "Special"
+    }
 end
 ```
 

@@ -54,6 +54,9 @@ P.config = function()
 				WinBar = {
 					bg = c.sumiInk1
 				},
+				WinBarNC = {
+					bg = c.sumiInk0
+				},
 				CursorLineNr = {
 					-- winblend = 50
 					bold = true,
