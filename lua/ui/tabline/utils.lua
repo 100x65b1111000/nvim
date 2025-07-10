@@ -246,7 +246,8 @@ local calculate_buf_space = function(bufs)
 	return length
 end
 
-M.update_overflow_info = function(bufs)
+M.update_overflow_info = function()
+	local bufs = states.buffers_list
 	local left_dist = states.start_idx - 1
 	local right_dist = #bufs - states.end_idx
 	states.left_overflow_str = ""
@@ -528,12 +529,10 @@ M.update_tabline_buffer_info = function()
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 		states.left_overflow_idicator_length = 0
 		states.right_overflow_idicator_length = 0
-		local bufs = states.buffers_list
-		local buf_specs = states.buffers_spec
-		fetch_visible_buffers(bufnr, bufs, buf_specs)
-		M.update_overflow_info(bufs)
-		fetch_visible_buffers(bufnr, bufs, buf_specs) -- overflow indicators might shorten the available width
-		M.update_overflow_info(bufs)
+		fetch_visible_buffers(bufnr, states.buffers_list, states.buffers_spec)
+		M.update_overflow_info()
+		fetch_visible_buffers(bufnr, states.buffers_list, states.buffers_spec) -- overflow indicators might shorten the available width
+		M.update_overflow_info()
 	end)
 end
 
