@@ -1,5 +1,6 @@
 local M = {
 	"yetone/avante.nvim",
+	enabled = false,
 	-- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
 	-- ⚠️ must add this setting! ! !
 	build = function()

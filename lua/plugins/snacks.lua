@@ -1,6 +1,6 @@
 ---@diagnostic disable: missing-fields
 local P = {
-	"100x65b1111000/snacks.nvim",
+	"folke/snacks.nvim",
 	enabled = true,
 	priority = 999,
 	lazy = false,

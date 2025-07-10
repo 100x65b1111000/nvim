@@ -163,7 +163,7 @@ end
 ---@param fun function?
 local on_attach = function(client, bufnr)
 	if client.server_capabilities.inlayHintProvider then
-		vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+		vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), { bufnr = bufnr })
 	end
 
 	vim.keymap.set(

@@ -16,7 +16,6 @@ local generate_highlight = utils.generate_highlight
 local find_index = utils.find_index
 local fnamemodify = fn.fnamemodify
 local schedule = vim.schedule
-local tbl_contains = vim.tbl_contains
 local nvim_get_current_tabpage = api.nvim_get_current_tabpage
 local nvim_list_tabpages = api.nvim_list_tabpages
 local isdirectory = fn.isdirectory
@@ -28,10 +27,7 @@ local M = {}
 ---@return boolean True if the buffer is valid, false otherwise.
 local function buf_is_valid(bufnr)
 	local listed = nvim_get_option_value("buflisted", { buf = bufnr }) or false
-	-- return nvim_buf_is_loaded(bufnr)
-	-- 	and nvim_buf_is_valid(bufnr)
-	-- 	and (nvim_get_option_value("buftype", { buf = bufnr }) == "")
-	return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 -- and nvim_buf_get_name(bufnr) ~= ""
+	return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 and nvim_buf_get_name(bufnr) ~= ""
 end
 
 ---Filters a list of buffer numbers, returning only the valid ones.
@@ -42,6 +38,7 @@ local function get_tabline_buffers_list(buffers)
 	for _, i in ipairs(buffers) do
 		if buf_is_valid(i) then
 			table.insert(buf_list, i)
+			states.buffer_map[i] = i
 		end
 	end
 	return buf_list
@@ -68,13 +65,30 @@ end
 ---Gets the buffer state.
 ---@param bufnr integer The buffer number.
 ---@return integer
-local function get_buffer_state(bufnr, bufs)
+local function get_buffer_state(bufnr)
 	if bufnr == nvim_get_current_buf() then
 		return states.BufferStates.ACTIVE
-	elseif tbl_contains(bufs, bufnr) then
+	elseif states.buffer_map[bufnr] then
 		return states.BufferStates.INACTIVE
 	end
 	return states.BufferStates.NONE
+end
+
+local function get_duplicate_bufs()
+	local bufs = states.buffers_list
+	local bufnames = {}
+	local duplicate_bufs = {}
+	for _, i in ipairs(bufs) do
+		local buf_path = nvim_buf_get_name(i)
+		local buf_name = fnamemodify(buf_path, ":t")
+		if bufnames[buf_name] then
+			duplicate_bufs[buf_name] = true
+		else
+			bufnames[buf_name] = true
+		end
+	end
+
+	return duplicate_bufs
 end
 
 ---Processes the buffer name for display.
@@ -83,9 +97,10 @@ end
 local function process_buffer_name(bufnr)
 	local buf = nvim_buf_get_name(bufnr)
 	local bufname = fnamemodify(buf, ":t")
+	local duplicate_bufs = get_duplicate_bufs()
 	local init_files = states.init_files or { "init.lua" }
-	if vim.list_contains(init_files, bufname) then
-		bufname = string.format("%s%s%s", fnamemodify(nvim_buf_get_name(bufnr), ":h:t"), "/", bufname)
+	if init_files[bufname] or duplicate_bufs[bufname] then
+		bufname = string.format("%s%s%s", fnamemodify(buf, ":h:t"), "/", bufname)
 	end
 	return bufname
 end
@@ -174,10 +189,10 @@ end
 
 ---Gets buffer information.
 ---@param bufnr integer The buffer number.
----@return { buf_name: string, buf_name_length: integer, icon_hl: string,icon:  string,length: integer,state: integer, left_padding: string, right_padding: string, close_btn: string }|nil
-local function get_buffer_info(bufnr, bufs)
+---@return { buf_name: string, buf_name_length: integer, icon_hl: string,icon:  string,length: integer,state: integer, left_padding: string, right_padding: string, close_btn: string}|nil
+local function get_buffer_info(bufnr)
 	local buf_name = process_buffer_name(bufnr)
-	local state = get_buffer_state(bufnr, bufs)
+	local state = get_buffer_state(bufnr)
 	local icon, icon_hl = get_file_icon(bufnr)
 	icon = icon .. " "
 	icon_hl = generate_tabline_highlight(icon_hl, state, {}, nil)
@@ -207,20 +222,20 @@ M.buf_is_valid = buf_is_valid
 M.get_buffer_info = get_buffer_info
 
 ---Gets valid buffers.
----@return {buf_name: string, icon: string, icon_hl: string, length: integer, state: integer, left_padding: string, right_padding: string}
+---@return {buf_name: string, icon: string, icon_hl: string, length: integer, state: integer, left_padding: string, right_padding: string}[]
 local function get_buffers_with_specs(bufs)
-	local valid_bufs = {}
+	local bufs_spec = {}
 	for _, i in ipairs(bufs) do
-		local info = get_buffer_info(i, bufs)
-		valid_bufs[i] = info
+		local info = get_buffer_info(i) or {}
+		bufs_spec[i] = info
 	end
-	return valid_bufs
+	return bufs_spec
 end
 
 local calculate_buf_space = function(bufs)
 	local length = 0
 	for _, i in ipairs(bufs) do
-		local buf_len = get_buffer_info(i, bufs).length
+		local buf_len = get_buffer_info(i).length
 		length = length + buf_len
 	end
 	return length
@@ -344,6 +359,7 @@ _G.tabline_close_button_callback = function(bufnr)
 		end
 	end
 	schedule(function()
+		vim.lsp.inlay_hint.enable(false, { bufnr = bufnr }) -- disable inlay hints prior deleting the buffer
 		nvim_buf_delete(bufnr, { force = false })
 		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
@@ -356,8 +372,8 @@ end
 ---Generates the buffer string for the tabline.
 ---@param bufnr integer The buffer number.
 ---@return string The formatted buffer string.
-local function generate_buffer_string(bufnr, bufs)
-	local buf_spec = get_buffer_info(bufnr, bufs)
+local function generate_buffer_string(bufnr)
+	local buf_spec = get_buffer_info(bufnr)
 	if not buf_spec then
 		return ""
 	end
@@ -383,9 +399,8 @@ local function update_tabline_buffer_string()
 	states.tabline_update_buffer_string_timer = timer_fn(states.tabline_update_buffer_string_timer, 50, function()
 		states.timer_count = states.timer_count + 1
 		local str = ""
-		local bufs = states.buffers_list
 		for _, bufnr in ipairs(states.visible_buffers) do
-			str = str .. generate_buffer_string(bufnr, bufs)
+			str = str .. generate_buffer_string(bufnr)
 		end
 		states.cache.tabline_string = string.format(
 			"%s%s%s%s%s",
@@ -399,8 +414,7 @@ local function update_tabline_buffer_string()
 	end)
 end
 
-
-M.initialize_tabline  = function ()
+M.initialize_tabline = function()
 	M.update_tabline_buffer_info()
 	M.update_tabline_buffer_string()
 end
@@ -443,7 +457,7 @@ local get_tabpage_hl = function(tab)
 		states.icons.tabpage_status_icon_inactive
 end
 
-M.tabline_update_tab_string = function(tabs)
+M.update_tabline_string = function(tabs)
 	local str = ""
 	for idx, tab in ipairs(tabs) do
 		local hl, close_hl, close_icon = get_tabpage_hl(tab)
@@ -487,7 +501,7 @@ M.tabline_update_tabpages_info = function()
 	states.tabline_tabpage_timer = timer_fn(states.tabline_tabpage_timer, 50, function()
 		states.timer_count = states.timer_count + 1
 		local tabs = nvim_list_tabpages() or {}
-		M.tabline_update_tab_string(tabs)
+		M.update_tabline_string(tabs)
 		states.tabpages_str_length = nvim_eval_statusline(states.tabpages_str, { use_tabline = true }).width
 	end)
 end

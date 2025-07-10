@@ -4,13 +4,14 @@ M.cache = { highlights = {} }
 
 --- *** Tabline Cache ***
 M.tabline_states = {}
+
 M.tabline_states.BufferStates = {
 	ACTIVE = 1,
 	INACTIVE = 2,
 	NONE = 3,
 }
 
-M.tabline_states.tabline_buf_str_max_width = 18
+M.tabline_states.tabline_buf_str_max_width = math.huge
 
 M.tabline_states.cache = {
 	tabline_string = "",
@@ -21,7 +22,7 @@ M.tabline_states.cache = {
 }
 
 M.tabline_states.init_files = {
-	"init.lua",
+	["init.lua"] = true
 }
 
 ---@class Icons
@@ -43,6 +44,7 @@ M.tabline_states.offset = 0
 
 ---@type integer[]
 M.tabline_states.visible_buffers = {}
+M.tabline_states.bufname_count = {}
 
 M.tabline_states.left_overflow_str = ""
 M.tabline_states.right_overflow_str = ""
