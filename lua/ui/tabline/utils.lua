@@ -80,7 +80,7 @@ local function get_buffer_state(bufnr)
 end
 
 local function get_duplicate_bufs()
-	local bufs = states.visible_buffers
+	local bufs = states.buffers_list
 	local bufnames = {}
 	local duplicate_bufs = {}
 	for _, i in ipairs(bufs) do
@@ -96,7 +96,7 @@ local function get_duplicate_bufs()
 	return duplicate_bufs
 end
 
----Processes the buffer name for display.
+---rocesses the buffer name for display.
 ---@param bufnr integer The buffer number.
 ---@return string The processed buffer name.
 local function process_buffer_name(bufnr)
@@ -396,6 +396,7 @@ local function generate_buffer_string(bufnr)
 		right_padding,
 		buf_spec.close_btn
 	)
+	M.update_overflow_info(states.visible_buffers)
 	return buf_string
 end
 
