@@ -41,7 +41,7 @@
     </tr>
 </table>
 
-## Table of Contents
+# Table of Contents
 
 *   [Introduction](#about-the-project)
 *   [Prerequisites](#prerequisites)
@@ -55,7 +55,7 @@
 *   [Planned Features](#planned-features)
 *   [Contributing](#contributing)
 
-## About the project
+# About the project
 
 I wanted a Neovim setup that looks good, runs fast, and feels like *mine*. If someone's into clean looks, custom UI bits (like the statusline, tabline, and statuscolumn), and want something that just works nicely from the get-go, this might be for them. It's definitely **heavily tweaked** to my liking, but I've tried to keep things straightforward enough if someone wants to tinker with it or use it as a starting point.
 
@@ -63,7 +63,7 @@ I wanted a Neovim setup that looks good, runs fast, and feels like *mine*. If so
 > This configuration is actively developed and functional. While I strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. I'll try to do my best to address any encountered issues.
 > If you encounter any problems or bugs, please raise an issue; I'll try to fix them as soon as possible. PRs are more than welcome!
 
-## Prerequisites
+# Prerequisites
 
 Before you begin, ensure you have the following installed:
 
