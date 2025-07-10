@@ -1,6 +1,6 @@
 ---@diagnostic disable: missing-fields
 local P = {
-	"100x65b1111000/snacks.nvim",
+	"folke/snacks.nvim",
 	enabled = true,
 	priority = 999,
 	lazy = false,
@@ -14,7 +14,9 @@ P.opts = {
 	bigfile = { enabled = true },
 	image = { enabled = true },
 	dashboard = { enabled = false },
-	explorer = { enabled = false },
+	explorer = {
+		enabled = false,
+	},
 	---@type snacks.indent.Config
 	indent = { enabled = false },
 	input = { enabled = true },

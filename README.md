@@ -263,6 +263,6 @@ This section outlines the keybindings configured in this Neovim setup.
 
 # Things not done yet, but are planned
 - [ ] Better error handling for statusline/tabline/statuscolumn.
-- [ ] luasnip snippets (right now it just serves the purpose of completing lsp snippets via `blink.cmp`).
+- [x] luasnip snippets.
 - [x] Document existing keybindings.
 - [ ] LSP configuration for more LSP servers.

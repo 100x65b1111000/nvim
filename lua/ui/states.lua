@@ -88,7 +88,7 @@ M.statusline_states = {}
 
 ---@type StatusLineConfig
 M.statusline_states.default_config = {
-	enabled = false,
+	enabled = true,
 	left = {
 		separator = { left = "", right = "" },
 		modules = {

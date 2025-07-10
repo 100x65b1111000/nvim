@@ -240,7 +240,7 @@ M.generate_highlight = function(
 	local bg = "#" .. string.format("%06x", source_hl_bg or fallback_hl.bg)
 
 	bg = M.alter_hex_color(bg, brightness_bg)
-	fg = M.alter_hex_color(fg, brightness_fg, brightness_fg)
+	fg = M.alter_hex_color(fg, brightness_fg, math.floor(brightness_fg * 1.75))
 	suffix = suffix or ""
 	prefix = prefix or ""
 	local hl_opts = vim.tbl_extend("force", { fg = fg, bg = bg }, opts)

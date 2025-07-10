@@ -31,7 +31,7 @@ local function buf_is_valid(bufnr)
 	-- return nvim_buf_is_loaded(bufnr)
 	-- 	and nvim_buf_is_valid(bufnr)
 	-- 	and (nvim_get_option_value("buftype", { buf = bufnr }) == "")
-	return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 -- and nvim_buf_get_name(bufnr) ~= ""
+	return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 and nvim_buf_get_name(bufnr) ~= ""
 end
 
 ---Filters a list of buffer numbers, returning only the valid ones.
@@ -56,7 +56,7 @@ local function generate_tabline_highlight(source, state, opts, new_name)
 	if state == states.BufferStates.ACTIVE then
 		suffix, prefix, brightness_bg, brightness_fg = "Active", "TabLine", 10, 0
 	elseif state == states.BufferStates.INACTIVE then
-		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "TabLine", 5, -45
+		suffix, prefix, brightness_bg, brightness_fg = "Inactive", "TabLine", 5, -25
 	elseif state == states.BufferStates.NONE then
 		suffix, prefix, brightness_bg, brightness_fg = "None", "TabLine", 0, -25
 	elseif state == states.BufferStates.MISC then

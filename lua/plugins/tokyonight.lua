@@ -2,11 +2,11 @@ local P = {
 	"folke/tokyonight.nvim",
 	enabled = true,
 	-- priority = 1000,
-	lazy = true,
+	-- lazy = true,
 }
 
 -- P.opts =
-P.config = function(_, opts)
+P.config = function()
 	require("tokyonight").setup({
 		style = "moon",
 		light_stype = "storm",

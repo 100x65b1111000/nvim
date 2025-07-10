@@ -32,7 +32,7 @@ P.config = function()
 			palette = {
 				sumiInk0 = "#16161c",
 				sumiInk3 = "#1d1d26",
-				sumiInk5 = "#30303f"
+				sumiInk5 = "#30303f",
 			},
 		},
 		---@param colors KanagawaColors Kanagwa colors
