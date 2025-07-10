@@ -1,11 +1,5 @@
 # NEOVIM CONFIG
-This is my personal Neovim config that I have developed throughout my journey of daily driving neovim. It may or may not suit your needs but if it does, I'm happy to hear that.
 
-> [!Note]
-> This config is currently experimental but functional. As changes are made on the fly, the code is a mess rn (I'm doing my best to clean it up). I try to fix any issues I encounter as soon as possible.
-> If you encounter any problems or bugs, please raise an issue, I'll try to fix them as soon as possible. PRs are more than welcome!
-
-# SHOWCASE
 <table>
     <th colspan=2>StartupTime: ~20ms</th>
     <tr>
@@ -47,9 +41,40 @@ This is my personal Neovim config that I have developed throughout my journey of
     </tr>
 </table>
 
+## Table of Contents
+
+*   [Introduction](#about-the-project)
+*   [Prerequisites](#prerequisites)
+*   [Install Instructions](#install-instructions)
+*   [Features & Plugins](#features--plugins)
+*   [How to's](#how-tos)
+    *   [Add an LSP Configuration](#add-an-lsp-configuration-for-your-lsp-server)
+    *   [Using the UI Elements](#using-the-tablinestatuslinestatuscolumn-in-your-personal-config)
+    *   [Adding Custom Modules to the Statusline](#adding-custom-modules-to-the-statusline)
+*   [Keybindings](#keybindings)
+*   [Planned Features](#planned-features)
+*   [Contributing](#contributing)
+
+## About the project
+
+I wanted a Neovim setup that looks good, runs fast, and feels like *mine*. If someone's into clean looks, custom UI bits (like the statusline, tabline, and statuscolumn), and want something that just works nicely from the get-go, this might be for them. It's definitely **heavily tweaked** to my liking, but I've tried to keep things straightforward enough if someone wants to tinker with it or use it as a starting point.
+
+> [!Note]
+> This configuration is actively developed and functional. While I strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. I'll try to do my best to address any encountered issues.
+> If you encounter any problems or bugs, please raise an issue; I'll try to fix them as soon as possible. PRs are more than welcome!
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+*   **Neovim(obviously):** I use the latest git version but any binaries with version 0.11+ should work just fine.
+*   **Git:** For cloning the repository.
+*   **A Nerd Font:** Required for icons in the UI elements (statusline, tabline, etc.) to display correctly. The one used in the config is `Victor Mono Nerd Font Propo`.
+*   **A C Compiler:** For `nvim-treesitter` and other plugins that might need to build components, typically `gcc` or `clang`.
+
 # Install Instructions
 
-To get the setup up and running.
+To get the setup up and running,
 Firstly backup your current neovim setup:
 
 ```bash
@@ -57,95 +82,126 @@ mv ~/.config/nvim ~/.config/nvim.bak
 mv ~/.local/share/nvim ~/.local/share/nvim.bak
 ```
 
-Now, simply clone the repository into your `$XDG_CONFIG_HOME/nvim` directory.
+Now, simply clone the repository into your `$XDG_CONFIG_HOME/nvim` directory (typically `~/.config/nvim`):
 
 ```bash
 git clone https://gitlab.com/100x65b1111000/nvim.git ~/.config/nvim
+```
+
+Then, launch Neovim:
+```bash
 nvim
 ```
+On the first launch, `lazy.nvim` should automatically install all the plugins.
 
-# Highlights
-- Custom statusline (\~500 LOC, \~0.25ms), statuscolumn (\~150 LOC, \~0.03ms), and tabline (\~500 LOC, \~0.20ms) with minimalism and aesthetics in mind. However, not much configurable.
-![image](https://github.com/user-attachments/assets/4030f2b2-efea-44dc-bde8-60b319abece2)
-![image](https://github.com/user-attachments/assets/2d06e484-7659-4098-b6e5-7250a033a10d)
-- Reasonable defaults.
-- [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management.
-- Customized dashboard with [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
-- [tokyonight.nvim](https://github.com/folke/tokyonight.nvim) theme with tweaked colors for better visibility.
-- [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
-- [blink.cmp](https://github.com/Saghen/blink.cmp) for completions.
-- [snacks.nvim](https://github.com/folke/snacks.nvim) for tasty snacks.
-- [mini.files](https://github.com/echasnovski/mini.files) as the file explorer.
-- lsp setup via `vim.lsp.config`.
+# Features & Plugins
 
-Other plugins included, are:
-- [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim)
-- [mini.pairs](https://github.com/echasnovski/mini.nvim)
-- [helpview.nvim](https://github.com/OXY2DEV/helpview.nvim)
-- [markview.nvim](https://github.com/OXY2DEV/markview.nvim)
-- [showkeys.nvim](https://github.com/nvzone/showkeys)
-- [dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim)
-- [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)
-- [vim-startuptime](https://github.com/dstein64/vim-startuptime)
-- [lazydev](https://github.com/folke/lazydev.nvim)
-- [conform.nvim](https://github.com/stevearc/conform.nvim)
-- [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors)
+Following are the main highlights of the configuration.
 
-# How to's
+**Core Functionality & UI:**
 
-## Add an lsp configuration for your lsp server.
-Here's a step by step guide (with an example setup to configure the `basedpyright` language-server ) to add a new lsp server configuration:
-1. Create a file inside the `~/.config/nvim/lua/config/lsp/servers/` directory, say `lua-ls.lua`.
-2. Define the lsp configuration spec like this:
-```lua
+*   **Custom UI Elements:**
+    *   Statusline: Custom-built (\~500 LOC, \~0.25ms performance) with a focus on minimalism and aesthetics.
+        ![image](https://github.com/user-attachments/assets/4030f2b2-efea-44dc-bde8-60b319abece2)
+    *   Tabline: Custom-built (\~500 LOC, \~0.20ms performance) for a clean and informative tab experience.
+        ![image](https://github.com/user-attachments/assets/2d06e484-7659-4098-b6e5-7250a033a10d)
+    *   Statuscolumn: Custom-built (\~150 LOC, \~0.03ms performance) for displaying line-related information.
+    *   *Note: These custom UI elements are highly optimized but offer limited direct configuration. See the "How to's" section for usage.*
+*   **Plugin Management:** [lazy.nvim](https://github.com/folke/lazy.nvim) for efficient and easy plugin management.
+*   **Dashboard:** Customized startup dashboard via [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
+*   **Theme:** [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) with tweaked colors for better visibility.
+*   **Keybinding Hints:** [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
+*   **File Explorer:** [mini.files](https://github.com/echasnovski/mini.files) for a minimalistic and fast file explorer.
+*   **Auto Pairs:** [mini.pairs](https://github.com/echasnovski/mini.nvim) for automatic insertion of matching pairs.
 
-vim.lsp.config("basedpyright", {
-	cmd = {
-		"basedpyright-langserver", -- filetypes to attach the lsp server to
+**LSP, Completion & Formatting:**
 
-		"--stdio",
-	},
-	filetypes = { "python" },
-	settings = { -- extra options you might want to pass to the lsp server (visit the lsp server documentation to see which options to include here)
-		basedpyright = {
-			analysis = {
-				logLevel = "Error",
-				inlayHints = {
-					genericTypes = true,
-				},
-				useLibraryForCodeTypes = true,
-				autoImportCompletions = true,
-				diagnosticMode = "workspace",
-				typeCheckingMode = "standard",
-			},
-			python = {},
-		},
-	},
-})
+*   **LSP:** Native LSP setup via `vim.lsp.config` for language intelligence.
+*   **Completion:** [blink.cmp](https://github.com/Saghen/blink.cmp) for code completions.
+*   **Formatting:** [conform.nvim](https://github.com/stevearc/conform.nvim) for code formatting.
+*   **Treesitter:** [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) for advanced syntax highlighting and code analysis.
 
-vim.lsp.enable("basedpyright")
-```
-3. Save the file.
-4. And that's it. The setup will automatically define and add `capabilities` and `on_attach` options to your configuration and include it.
+**Git Integration:**
 
+*   **Git Signs:** [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim) to show git changes in the sign column.
+*   **Git Utilities:** [snacks.nvim](https://github.com/folke/snacks.nvim) includes various git-related utilities (blame, browse, etc. - also listed under "Productivity Tools").
 
-## Using the tabline/statusline/statuscolumn in your personal config
-Doing so is fairly easy, just grab the `ui` folder and place it inside your config, and call the setup function to enable the UI elements. Here is a simple example:
+**Productivity & Utility Tools:**
 
-```lua
-require('ui').setup({ enable = true }) -- enables all the ui elements
+*   **General Utilities:** [snacks.nvim](https://github.com/folke/snacks.nvim) for tasty snacks (picker, notifier, indent-guides).
+*   **Help Viewer:** [helpview.nvim](https://github.com/OXY2DEV/helpview.nvim) for an improved help viewing experience.
+*   **Markdown Preview (enhanced):** [markview.nvim](https://github.com/OXY2DEV/markview.nvim) for viewing marks and improved markdown navigation/preview.
+*   **Keypress Display:** [showkeys.nvim](https://github.com/nvzone/showkeys) to display pressed keys (useful for demos/screencasts).
+*   **Navigation Bar:** [dropbar.nvim](https://github.com/Bekaboo/dropbar.nvim) for a context-aware treesitter powered navigation bar.
+*   **Startup Time Analysis:** [vim-startuptime](https://github.com/dstein64/vim-startuptime) for profiling Neovim startup time.
+*   **Developer Utilities for Lua:** [lazydev](https://github.com/folke/lazydev.nvim) for assisting with Lua development in Neovim.
+*   **Color Highlighter:** [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors) to highlight color codes in your files.
 
-require('ui').setup({enable = true, statusline = { enabled = false }}) -- enables all the ui modules expect the statusline
-```
+# How To's
 
+## Add an LSP Configuration for Your LSP Server
+Here's a step-by-step guide (with an example setup to configure the `basedpyright` language-server) to add a new LSP server configuration:
+1.  Create a file inside the `~/.config/nvim/lua/config/lsp/servers/` directory, say `basedpyright.lua`.
+2.  Define the LSP configuration spec like this:
+    ```lua
+    vim.lsp.config("basedpyright", {
+        cmd = {
+            "basedpyright-langserver", -- command to start the language server
+            "--stdio", -- arguments
+        },
+        filetypes = { "python" }, -- filetypes to attach the lsp server to
+        settings = { -- extra options you might want to pass to the lsp server (consult the lsp server documentation)
+            basedpyright = {
+                analysis = {
+                    logLevel = "Error",
+                    inlayHints = {
+                        genericTypes = true,
+                    },
+                    useLibraryForCodeTypes = true,
+                    autoImportCompletions = true,
+                    diagnosticMode = "workspace",
+                    typeCheckingMode = "standard",
+                },
+                python = {},
+            },
+        },
+    })
 
-> [!Note]
-> The statusline and tabline require the `mini.icons` plugin to generate some highlight groups and display file icons.
-> There are also some highlight groups you must define first, or else the colors will look off if you are using any other colorscheme. You can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search for `/StatusLine` and `/TabLine` and define the highlight groups).
+    vim.lsp.enable("basedpyright") -- Enable the language server
+    ```
+3.  Save the file.
+4.  And that's it. The setup will automatically define and add necessary `capabilities` and `on_attach` options to your configuration and include it. The `capabilities` generally refer to what features the LSP client (Neovim) supports, and `on_attach` is a function that runs when the LSP server attaches to a buffer, often used to set buffer-local keymaps for LSP actions.
 
-### Adding Custom Modules to the Statusline.
+## Using the Tabline/Statusline/Statuscolumn in Your Personal Config
 
-You can extend the statusline with your own custom modules(although its just bare bones). The process involves defining a Lua function that returns information about what to display, and then adding this function to your statusline configuration.
+Integrating the custom UI elements (statusline, tabline, statuscolumn) into your own Neovim configuration is pretty straightforward.
+
+**Important Dependencies & Setup:**
+
+> [!Important]
+> *   **`mini.icons`:** The statusline and tabline require the [mini.icons](https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-icons.md) plugin (part of the `mini.nvim` suite) to generate some highlight groups and display file icons. Ensure this plugin is installed and loaded.
+> *   **Nerd Fonts:** As mentioned in Prerequisites, a Nerd Font is essential for icons to render correctly.
+> *   **Highlight Groups:** If you are using a colorscheme other than the modified ones included in the setup, you **must** define specific highlight groups for the UI elements to look correct. You can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search `/StatusLine` and `/TabLine` for `StatusLine` and `TabLine` specific highlights, and define them directly in the colorscheme spec or via `vim.api.nvim_set_hl`).
+
+**Integration Steps:**
+
+1.  **Copy the `ui` directory:** Grab the entire `lua/ui` folder from this configuration and place it inside your Neovim config's `lua` directory (e.g., `~/.config/nvim/lua/ui`).
+2.  **Call the setup function:** In your Neovim configuration (e.g., in your `init.lua` or a dedicated UI setup file), call the setup function to enable the UI elements.
+
+    ```lua
+    -- Enable all custom UI elements
+    require('ui').setup({ enable = true })
+    
+    -- Or, enable specific elements (e.g., all except statusline)
+    require('ui').setup({
+        enable = true,
+        statusline = { enabled = false }
+    })
+    ```
+
+### Adding Custom Modules to the Statusline
+
+You can extend the statusline with your own custom modules (although it's just bare bones). The process involves defining a Lua function that returns a table with a specific spec, and then adding this function to your statusline configuration.
 
 **1. Define Your Module Function**
 
@@ -156,10 +212,10 @@ A custom module is a Lua function that returns a table with specific keys. The m
 *   `icon`: (Optional) An icon to display in the module.
 *   `icon_hl`: (Optional) The highlight group for the `icon`.
 *   `reverse`: (Optional) A boolean. If `true`, the `string` is displayed first, then the `icon`. Defaults to `false` (icon first).
-*   `show_right_sep`: (Optional) A boolean that defines whether to show the right seperator for the module or not. (Does not show the separator by default).
+*   `show_right_sep`: (Optional) A boolean that defines whether to show the right separator for the module or not. (Does not show the separator by default).
 *   `show_left_sep`: (Optional) Same as `show_right_sep` but for the left separator (useful for modules at right).
 *   `right_sep_hl`: (Optional) Highlight group for right separator.
-*   `left_sep_hl`: (Optional) Same as `right_sep_hl`, but for the left seperator.
+*   `left_sep_hl`: (Optional) Same as `right_sep_hl`, but for the left separator.
 
 Here's an example of a simple custom module that displays the current date:
 
@@ -175,36 +231,16 @@ local function my_date_module()
 end
 ```
 
-**2. Add Your Module to the Statusline Configuration**
-
-When you set up the statusline using `require('ui.statusline').setup(opts)`, you can pass your custom module function in the `opts.modules` table. You can add it to the `left`, `middle`, or `right` sections of the statusline.
-
-For example, to add `my_date_module` to the left section of the statusline:
+**2. Now Just Add This Function Inside Your Statusline Setup Like This**
 
 ```lua
--- Define your custom module function 
-local function my_date_module()
-    local date_str = os.date("%Y-%m-%d")
-    return {
-        string = date_str,
-        hl_group = "Comment",
-        icon = " ",
-        icon_hl = "Special"
-    }
-end
+-- Assuming the ui directory exists inside ~/.config/nvim/lua/
+require('ui').setup({enabled = true, statusline = { enabled = true, modules = { left = { "mode", "buf-status", "buf-info", my_date_module }, middle = { ... }, right = { ... }}}})
 ```
 
-**3. Now just add this function inside your statusline setup like this**
-
-```lua
--- Assuming the ui directly exists inside ~/.config/nvim/lua/
-require('ui.statusline').setup({ modules = { left = { "mode", "buf-status", "buf-info", my_date_module }, middle = { ... }, right = { ... }}})
-
-```
-
-**Here's what the above setup results in**
-![image](https://github.com/user-attachments/assets/1c17926f-c2d8-430c-9197-72e3da7fcbab)
-> Notice that the middle and right modules are blank, once you define the left/middle/right modules, they would be overidden! and default to empty if empty table is passed to them.
+**Here's What the Above Setup Results In**
+![image](https://github.com/user-attachments/assets/cb20e4b5-c8d9-47c2-8f69-1cc5ef9a0d81)
+> Notice that the middle and right modules are blank. Once you define the `left`, `middle`, or `right` modules, they will be overridden and will default to empty if an empty table is passed to them.
 
 # Keybindings
 
@@ -230,8 +266,8 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>wk`| Focus window (up)               |
 | `<leader>wl`| Focus window (down)             |
 | `<leader>wo`| Close all other windows         |
-| `<leader>ws`| Split window(horizontally)      |
-| `<leader>wv`| Split window(vertically)        |
+| `<leader>ws`| Split window (horizontally)     |
+| `<leader>wv`| Split window (vertically)       |
 | `<leader>wq`| Quit window                     |
 | `<leader>wT`| Break out to a new tab          |
 | `<leader>ww`| Switch windows                  |
@@ -260,8 +296,8 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>wk`| Focus window (up)                    |
 | `<leader>wl`| Focus window (down)                  |
 | `<leader>wo`| Close all other windows              |
-| `<leader>ws`| Split window(horizontally)           |
-| `<leader>wv`| Split window(vertically)             |
+| `<leader>ws`| Split window (horizontally)          |
+| `<leader>wv`| Split window (vertically)            |
 | `<leader>wq`| Quit window                          |
 | `<leader>wT`| Break out to a new tab               |
 | `<leader>ww`| Switch windows                       |
@@ -332,8 +368,18 @@ This section outlines the keybindings configured in this Neovim setup.
 | `<leader>ll`| Jump to declaration                                   |
 | `<leader>lf`| Show float diagnostics                                |
 
-# Things not done yet, but are planned
+# Planned Features
 - [ ] Better error handling for statusline/tabline/statuscolumn.
 - [x] luasnip snippets.
 - [x] Document existing keybindings.
-- [ ] LSP configuration for more LSP servers.
+- [x] LSP configuration for more LSP servers.
+
+# Contributing
+
+Contributions are highly welcome! Whether it's reporting a bug, suggesting an enhancement, or submitting a pull request, your input is valued.
+
+*   **Reporting Issues:** If you encounter any bugs or have suggestions for improvements, please open an issue on the GitLab repository. Provide as much detail as possible, including steps to reproduce, your Neovim version, and any relevant error messages.
+*   **Pull Requests:**
+    *   For small fixes or enhancements, feel free to submit a PR directly.
+    *   For more significant changes, it's a good idea to open an issue first to discuss the proposed changes and ensure they align with the project's direction.
+    *   Please try to follow the existing coding style and provide a clear description of your changes in the PR.
