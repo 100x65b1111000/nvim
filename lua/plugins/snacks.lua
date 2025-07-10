@@ -12,7 +12,7 @@ P.opts = {
 	-- or leave it empty to use the default settings
 	-- refer to the configuration section below
 	bigfile = { enabled = true },
-	image = { enabled = true },
+	image = { enabled = false },
 	dashboard = { enabled = false },
 	explorer = {
 		enabled = false,

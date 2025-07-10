@@ -1,67 +1,61 @@
-# NEOVIM CONFIG
 
-<table>
-    <th colspan=2>StartupTime: ~20ms</th>
-    <tr>
-        <td align="center" colspan=2>
-            <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0892bed6-d315-40dc-ab99-21b5c8b2b01d" />
-        </td>
-    </tr>
-    <tr>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c7e422c9-84af-46fa-b925-604a2dd2a53b" />
-        </td>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/200577fd-fdbb-494d-a4c1-44bee36b1d07" />
-        </td>
-    </tr>
-    <tr>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4107f082-533a-4e47-876d-2f8c6967839f" />
-        </td>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a800fcfb-c145-4f98-a2ad-138e2c44928c" />
-        </td>
-    </tr>
-    <tr>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/85565852-cff8-4ddf-9492-2e9d76467230" />
-        </td>
-		    <td>
-		    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/00faa27d-6037-45fe-91dc-54b51c801051" />
-        </td>
-    </tr>
-    <tr>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ecfd9674-0a62-4cf4-a03d-46455761981b" />
-		</td>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7db2dfec-d207-4fbd-88d0-a12ab77c4bed" />
-        </td>
-    </tr>
-</table>
+# NEOVIM CONFIG
+A clean, blazingly fast and heavily tweaked neovim setup focused on usability and performance.
+
+> [!Note]
+> The setup's being actively developed and functional. While I strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. I'll try to do my best to address any encountered issues.
+> If you encounter any problems or bugs, please raise an issue; I'll try to fix them as soon as possible. PRs are more than welcome!
+
+> ⚡ **Startup Time:** \~20ms
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0892bed6-d315-40dc-ab99-21b5c8b2b01d" />
 
 # Table of Contents
-
-*   [Introduction](#about-the-project)
+*   [Screeshots](#screenshots)
 *   [Prerequisites](#prerequisites)
 *   [Install Instructions](#install-instructions)
 *   [Features & Plugins](#features--plugins)
 *   [How to's](#how-tos)
-    *   [Add an LSP Configuration](#add-an-lsp-configuration-for-your-lsp-server)
-    *   [Using the UI Elements](#using-the-tablinestatuslinestatuscolumn-in-your-personal-config)
-    *   [Adding Custom Modules to the Statusline](#adding-custom-modules-to-the-statusline)
+*   [Add an LSP Configuration](#add-an-lsp-configuration-for-your-lsp-server)
+*   [Using the UI Elements](#using-the-tablinestatuslinestatuscolumn-in-your-personal-config)
+*   [Adding Custom Modules to the Statusline](#adding-custom-modules-to-the-statusline)
 *   [Keybindings](#keybindings)
 *   [Planned Features](#planned-features)
 *   [Contributing](#contributing)
 
-# About the project
-
-I wanted a Neovim setup that looks good, runs fast, and feels like *mine*. If someone's into clean looks, custom UI bits (like the statusline, tabline, and statuscolumn), and want something that just works nicely from the get-go, this might be for them. It's definitely **heavily tweaked** to my liking, but I've tried to keep things straightforward enough if someone wants to tinker with it or use it as a starting point.
-
-> [!Note]
-> This configuration is actively developed and functional. While I strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. I'll try to do my best to address any encountered issues.
-> If you encounter any problems or bugs, please raise an issue; I'll try to fix them as soon as possible. PRs are more than welcome!
+# Screenshots
+<details>
+    <summary><h3>Picker (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c7e422c9-84af-46fa-b925-604a2dd2a53b" />
+</details>
+<details>
+    <summary><h3>File Explorer (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/200577fd-fdbb-494d-a4c1-44bee36b1d07" />
+</details>
+<details>
+    <summary><h3>Completions (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/4107f082-533a-4e47-876d-2f8c6967839f" />
+</details>
+<details>
+    <summary><h3>Splits (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a800fcfb-c145-4f98-a2ad-138e2c44928c" />
+</details>
+<details>
+    <summary><h3>WhichKey (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/85565852-cff8-4ddf-9492-2e9d76467230" />
+</details>
+<details>
+    <summary><h3>Diagnostics (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/00faa27d-6037-45fe-91dc-54b51c801051" />
+</details>
+<details>
+    <summary><h3>Plugin Manager (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ecfd9674-0a62-4cf4-a03d-46455761981b" />
+</details>
+<details>
+    <summary><h3>Mason (click to expand)</h3></summary>
+    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7db2dfec-d207-4fbd-88d0-a12ab77c4bed" />
+</details>
 
 # Prerequisites
 
@@ -102,9 +96,9 @@ Following are the main highlights of the configuration.
 
 *   **Custom UI Elements:**
     *   Statusline: Custom-built (\~500 LOC, \~0.25ms performance) with a focus on minimalism and aesthetics.
-        ![image](https://github.com/user-attachments/assets/4030f2b2-efea-44dc-bde8-60b319abece2)
+    ![image](https://github.com/user-attachments/assets/4030f2b2-efea-44dc-bde8-60b319abece2)
     *   Tabline: Custom-built (\~500 LOC, \~0.20ms performance) for a clean and informative tab experience.
-        ![image](https://github.com/user-attachments/assets/2d06e484-7659-4098-b6e5-7250a033a10d)
+    ![image](https://github.com/user-attachments/assets/2d06e484-7659-4098-b6e5-7250a033a10d)
     *   Statuscolumn: Custom-built (\~150 LOC, \~0.03ms performance) for displaying line-related information.
     *   *Note: These custom UI elements are highly optimized but offer limited direct configuration. See the "How to's" section for usage.*
 *   **Plugin Management:** [lazy.nvim](https://github.com/folke/lazy.nvim) for efficient and easy plugin management.
@@ -139,9 +133,12 @@ Following are the main highlights of the configuration.
 
 # How To's
 
+## Add snippets for X language
+The snippets are provided under `./lua/snippets` folder. Unfortunately you have to add and write snippets mannually if they are not provided in the config.
+
 ## Add an LSP Configuration for Your LSP Server
 Here's a step-by-step guide (with an example setup to configure the `basedpyright` language-server) to add a new LSP server configuration:
-1.  Create a file inside the `~/.config/nvim/lua/config/lsp/servers/` directory, say `basedpyright.lua`.
+1.  Create a file inside the `./lua/config/lsp/servers/` directory, say `basedpyright.lua`.
 2.  Define the LSP configuration spec like this:
     ```lua
     vim.lsp.config("basedpyright", {
@@ -191,7 +188,7 @@ Integrating the custom UI elements (statusline, tabline, statuscolumn) into your
     ```lua
     -- Enable all custom UI elements
     require('ui').setup({ enable = true })
-    
+
     -- Or, enable specific elements (e.g., all except statusline)
     require('ui').setup({
         enable = true,
@@ -240,7 +237,6 @@ require('ui').setup({enabled = true, statusline = { enabled = true, modules = { 
 
 **Here's What the Above Setup Results In**
 ![image](https://github.com/user-attachments/assets/cb20e4b5-c8d9-47c2-8f69-1cc5ef9a0d81)
-> Notice that the middle and right modules are blank. Once you define the `left`, `middle`, or `right` modules, they will be overridden and will default to empty if an empty table is passed to them.
 
 # Keybindings
 
