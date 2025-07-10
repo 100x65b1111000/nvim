@@ -33,13 +33,16 @@ This is my personal Neovim config that I have developed throughout my journey of
         <td align="center">
           <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/85565852-cff8-4ddf-9492-2e9d76467230" />
         </td>
-        <td align="center">
-          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7db2dfec-d207-4fbd-88d0-a12ab77c4bed" />
+		    <td>
+		    <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/00faa27d-6037-45fe-91dc-54b51c801051" />
         </td>
     </tr>
     <tr>
-        <td align="center" colspan=2>
+        <td align="center">
           <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/ecfd9674-0a62-4cf4-a03d-46455761981b" />
+		</td>
+        <td align="center">
+          <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7db2dfec-d207-4fbd-88d0-a12ab77c4bed" />
         </td>
     </tr>
 </table>
@@ -63,8 +66,8 @@ nvim
 
 # Highlights
 - Custom statusline (\~500 LOC, \~0.25ms), statuscolumn (\~150 LOC, \~0.03ms), and tabline (\~500 LOC, \~0.20ms) with minimalism and aesthetics in mind. However, not much configurable.
-![image](https://github.com/user-attachments/assets/a8522a29-dc3e-41af-b23b-c8268ca81a3f)
-![image](https://github.com/user-attachments/assets/e0f57119-ba19-4d1b-a8ba-e15b1e8d8f95)
+![image](https://github.com/user-attachments/assets/4030f2b2-efea-44dc-bde8-60b319abece2)
+![image](https://github.com/user-attachments/assets/2d06e484-7659-4098-b6e5-7250a033a10d)
 - Reasonable defaults.
 - [lazy.nvim](https://github.com/folke/lazy.nvim) for plugin management.
 - Customized dashboard with [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).

@@ -79,6 +79,8 @@ local function get_buffer_state(bufnr)
 	return states.BufferStates.NONE
 end
 
+--- returns a table containing duplicate filenames from all the listed buffers
+---@return string[] List of duplicate filenames
 local function get_duplicate_bufs()
 	local bufs = states.buffers_list
 	local bufnames = {}
@@ -96,7 +98,7 @@ local function get_duplicate_bufs()
 	return duplicate_bufs
 end
 
----rocesses the buffer name for display.
+---Processes the buffer name for display.
 ---@param bufnr integer The buffer number.
 ---@return string The processed buffer name.
 local function process_buffer_name(bufnr)
@@ -108,19 +110,6 @@ local function process_buffer_name(bufnr)
 		bufname = string.format("%s%s%s", fnamemodify(buf, ":h:t"), "/", bufname)
 	end
 	return bufname
-end
-
----Truncates a string.
----@param string string The string to truncate.
----@param source_length integer The original string length.
----@param target_length integer The target string length.
----@return string The truncated string.
-local function truncate_string(string, source_length, target_length)
-	local ellipsis = "…"
-	if source_length <= target_length then
-		return string
-	end
-	return string.sub(string, 1, target_length - 1) .. ellipsis
 end
 
 ---Gets left and right padding.
