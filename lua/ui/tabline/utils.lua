@@ -75,7 +75,7 @@ local function get_buffer_state(bufnr)
 end
 
 local function get_duplicate_bufs()
-	local bufs = states.buffers_list
+	local bufs = states.visible_buffers
 	local bufnames = {}
 	local duplicate_bufs = {}
 	for _, i in ipairs(bufs) do
