@@ -9,6 +9,7 @@ M.tabline_states.BufferStates = {
 	ACTIVE = 1,
 	INACTIVE = 2,
 	NONE = 3,
+	MISC = 4, -- Added for miscellaneous states like modified inactive
 }
 
 M.tabline_states.tabline_buf_str_max_width = math.huge
@@ -17,8 +18,8 @@ M.tabline_states.cache = {
 	tabline_string = "",
 	highlights = M.cache.highlights,
 	fileicons = {},
-	last_visible_buffers = {},
-	close_button_string = "",
+	-- last_visible_buffers = {}, -- Unused
+	-- close_button_string = "", -- Unused
 }
 
 M.tabline_states.init_files = {
@@ -39,12 +40,12 @@ M.tabline_states.icons = {
 
 M.tabline_states.end_idx = 1
 M.tabline_states.start_idx = 1
-M.tabline_states.diff = 0
-M.tabline_states.offset = 0
+-- M.tabline_states.diff = 0 -- Unused
+-- M.tabline_states.offset = 0 -- Unused
 
 ---@type integer[]
 M.tabline_states.visible_buffers = {}
-M.tabline_states.bufname_count = {}
+-- M.tabline_states.bufname_count = {} -- Replaced by duplicate_buf_names logic
 
 M.tabline_states.left_overflow_str = ""
 M.tabline_states.right_overflow_str = ""
@@ -55,7 +56,9 @@ M.tabline_states.buffer_map = {}
 M.tabline_states.timer_count = 0
 M.tabline_states.buffers_list = {}
 M.tabline_states.buffers_spec = {}
-M.tabline_states.highlight_gen_count = 0
+M.tabline_states.duplicate_buf_names = {} -- Added for caching duplicate buffer names
+M.tabline_states.has_mini_icons = false -- Added for caching mini.icons check
+-- M.tabline_states.highlight_gen_count = 0 -- Unused
 
 M.tabline_states.tabpages_str = ""
 M.tabline_states.tabpages_str_length = 0

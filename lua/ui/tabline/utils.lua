@@ -16,6 +16,8 @@ local generate_highlight = utils.generate_highlight
 local find_index = utils.find_index
 local fnamemodify = fn.fnamemodify
 local schedule = vim.schedule
+
+states.has_mini_icons = package.loaded["mini.icons"] -- Cache this check
 local nvim_get_current_tabpage = api.nvim_get_current_tabpage
 local nvim_list_tabpages = api.nvim_list_tabpages
 local isdirectory = fn.isdirectory
@@ -80,36 +82,18 @@ local function get_buffer_state(bufnr)
 end
 
 --- returns a table containing duplicate filenames from all the listed buffers
----@return string[] List of duplicate filenames
-local function get_duplicate_bufs()
-	local bufs = states.buffers_list
-	local bufnames = {}
-	local duplicate_bufs = {}
-	for _, i in ipairs(bufs) do
-		local buf_path = nvim_buf_get_name(i)
-		local buf_name = fnamemodify(buf_path, ":t")
-		if bufnames[buf_name] then
-			duplicate_bufs[buf_name] = true
-		else
-			bufnames[buf_name] = true
-		end
-	end
-
-	return duplicate_bufs
-end
-
 ---Processes the buffer name for display.
 ---@param bufnr integer The buffer number.
 ---@return string The processed buffer name.
 local function process_buffer_name(bufnr)
-	local buf = nvim_buf_get_name(bufnr)
-	local bufname = fnamemodify(buf, ":t")
-	local duplicate_bufs = get_duplicate_bufs()
+	local buf_path = nvim_buf_get_name(bufnr)
+	local bufname_short = fnamemodify(buf_path, ":t")
 	local init_files = states.init_files or { "init.lua" }
-	if init_files[bufname] or duplicate_bufs[bufname] then
-		bufname = string.format("%s%s%s", fnamemodify(buf, ":h:t"), "/", bufname)
+
+	if init_files[bufname_short] or states.duplicate_buf_names[bufname_short] then
+		return string.format("%s%s%s", fnamemodify(buf_path, ":h:t"), "/", bufname_short)
 	end
-	return bufname
+	return bufname_short
 end
 
 ---Gets left and right padding.
@@ -131,7 +115,7 @@ end
 local get_file_icon = function(bufnr)
 	local filetype = nvim_get_option_value("filetype", { buf = bufnr })
 	local icon, hl = "", ""
-	if not package.loaded["mini.icons"] then
+	if not states.has_mini_icons then -- Use cached value
 		icon, hl = "", "TabLineFill"
 		return icon, hl
 	end
@@ -226,11 +210,19 @@ local function get_buffers_with_specs(bufs)
 	return bufs_spec
 end
 
-local calculate_buf_space = function(bufs)
+local calculate_buf_space = function(bufs) -- bufs is a list of bufnrs
 	local length = 0
-	for _, i in ipairs(bufs) do
-		local buf_len = get_buffer_info(i).length
-		length = length + buf_len
+	for _, bufnr in ipairs(bufs) do
+		if states.buffers_spec[bufnr] and states.buffers_spec[bufnr].length then
+			length = length + states.buffers_spec[bufnr].length
+		else
+			-- Fallback: This case should ideally not be hit if buffers_spec is always populated first.
+			-- Warning: Calling get_buffer_info here can be expensive and might lead to recursion if not handled carefully.
+			-- For safety, let's log if this happens, or consider a default length.
+			-- vim.notify("Warning: Buffer spec not found for " .. bufnr .. " in calculate_buf_space", vim.log.levels.WARN)
+			local buf_info = get_buffer_info(bufnr) -- Ensure this doesn't cause issues if called mid-update
+			if buf_info then length = length + buf_info.length end
+		end
 	end
 	return length
 end
@@ -394,14 +386,16 @@ end
 local function update_tabline_buffer_string()
 	states.tabline_update_buffer_string_timer = timer_fn(states.tabline_update_buffer_string_timer, 50, function()
 		states.timer_count = states.timer_count + 1
-		local str = ""
+		local parts = {}
 		for _, bufnr in ipairs(states.visible_buffers) do
-			str = str .. generate_buffer_string(bufnr)
+			table.insert(parts, generate_buffer_string(bufnr))
 		end
+		local tabline_content = table.concat(parts)
+
 		states.cache.tabline_string = string.format(
 			"%s%s%s%s%s",
 			states.left_overflow_str,
-			str,
+			tabline_content,
 			states.right_overflow_str,
 			"%#TabLineFill#%=",
 			states.tabpages_str
@@ -509,19 +503,65 @@ M.generate_buffer_string = generate_buffer_string
 
 M.update_tabline_buffer_info = function()
 	states.tabline_update_buffer_info_timer = timer_fn(states.tabline_update_buffer_info_timer, 50, function()
-		local bufnr = nvim_get_current_buf()
-		if not buf_is_valid(bufnr) then
-			return
+		local current_bufnr = nvim_get_current_buf()
+		if not buf_is_valid(current_bufnr) then
+			-- If current buffer is not valid (e.g. terminal, help page),
+			-- we might still want to update tabline if other valid buffers exist or tabpages changed.
+			-- However, fetch_visible_buffers requires a valid current_bufnr to center around.
+			-- For now, if current buffer is invalid, we might not have a good reference point.
+			-- This part might need more nuanced handling if we want to display tabs even with an invalid current buffer.
+			-- A simple approach: if current is invalid, try to find the first valid buffer to use as reference.
+			local bufs = states.buffers_list
+			local first_valid_buf = nil
+			for _, b in ipairs(bufs) do
+				if buf_is_valid(b) then
+					first_valid_buf = b
+					break
+				end
+			end
+			if not first_valid_buf then return end -- No valid buffers to show
+			current_bufnr = first_valid_buf
+			-- It's possible no buffer is current if e.g. only one tab page with a terminal is open.
+			-- The original code would return here. We allow proceeding if a valid buffer exists.
 		end
+
 		states.timer_count = states.timer_count + 1
 		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
+
+		-- Cache duplicate buffer names once per refresh
+		local bufnames_temp = {}
+		states.duplicate_buf_names = {} -- Clear previous
+		for _, bufnr_iter in ipairs(states.buffers_list) do -- Iterate over already filtered valid buffers
+			local buf_path = nvim_buf_get_name(bufnr_iter)
+			local buf_name_short = fnamemodify(buf_path, ":t")
+			if bufnames_temp[buf_name_short] then
+				states.duplicate_buf_names[buf_name_short] = true
+			else
+				bufnames_temp[buf_name_short] = true
+			end
+		end
+
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
+
+		-- Reset overflow indicators before first fetch_visible_buffers
+		states.left_overflow_str = ""
+		states.right_overflow_str = ""
 		states.left_overflow_idicator_length = 0
 		states.right_overflow_idicator_length = 0
-		fetch_visible_buffers(bufnr, states.buffers_list, states.buffers_spec)
-		M.update_overflow_info()
-		fetch_visible_buffers(bufnr, states.buffers_list, states.buffers_spec) -- overflow indicators might shorten the available width
-		M.update_overflow_info()
+
+		-- First pass: Determine visible buffers without considering overflow indicators yet
+		fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
+
+		-- Now, based on the outcome of the first fetch, determine if overflow indicators are needed
+		M.update_overflow_info() -- This will set overflow string lengths if needed
+
+		-- Second pass: Recalculate visible buffers, now accounting for the space taken by overflow indicators
+		-- This is only strictly necessary if update_overflow_info actually set any overflow indicators
+		-- which would change the available space.
+		if states.left_overflow_idicator_length > 0 or states.right_overflow_idicator_length > 0 then
+			fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
+			M.update_overflow_info() -- Update overflow strings again if the visible range changed
+		end
 	end)
 end
 

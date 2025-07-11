@@ -8,6 +8,7 @@ vim.api.nvim_create_autocmd(
 			local utils = require("ui.tabline.utils")
 			local update_tabline_buffer_string = utils.update_tabline_buffer_string
 			local update_tabline_buffer_info = utils.update_tabline_buffer_info
+
 			if vim.bo[args.buf].buflisted then
 				update_tabline_buffer_info()
 				update_tabline_buffer_string()
@@ -27,7 +28,6 @@ vim.api.nvim_create_autocmd({ "UIEnter", "TabEnter", "TabClosed", "TabNew" }, {
 		local update_tabline_buffer_string = utils.update_tabline_buffer_string
 		local update_tabline_buffer_info = utils.update_tabline_buffer_info
 		local tabline_update_tabpages_info = utils.tabline_update_tabpages_info
-
 		tabline_update_tabpages_info()
 		update_tabline_buffer_info()
 		update_tabline_buffer_string()
