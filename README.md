@@ -107,9 +107,9 @@ Following are the main highlights of the configuration.
 *   **Keybinding hints:** [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
 *   **File explorer:** [mini.files](https://github.com/echasnovski/mini.files) for a minimalistic and fast file explorer.
 
-**Lsp, completion & formatting:**
+**LSP, completion & formatting:**
 
-*   **Lsp:** native lsp setup via `vim.lsp.config` for language intelligence.
+*   **LSP:** native lsp setup via `vim.lsp.config` for language intelligence.
 *   **Completion:** [blink.cmp](https://github.com/saghen/blink.cmp) for code completions.
 *   **Formatting:** [conform.nvim](https://github.com/stevearc/conform.nvim) for code formatting.
 *   **Treesitter:** [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) for advanced syntax highlighting and code analysis.
@@ -243,9 +243,9 @@ This section outlines the keybindings configured in this neovim setup.
 
 
 <details>
-    <summary><h3>core keybindings (click to expand)</h3></summary>
+    <summary><h3>Core Keybindings (click to expand)</h3></summary>
     <details>
-        <summary>normal mode (click to expand)</summary>
+        <summary>Normal Mode (click to expand)</summary>
         <table>
             <thead>
                 <tr>
@@ -390,7 +390,7 @@ This section outlines the keybindings configured in this neovim setup.
         </table>
     </details>
     <details>
-        <summary>visual mode (click to expand)</summary>
+        <summary>Visual Mode (click to expand)</summary>
         <table>
             <thead>
                 <tr>
@@ -503,7 +503,7 @@ This section outlines the keybindings configured in this neovim setup.
         </table>
     </details>
     <details>
-        <summary>insert mode (click to expand)</summary>
+        <summary>Insert Mode (click to expand)</summary>
         <table>
             <thead>
                 <tr>
@@ -531,7 +531,7 @@ This section outlines the keybindings configured in this neovim setup.
 </details>
 
 <details>
-    <summary><h3>plugin: `mini.files` keybindings (click to expand)</h3></summary>
+    <summary><h3>Plugin: `mini.files` keybindings (click to expand)</h3></summary>
     <code>(note: `g.`, `g/`, `go`, `gy` are active when the minifiles buffer is open)</code>
     <table>
         <thead>
@@ -566,7 +566,7 @@ This section outlines the keybindings configured in this neovim setup.
 </details>
 
 <details>
-    <summary><h3>plugin: `snacks.nvim` keybindings (click to expand)</h3></summary>
+    <summary><h3>Plugin: `snacks.nvim` keybindings (click to expand)</h3></summary>
     <table>
         <thead>
             <tr>
@@ -636,7 +636,7 @@ This section outlines the keybindings configured in this neovim setup.
 </details>
 
 <details>
-    <summary><h3>lsp keybindings (normal mode, buffer-specific) (click to expand)</h3></summary>
+    <summary><h3>LSP Keybindings (normal mode, buffer-specific) (click to expand)</h3></summary>
     <table>
         <thead>
             <tr>
@@ -697,13 +697,13 @@ This section outlines the keybindings configured in this neovim setup.
     </table>
 </details>
 
-# planned features
+# Planned features
 - [ ] better error handling for statusline/tabline/statuscolumn.
 - [x] luasnip snippets.
 - [x] document existing keybindings.
 - [x] lsp configuration for more lsp servers.
 
-# contributing
+# Contributing
 
 Contributions are highly welcome! whether it's reporting a bug, suggesting an enhancement, or submitting a pull request.
 

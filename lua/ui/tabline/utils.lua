@@ -81,7 +81,6 @@ local function get_buffer_state(bufnr)
 	return states.BufferStates.NONE
 end
 
---- returns a table containing duplicate filenames from all the listed buffers
 ---Processes the buffer name for display.
 ---@param bufnr integer The buffer number.
 ---@return string The processed buffer name.
