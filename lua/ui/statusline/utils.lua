@@ -19,8 +19,7 @@ function M.buf_status()
 	-- if not M.buf_is_file() then
 	-- 	return { hl_group = "", string = "" }
 	-- end
-	local hl =
-		generate_highlight("Constant", "StatusLine", {}, 25, 0, "", "", "StatusLineBufStatus")
+	local hl = generate_highlight("Constant", "StatusLine", {}, 25, 0, "", "", "StatusLineBufStatus")
 	local mo_string = nvim_get_option_value("modified", { buf = 0 }) and " %m " or ""
 	local ro_string = nvim_get_option_value("readonly", { buf = 0 }) and " %r " or ""
 	local sephl = generate_highlight(
@@ -44,8 +43,7 @@ function M.statusline_mode()
 	local mode_string = states.Modes[mode or "n"].name or ""
 	local mode_name = states.Modes[mode or "n"].mode_name or ""
 	local hl_string = "StatusLine" .. mode_name
-	local sephl =
-		generate_highlight(hl_string, "StatusLine", {}, 25, 0, "", "", "StatusLineModeSep" .. mode_name)
+	local sephl = generate_highlight(hl_string, "StatusLine", {}, 25, 0, "", "", "StatusLineModeSep" .. mode_name)
 	return {
 		hl_group = hl_string,
 		string = mode_string,
@@ -65,8 +63,7 @@ M.buf_is_file = buf_is_file
 --- Display the filename
 ---@return StatusLineModuleFnTable
 function M.statusline_bufinfo()
-	local buf_hl =
-		generate_highlight("Normal", "StatusLine", { italic = true }, 15, 0, "", "", "StatusLineBufname")
+	local buf_hl = generate_highlight("Normal", "StatusLine", { italic = true }, 15, 0, "", "", "StatusLineBufname")
 	local sephl = generate_highlight(
 		buf_hl,
 		"StatusLine",
@@ -113,16 +110,7 @@ M.statusline_filetype_info = function()
 		states.cache.filetype_icons[filetype_].icon_hl = icon_hl
 		return {
 			string = filetype,
-			hl_group = generate_highlight(
-				"Normal",
-				"StatusLine",
-				{},
-				10,
-				0,
-				"",
-				"",
-				"StatusLineFiletype"
-			),
+			hl_group = generate_highlight("Normal", "StatusLine", {}, 10, 0, "", "", "StatusLineFiletype"),
 			icon = states.cache.filetype_icons[filetype_].icon,
 			icon_hl = icon_hl,
 			right_sep_hl = sephl,
@@ -480,79 +468,62 @@ local function format_hl_string(hl_group)
 end
 
 --- Converts the module information to string
----@param module_type StatusLineModuleTypeConfig A table containing a list of predefined modules or custom modules that are functions with return type { hl_group = "highlight_group", string = "output from module"}
-local generate_module_string = function(module_type)
+---@param module_type StatusLineModuleTypeConfig
+local function generate_module_string(module_type)
 	local modules = module_type.modules
-	local meta_string = ""
+	local meta_table = {}
 	for _, module in ipairs(modules) do
-		local module_string = ""
+		local module_info
+		local module_info_tbl = {}
 		if type(module) == "function" then
-			local status, module_info = pcall(module)
+			local status, result = pcall(module)
 			if not status then
-				error(
-					"an error occurred, sorry its not your fault, please report to upstream [err]: " .. module_info,
-					4
-				)
+				local err_msg = "Error in custom statusline function: " .. tostring(result)
+				vim.notify_once(err_msg, vim.log.levels.ERROR, { title = "Statusline Error" })
+				vim.notify(err_msg, vim.log.levels.ERROR, { title = "Statusline Error Details" })
+				module_info = { string = "ERROR", hl_group = "ErrorMsg" }
+			else
+				module_info = result
 			end
-			module_string = module_info.reverse
-					and string.format(
-						"%s%s%s%s%s%s%s%s%%*",
-						format_hl_string(module_info.left_sep_hl),
-						module_info.show_left_sep and module_type.separator.left or "",
-						format_hl_string(module_info.hl_group),
-						module_info.string or "",
-						format_hl_string(module_info.icon_hl),
-						module_info.icon,
-						format_hl_string(module_info.right_sep_hl),
-						module_info.show_right_sep and module_type.separator.right or ""
-					)
-				or string.format(
-					"%s%s%s%s%s%s%s%s%%*",
-					format_hl_string(module_info.left_sep_hl),
-					module_info.show_left_sep and module_type.separator.left or "",
-					format_hl_string(module_info.icon_hl),
-					module_info.icon or "",
-					format_hl_string(module_info.hl_group),
-					module_info.string or "",
-					format_hl_string(module_info.right_sep_hl),
-					module_info.show_right_sep and module_type.separator.right or ""
-				)
 		else
-			module = states.modules_map[module] or module
-			local status, module_info = pcall(module)
-			if not status then
-				error(
-					"an error occurred, sorry its not your fault, please report to upstream [err]: " .. module_info,
-					4
-				)
+			local module_fn = states.modules_map[module]
+			if not module_fn then
+				local err_msg = "Unknown statusline module: " .. tostring(module)
+				vim.notify_once(err_msg, vim.log.levels.ERROR, { title = "Statusline Error" })
+				vim.notify(err_msg, vim.log.levels.ERROR, { title = "Statusline Error Details" })
+				module_info = { string = "ERROR", hl_group = "ErrorMsg" }
+			else
+				local status, result = pcall(module_fn)
+				if not status then
+					local err_msg = "Error in statusline module '" .. tostring(module) .. "': " .. tostring(result)
+					vim.notify_once(err_msg, vim.log.levels.ERROR, { title = "Statusline Error" })
+					vim.notify(err_msg, vim.log.levels.ERROR, { title = "Statusline Error Details" })
+					module_info = { string = "ERROR", hl_group = "ErrorMsg" }
+				else
+					module_info = result
+				end
 			end
-			module_string = module_info.reverse
-					and string.format(
-						"%s%s%s%s%s%s%s%s%%*",
-						format_hl_string(module_info.left_sep_hl),
-						module_info.show_left_sep and module_type.separator.left or "",
-						format_hl_string(module_info.hl_group),
-						module_info.string or "",
-						format_hl_string(module_info.icon_hl),
-						module_info.icon,
-						format_hl_string(module_info.right_sep_hl),
-						module_info.show_right_sep and module_type.separator.right or ""
-					)
-				or string.format(
-					"%s%s%s%s%s%s%s%s%%*",
-					format_hl_string(module_info.left_sep_hl),
-					module_info.show_left_sep and module_type.separator.left or "",
-					format_hl_string(module_info.icon_hl),
-					module_info.icon or "",
-					format_hl_string(module_info.hl_group),
-					module_info.string or "",
-					format_hl_string(module_info.right_sep_hl),
-					module_info.show_right_sep and module_type.separator.right or ""
-				)
 		end
-		meta_string = string.format("%s%s%s", meta_string, module_string, "%#StatusLine#")
+		table.insert(module_info_tbl, module_info.show_left_sep and format_hl_string(module_info.left_sep_hl) or "")
+		table.insert(module_info_tbl, module_info.show_left_sep and module_type.separator.left or "")
+		if module_info.reverse then
+			table.insert(module_info_tbl, format_hl_string(module_info.hl_group))
+			table.insert(module_info_tbl, module_info.string)
+			table.insert(module_info_tbl, format_hl_string(module_info.icon_hl))
+			table.insert(module_info_tbl, module_info.icon)
+		else
+			table.insert(module_info_tbl, format_hl_string(module_info.icon_hl))
+			table.insert(module_info_tbl, module_info.icon)
+			table.insert(module_info_tbl, format_hl_string(module_info.hl_group))
+			table.insert(module_info_tbl, module_info.string)
+		end
+		table.insert(module_info_tbl, module_info.show_right_sep and format_hl_string(module_info.right_sep_hl) or "")
+		table.insert(module_info_tbl, module_info.show_right_sep and module_type.separator.right or "")
+		table.insert(module_info_tbl, "%*")
+
+		table.insert(meta_table, table.concat(module_info_tbl))
 	end
-	return meta_string
+	return table.concat(meta_table)
 end
 
 --- Meta function to set the statusline

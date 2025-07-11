@@ -1,28 +1,28 @@
 # Neovim Config
-a clean, blazingly fast and heavily tweaked neovim setup focused on usability and performance.
+A clean, blazingly fast and heavily tweaked neovim setup focused on productivity and performance.
 
 > [!note]
-> the setup's being actively developed and functional. while i strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. i'll try to do my best to address any encountered issues.
+> The setup's being actively developed and functional. while i strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. i'll try to do my best to address any encountered issues.
 > if you encounter any problems or bugs, please raise an issue; i'll try to fix them as soon as possible. prs are more than welcome!
 
-> ⚡ **startup time:** \~20ms
+> ⚡ **Startup time:** \~20ms
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0892bed6-d315-40dc-ab99-21b5c8b2b01d" />
 
-# table of contents
-*   [screeshots](#screenshots)
-*   [prerequisites](#prerequisites)
-*   [install instructions](#install-instructions)
-*   [features & plugins](#features--plugins)
-*   [how to's](#how-tos)
-*   [add an lsp configuration](#add-an-lsp-configuration-for-your-lsp-server)
-*   [using the ui elements](#using-the-tablinestatuslinestatuscolumn-in-your-personal-config)
-*   [adding custom modules to the statusline](#adding-custom-modules-to-the-statusline)
-*   [keybindings](#keybindings)
-*   [planned features](#planned-features)
-*   [contributing](#contributing)
+## Table of contents
+*   [Screeshots](#screenshots)
+*   [Prerequisites](#prerequisites)
+*   [Install Instructions](#install-instructions)
+*   [Features & plugins](#features--plugins)
+*   [How to's](#how-tos)
+*   [Add an lsp configuration](#add-an-lsp-configuration-for-your-lsp-server)
+*   [Using the ui elements](#using-the-tablinestatuslinestatuscolumn-in-your-personal-config)
+*   [Adding custom modules to the statusline](#adding-custom-modules-to-the-statusline)
+*   [Keybindings](#keybindings)
+*   [Planned features](#planned-features)
+*   [Contributing](#contributing)
 
-# screenshots
+# Screenshots
 <details>
     <summary><h3>picker (click to expand)</h3></summary>
     <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c7e422c9-84af-46fa-b925-604a2dd2a53b" />
@@ -56,89 +56,89 @@ a clean, blazingly fast and heavily tweaked neovim setup focused on usability an
     <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7db2dfec-d207-4fbd-88d0-a12ab77c4bed" />
 </details>
 
-# prerequisites
+# Prerequisites
 
-before you begin, ensure you have the following installed:
+Before you begin, ensure you have the following installed:
 
-*   **neovim(obviously):** i use the latest git version but any binaries with version 0.11+ should work just fine.
-*   **git:** for cloning the repository.
-*   **a nerd font:** required for icons in the ui elements (statusline, tabline, etc.) to display correctly. the one used in the config is `victor mono nerd font propo`.
-*   **a c compiler:** for `nvim-treesitter` and other plugins that might need to build components, typically `gcc` or `clang`.
+*   **Neovim(obviously):** i use the latest git version but any binaries with version 0.11+ should work just fine.
+*   **Git:** for cloning the repository.
+*   **A Nerd Font:** required for icons in the ui elements (statusline, tabline, etc.) to display correctly. the one used in the config is `victor mono nerd font propo`.
+*   **A C Compiler:** for `nvim-treesitter` and other plugins that might need to build components, typically `gcc` or `clang`.
 
-# install instructions
+# Install Instructions
 
-to get the setup up and running,
-firstly backup your current neovim setup:
+To get the setup up and running,
+Firstly backup your current neovim setup:
 
 ```bash
 mv ~/.config/nvim ~/.config/nvim.bak
 mv ~/.local/share/nvim ~/.local/share/nvim.bak
 ```
 
-now, simply clone the repository into your `$xdg_config_home/nvim` directory (typically `~/.config/nvim`):
+Now, simply clone the repository into your `$xdg_config_home/nvim` directory (typically `~/.config/nvim`):
 
 ```bash
 git clone https://gitlab.com/100x65b1111000/nvim.git ~/.config/nvim
 ```
 
-then, launch neovim:
+Then, launch neovim:
 ```bash
 nvim
 ```
-on the first launch, `lazy.nvim` should automatically install all the plugins.
+On the first launch, `lazy.nvim` should automatically install all the plugins.
 
-# features & plugins
+# Features & Plugins
 
-following are the main highlights of the configuration.
+Following are the main highlights of the configuration.
 
-**core functionality & ui:**
+**Core functionality & ui:**
 
-*   **custom ui elements:**
-*   statusline: custom-built (\~500 loc, \~0.25ms performance) with a focus on minimalism and aesthetics.
+*   **Custom ui elements:**
+*   Statusline: custom-built (\~500 loc, \~0.25ms performance) with a focus on minimalism and aesthetics.
 ![image](https://github.com/user-attachments/assets/4030f2b2-efea-44dc-bde8-60b319abece2)
-*   tabline: custom-built (\~500 loc, \~0.20ms performance) for a clean and informative tab experience.
+*   Tabline: custom-built (\~500 loc, \~0.20ms performance) for a clean and informative tab experience.
 ![image](https://github.com/user-attachments/assets/2d06e484-7659-4098-b6e5-7250a033a10d)
-*   statuscolumn: custom-built (\~150 loc, \~0.03ms performance) for displaying line-related information.
+*   Statuscolumn: custom-built (\~150 loc, \~0.03ms performance) for displaying line-related information.
 *   *note: these custom ui elements are highly optimized but offer limited direct configuration. see the "how to's" section for usage.*
-*   **plugin management:** [lazy.nvim](https://github.com/folke/lazy.nvim) for efficient and easy plugin management.
-*   **dashboard:** customized startup dashboard via [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
-*   **theme:** [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) with tweaked colors for better visibility.
-*   **keybinding hints:** [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
-*   **file explorer:** [mini.files](https://github.com/echasnovski/mini.files) for a minimalistic and fast file explorer.
-*   **auto pairs:** [mini.pairs](https://github.com/echasnovski/mini.nvim) for automatic insertion of matching pairs.
 
-**lsp, completion & formatting:**
+*   **Plugin management:** [lazy.nvim](https://github.com/folke/lazy.nvim) for efficient and easy plugin management.
+*   **Dashboard:** customized startup dashboard via [dashboard.nvim](https://github.com/nvimdev/dashboard.nvim).
+*   **Theme:** [kanagawa.nvim](https://github.com/rebelot/kanagawa.nvim) and [tokyonight.nvim](https://github.com/folke/tokyonight.nvim) with tweaked colors for better visibility.
+*   **Keybinding hints:** [which-key](https://github.com/folke/which-key.nvim) to display available key bindings.
+*   **File explorer:** [mini.files](https://github.com/echasnovski/mini.files) for a minimalistic and fast file explorer.
 
-*   **lsp:** native lsp setup via `vim.lsp.config` for language intelligence.
-*   **completion:** [blink.cmp](https://github.com/saghen/blink.cmp) for code completions.
-*   **formatting:** [conform.nvim](https://github.com/stevearc/conform.nvim) for code formatting.
-*   **treesitter:** [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) for advanced syntax highlighting and code analysis.
+**Lsp, completion & formatting:**
+
+*   **Lsp:** native lsp setup via `vim.lsp.config` for language intelligence.
+*   **Completion:** [blink.cmp](https://github.com/saghen/blink.cmp) for code completions.
+*   **Formatting:** [conform.nvim](https://github.com/stevearc/conform.nvim) for code formatting.
+*   **Treesitter:** [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) for advanced syntax highlighting and code analysis.
 
 **git integration:**
 
-*   **git signs:** [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim) to show git changes in the sign column.
-*   **git utilities:** [snacks.nvim](https://github.com/folke/snacks.nvim) includes various git-related utilities (blame, browse, etc. - also listed under "productivity tools").
+*   **Git signs:** [git-signs.nvim](https://github.com/lewis6991/gitsigns.nvim) to show git changes in the sign column.
+*   **Git utilities:** [snacks.nvim](https://github.com/folke/snacks.nvim) includes various git-related utilities (blame, browse, etc.).
 
-**productivity & utility tools:**
+**Productivity & Utility tools:**
 
-*   **general utilities:** [snacks.nvim](https://github.com/folke/snacks.nvim) for tasty snacks (picker, notifier, indent-guides).
-*   **help viewer:** [helpview.nvim](https://github.com/oxy2dev/helpview.nvim) for an improved help viewing experience.
-*   **markdown preview (enhanced):** [markview.nvim](https://github.com/oxy2dev/markview.nvim) for viewing marks and improved markdown navigation/preview.
-*   **keypress display:** [showkeys.nvim](https://github.com/nvzone/showkeys) to display pressed keys (useful for demos/screencasts).
-*   **navigation bar:** [dropbar.nvim](https://github.com/bekaboo/dropbar.nvim) for a context-aware treesitter powered navigation bar.
-*   **startup time analysis:** [vim-startuptime](https://github.com/dstein64/vim-startuptime) for profiling neovim startup time.
-*   **developer utilities for lua:** [lazydev](https://github.com/folke/lazydev.nvim) for assisting with lua development in neovim.
-*   **color highlighter:** [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors) to highlight color codes in your files.
+*   **General utilities:** [snacks.nvim](https://github.com/folke/snacks.nvim) for tasty snacks (picker, notifier, indent-guides).
+*   **Help viewer:** [helpview.nvim](https://github.com/oxy2dev/helpview.nvim) for an improved help viewing experience.
+*   **Markdown preview (enhanced):** [markview.nvim](https://github.com/oxy2dev/markview.nvim) for viewing marks and improved markdown navigation/preview.
+*   **Keypress display:** [showkeys.nvim](https://github.com/nvzone/showkeys) to display pressed keys (useful for demos/screencasts).
+*   **Navigation bar:** [dropbar.nvim](https://github.com/bekaboo/dropbar.nvim) for a context-aware treesitter powered navigation bar.
+*   **Startup time analysis:** [vim-startuptime](https://github.com/dstein64/vim-startuptime) for profiling neovim startup time.
+*   **Developer utilities for lua:** [lazydev](https://github.com/folke/lazydev.nvim) for assisting with lua development in neovim.
+*   **Color highlighter:** [highlight-colors.nvim](https://github.com/brenoprata10/nvim-highlight-colors) to highlight color codes in your files.
 
-# how to's
+# How to's
 
-## add snippets for x language
-you’ll find snippets in `./lua/snippets`. if the snippets are missing for your x language, you’ll need to write it yourself (yeah, no auto-gen magic). but doing so is fairly easy.
+## Add snippets for x language
+You’ll find snippets in `./lua/snippets`. If the snippets are missing for your x language, you’ll need to write it yourself (yeah, no auto-gen magic here). but doing so is fairly easy and straightorward.
 
-## add an lsp configuration for your lsp server
-here's a step-by-step guide (with an example setup to configure the `basedpyright` language-server) to add a new lsp server configuration:
-1.  create a file inside the `./lua/config/lsp/servers/` directory, say `basedpyright.lua`.
-2.  define the lsp configuration spec like this:
+## Add an lsp configuration for your lsp server
+Here's a step-by-step guide (with an example setup to configure the `basedpyright` language-server) to add a new lsp server configuration:
+1.  Create a file inside the `./lua/config/lsp/servers/` directory, say `basedpyright.lua`.
+2.  Define the lsp configuration spec like this:
 ```lua
 vim.lsp.config("basedpyright", {
     cmd = {
@@ -165,24 +165,24 @@ vim.lsp.config("basedpyright", {
 
 vim.lsp.enable("basedpyright") -- enable the language server
 ```
-3.  save the file.
-4.  and that's it. the setup will automatically define and add necessary `capabilities` and `on_attach` options to your configuration and include it. the `capabilities` generally refer to what features the lsp client (neovim) supports, and `on_attach` is a function that runs when the lsp server attaches to a buffer, often used to set buffer-local keymaps for lsp actions.
+3.  Save the file.
+4.  And that's it. the setup will automatically define and add necessary `capabilities` and `on_attach` options to your configuration and include it. the `capabilities` generally refer to what features the lsp client (neovim) supports, and `on_attach` is a function that runs when the lsp server attaches to a buffer, often used to set buffer-local keymaps for lsp actions.
 
-## using the tabline/statusline/statuscolumn in your personal config
+## Using the tabline/statusline/statuscolumn in your personal config
 
-integrating the custom ui elements (statusline, tabline, statuscolumn) into your own neovim configuration is pretty straightforward.
+Integrating the custom ui elements (statusline, tabline, statuscolumn) into your own neovim configuration is pretty straightforward.
 
-**important dependencies & setup:**
+**Important dependencies & setup:**
 
 > [!important]
-> *   **`mini.icons`:** the statusline and tabline require the [mini.icons](https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-icons.md) plugin (part of the `mini.nvim` suite) to generate some highlight groups and display file icons. ensure this plugin is installed and loaded.
-> *   **nerd fonts:** as mentioned in prerequisites, a nerd font is essential for icons to render correctly.
-> *   **highlight groups:** if you are using a colorscheme other than the modified ones included in the setup, you **must** define specific highlight groups for the ui elements to look correct. you can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search `/statusline` and `/tabline` for `statusline` and `tabline` specific highlights, and define them directly in the colorscheme spec or via `vim.api.nvim_set_hl`).
+> *   **`mini.icons`:** The statusline and tabline require the [mini.icons](https://github.com/echasnovski/mini.nvim/blob/main/readmes/mini-icons.md) plugin (part of the `mini.nvim` suite) to generate some highlight groups and display file icons. ensure this plugin is installed and loaded.
+> *   **Nerd Font:** as mentioned in prerequisites, a nerd font is essential for icons to render correctly.
+> *   **Highlight groups:** If you are using a colorscheme other than the modified ones included in the setup, you **must** define specific highlight groups for the ui elements to look correct. you can find these highlight groups in the `lua/plugins/tokyonight.lua` spec file (search `/statusline` and `/tabline` for `statusline` and `tabline` specific highlights, and define them directly in the colorscheme spec or via `vim.api.nvim_set_hl`).
 
-**integration steps:**
+**Integration steps:**
 
-1.  **copy the `ui` directory:** grab the entire `lua/ui` folder from this configuration and place it inside your neovim config's `lua` directory (e.g., `~/.config/nvim/lua/ui`).
-2.  **call the setup function:** in your neovim configuration (e.g., in your `init.lua` or a dedicated ui setup file), call the setup function to enable the ui elements.
+1.  **Copy the `ui` directory:** grab the entire `lua/ui` folder from this configuration and place it inside your neovim config's `lua` directory (e.g., `~/.config/nvim/lua/ui`).
+2.  **Call the setup function:** in your neovim configuration (e.g., in your `init.lua` or a dedicated ui setup file), call the setup function to enable the ui elements.
 
 ```lua
 -- enable all custom ui elements
@@ -195,13 +195,13 @@ require('ui').setup({
 })
 ```
 
-### adding custom modules to the statusline
+## Adding custom modules to the statusline
 
-you can extend the statusline with your own custom modules (although it's just bare bones). the process involves defining a lua function that returns a table with a specific spec, and then adding this function to your statusline configuration.
+You can extend the statusline with your own custom modules (although it's just bare bones). the process involves defining a lua function that returns a table with a specific spec, and then adding this function to your statusline configuration.
 
-**1. define your module function**
+**1. Define a module function**
 
-a custom module is a lua function that returns a table with specific keys. the main keys are:
+A custom module is a lua function that returns a table with specific keys. the main keys are:
 
 *   `string`: (required) the text content you want the module to display.
 *   `hl_group`: (optional) the highlight group to apply to the `string`. if omitted, it will likely use the default highlight group.
@@ -213,7 +213,7 @@ a custom module is a lua function that returns a table with specific keys. the m
 *   `right_sep_hl`: (optional) highlight group for right separator.
 *   `left_sep_hl`: (optional) same as `right_sep_hl`, but for the left separator.
 
-here's an example of a simple custom module that displays the current date:
+Here's an example of a simple custom module that displays the current date:
 
 ```lua
 local function my_date_module()
@@ -227,19 +227,19 @@ local function my_date_module()
 end
 ```
 
-**2. now just add this function inside your statusline setup like this**
+**2. Now just add this function inside your statusline setup like this**
 
 ```lua
 -- assuming the ui directory exists inside ~/.config/nvim/lua/
 require('ui').setup({enabled = true, statusline = { enabled = true, modules = { left = { "mode", "buf-status", "buf-info", my_date_module }, middle = { ... }, right = { ... }}}})
 ```
 
-**here's what the above setup results in**
+**Here's what the above setup results in**
 ![image](https://github.com/user-attachments/assets/cb20e4b5-c8d9-47c2-8f69-1cc5ef9a0d81)
 
-# keybindings
+# Keybindings
 
-this section outlines the keybindings configured in this neovim setup.
+This section outlines the keybindings configured in this neovim setup.
 
 
 <details>
@@ -249,8 +249,8 @@ this section outlines the keybindings configured in this neovim setup.
         <table>
             <thead>
                 <tr>
-                    <th>key</th>
-                    <th>description</th>
+                    <th>Key</th>
+                    <th>Description</th>
                 </tr>
             </thead>
             <tbody>
@@ -394,8 +394,8 @@ this section outlines the keybindings configured in this neovim setup.
         <table>
             <thead>
                 <tr>
-                    <th>key</th>
-                    <th>description</th>
+                    <th>Key</th>
+                    <th>Description</th>
                 </tr>
             </thead>
             <tbody>
@@ -507,8 +507,8 @@ this section outlines the keybindings configured in this neovim setup.
         <table>
             <thead>
                 <tr>
-                    <th>key</th>
-                    <th>description</th>
+                    <th>Key</th>
+                    <th>Description</th>
                 </tr>
             </thead>
             <tbody>
@@ -536,8 +536,8 @@ this section outlines the keybindings configured in this neovim setup.
     <table>
         <thead>
             <tr>
-                <th>key</th>
-                <th>description</th>
+                <th>Key</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
@@ -570,8 +570,8 @@ this section outlines the keybindings configured in this neovim setup.
     <table>
         <thead>
             <tr>
-                <th>key</th>
-                <th>description</th>
+                <th>Key</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
@@ -640,8 +640,8 @@ this section outlines the keybindings configured in this neovim setup.
     <table>
         <thead>
             <tr>
-                <th>key</th>
-                <th>description</th>
+                <th>Key</th>
+                <th>Description</th>
             </tr>
         </thead>
         <tbody>
@@ -705,10 +705,10 @@ this section outlines the keybindings configured in this neovim setup.
 
 # contributing
 
-contributions are highly welcome! whether it's reporting a bug, suggesting an enhancement, or submitting a pull request, your input is valued.
+Contributions are highly welcome! whether it's reporting a bug, suggesting an enhancement, or submitting a pull request.
 
-*   **reporting issues:** if you encounter any bugs or have suggestions for improvements, please open an issue on the gitlab repository. provide as much detail as possible, including steps to reproduce, your neovim version, and any relevant error messages.
-*   **pull requests:**
-    *   for small fixes or enhancements, feel free to submit a pr directly.
-    *   for more significant changes, it's a good idea to open an issue first to discuss the proposed changes and ensure they align with the project's direction.
-    *   please try to follow the existing coding style and provide a clear description of your changes in the pr.
+*   **Reporting issues:** if you encounter any bugs or have suggestions for improvements, please open an issue on the gitlab repository. provide as much detail as possible, including steps to reproduce, your neovim version, and any relevant error messages.
+*   **Pull requests:**
+    *   For small fixes or enhancements, feel free to submit a pr directly.
+    *   For more significant changes, it's a good idea to open an issue first to discuss the proposed changes and ensure they align with the project's direction.
+    *   Please try to follow the existing coding style and provide a clear description of your changes in the pr.

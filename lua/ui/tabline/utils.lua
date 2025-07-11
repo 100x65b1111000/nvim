@@ -386,7 +386,7 @@ local function generate_buffer_string(bufnr)
 		right_padding,
 		buf_spec.close_btn
 	)
-	M.update_overflow_info(states.visible_buffers)
+	M.update_overflow_info()
 	return buf_string
 end
 
