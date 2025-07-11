@@ -521,7 +521,7 @@ M.update_tabline_buffer_info = function()
 			end
 			if not first_valid_buf then return end -- No valid buffers to show
 			current_bufnr = first_valid_buf
-			-- It's possible no buffer is current if e.g. only one tab page with a terminal is open.
+			-- It's possible that no buffer is current if e.g. only one tab page with a terminal is open.
 			-- The original code would return here. We allow proceeding if a valid buffer exists.
 		end
 
