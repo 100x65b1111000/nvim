@@ -8,7 +8,8 @@ A clean, blazingly fast and heavily tweaked neovim setup focused on productivity
 
 > ⚡ **Startup time:** \~20ms
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0892bed6-d315-40dc-ab99-21b5c8b2b01d" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3231a689-8020-4112-8402-c45dcc42c52e" />
+
 
 ## Table of contents
 *   [Screeshots](#screenshots)
