@@ -2,8 +2,9 @@
 A clean, blazingly fast and heavily tweaked neovim setup focused on productivity and performance.
 
 > [!note]
-> The setup's being actively developed and functional. while i strive for stability, some areas might undergo rapid changes or refactoring as improvements are made. i'll try to do my best to address any encountered issues.
-> if you encounter any problems or bugs, please raise an issue; i'll try to fix them as soon as possible. prs are more than welcome!
+> This neovim setup is heavily modified to my liking and my workflow. However, everything is pretty straightforward and clean, so you won't be having any trouble in tinkering with the setup to suit it to your needs.
+> The setup's being actively developed and functional. While I strive for stability, some areas might undergo rapid changes or refactoring as improvements are made.
+> If you encounter any problems or bugs, please raise an issue; I'll try to fix them as soon as possible. PR's are more than welcome!
 
 > ⚡ **Startup time:** \~20ms
 
