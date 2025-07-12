@@ -71,7 +71,7 @@ M.statusline_states = {}
 
 ---@alias StatusLineModuleFnTable { string: string, hl_group: string, icon: string, icon_hl: string, reverse: boolean, left_sep_hl: string, right_sep_hl: string, show_right_sep: boolean, show_left_sep: boolean }
 
----@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"
+---@alias StatusLineBuiltinModules "mode"|"buf-status"|"bufinfo"|"root-dir"|"ts-info"|"git-branch"|"file-percent"|"git-status"|"filetype"|"diagnostic"|"lsp-info"|"cursor-pos"|"scroll-pos"|"search-status"
 ---@alias StatusLineSeparator { left: string, right: string }
 
 ---@class StatusLineModulesConfig
@@ -115,6 +115,7 @@ M.statusline_states.default_config = {
 	right = {
 		separator = { left = "", right = "" },
 		modules = {
+			"search-status",
 			"diagnostic",
 			"lsp-info",
 			"cursor-pos",

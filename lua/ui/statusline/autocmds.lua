@@ -51,9 +51,19 @@ vim.api.nvim_create_autocmd({ "DiagnosticChanged" }, {
 		local fetch_diagnostics = utils.fetch_diagnostics
 		if utils.buf_is_file() then
 			fetch_diagnostics()
-			vim.schedule(function ()
+			vim.schedule(function()
 				vim.cmd("redrawstatus")
 			end)
 		end
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "ModeChanged" }, {
+	group = statusline_fetchers,
+	pattern = { "*[/:?]*" },
+	callback = function()
+		vim.schedule(function()
+			vim.cmd("redrawstatus")
+		end)
 	end,
 })

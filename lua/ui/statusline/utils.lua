@@ -7,10 +7,12 @@ local nvim_get_option_value = api.nvim_get_option_value
 local nvim_get_mode = api.nvim_get_mode
 local nvim_get_current_buf = api.nvim_get_current_buf
 local nvim_buf_set_var = api.nvim_buf_set_var
-local expand = vim.fn.expand
-local fnamemodify = vim.fn.fnamemodify
+local fn = vim.fn
+local expand = fn.expand
+local fnamemodify = fn.fnamemodify
 local find = vim.fs.find
-
+local cmd = vim.cmd
+local schedule = vim.schedule
 local M = {}
 
 --- Display readonly and modified status of the current file
@@ -171,13 +173,13 @@ M.fetch_git_file_stat = function()
 		local git_stat_cmd =
 			string.format("%s%s%s%s", states.git_cmd, parent, " status --short --porcelain ", file_path)
 		vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
-			vim.schedule(function()
+			schedule(function()
 				nvim_buf_set_var(
 					0,
 					"statusline_git_stat_obj",
 					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
 				)
-				vim.cmd([[redrawstatus]])
+				cmd([[redrawstatus]])
 			end)
 		end)
 	end)
@@ -194,13 +196,13 @@ M.fetch_git_file_diff = function()
 
 		local git_diff_cmd = string.format("%s%s%s%s", states.git_cmd, parent, " diff --numstat ", file_path)
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-			vim.schedule(function()
+			schedule(function()
 				nvim_buf_set_var(
 					0,
 					"statusline_git_diff_obj",
 					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
 				)
-				vim.cmd([[redrawstatus]])
+				cmd([[redrawstatus]])
 			end)
 		end)
 	end)
@@ -266,13 +268,13 @@ M.fetch_git_branch = function()
 
 		local git_diff_cmd = string.format("%s%s%s", states.git_cmd, parent, " branch --show-current ")
 		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-			vim.schedule(function()
+			schedule(function()
 				nvim_buf_set_var(
 					0,
 					"statusline_git_branch_obj",
 					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
 				)
-				vim.cmd("redrawstatus")
+				cmd("redrawstatus")
 			end)
 		end)
 	end)
@@ -348,9 +350,9 @@ M.fetch_lsp_info = function()
 		for _, i in ipairs(clients) do
 			table.insert(client_names, i.name)
 		end
-		vim.schedule(function()
+		schedule(function()
 			nvim_buf_set_var(0, "statusline_lsp_clients", client_names)
-			vim.cmd("redrawstatus")
+			cmd("redrawstatus")
 		end)
 	end)
 end
@@ -385,7 +387,7 @@ M.statusline_lsp_info = function()
 	local clients = table.concat(vim.b.statusline_lsp_clients or {}, ", ")
 	local icon = (clients == "" and "") or "   "
 	return {
-		string = clients .. " ",
+		string = string.format(" %s ", clients),
 		hl_group = "StatusLineLspInfo",
 		icon = icon,
 		icon_hl = "StatusLineLspIcon",
@@ -426,11 +428,60 @@ M.fetch_diagnostics = function()
 			format_diagnostics("HINT")
 		)
 
-		vim.schedule(function()
+		schedule(function()
 			nvim_buf_set_var(0, "statusline_diagnostic_info", string.format(" %s ", diagnostic_str))
-			vim.cmd([[redrawstatus]])
+			cmd([[redrawstatus]])
 		end)
 	end)
+end
+
+---@return StatusLineModuleFnTable
+M.statusline_search_status = function()
+	if vim.v.hlsearch == 0 then
+		return { string = "" }
+	end
+
+	local search_count = fn.searchcount({ maxcount = 999, recompute = 1 })
+
+	if search_count.total < 1 then
+		return { string = "" }
+	end
+
+	local icon_hl =
+		generate_highlight("Identifier", "StatusLine", { reverse = true }, 0, 0, nil, nil, "StatusLineSearchStatusIcon")
+
+	if search_count.incomplete == 1 then
+		return { icon = "   ", icon_hl = icon_hl, string = " [?/??] ", hl_group = "FoldEnd", reverse = true }
+	end
+
+	if search_count.incomplete == 2 then
+		if search_count.total > search_count.maxcount and search_count.current > search_count.maxcount then
+			return {
+				icon = "   ",
+				icon_hl = icon_hl,
+				string = string.format(" [>%d/>%d] ", search_count.current, search_count.total),
+				hl_group = "FoldEnd",
+				reverse = true,
+			}
+		end
+		if search_count.total > search_count.maxcount then
+			return {
+				icon = "   ",
+				icon_hl = icon_hl,
+				string = string.format(" [%d/>%d] ", search_count.current, search_count.total),
+				hl_group = "FoldEnd",
+				reverse = true,
+			}
+		end
+	end
+
+	return {
+		icon = "   ",
+		icon_hl = icon_hl,
+		reverse = true,
+		string = string.format(" [%d/%d] ", search_count.current, search_count.total),
+		hl_group = "FoldEnd",
+	}
 end
 
 --- Display the diagnostic information
@@ -455,6 +506,7 @@ function M.initialize_stl(opts)
 	states.modules_map["cursor-pos"] = M.statusline_cursor_pos
 	states.modules_map["file-percent"] = M.statusline_file_percent
 	states.modules_map["diagnostic"] = M.statusline_diagnostics
+	states.modules_map["search-status"] = M.statusline_search_status
 end
 
 --- Takes the hl_group string and returns the formmatted string that can be evaluated by the statusline
