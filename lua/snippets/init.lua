@@ -19,3 +19,8 @@ ls.add_snippets("sh", bash_snips.make_bash_snippets(s, i, fmt))
 ls.add_snippets("fish", fish_snips.make_fish_snippets(s, i, fmt))
 ls.add_snippets("rust", rust_snips.make_rust_snippets(s, i, fmt))
 ls.add_snippets("cpp", cpp_snips.make_cpp_snippets(s, i, fmt))
+local javascript_snips = require("snippets.javascript")
+local html_snips = require("snippets.html")
+
+ls.add_snippets("javascript", javascript_snips.make_javascript_snippets(s, i, fmt))
+ls.add_snippets("html", html_snips.make_html_snippets(s, i, fmt))
