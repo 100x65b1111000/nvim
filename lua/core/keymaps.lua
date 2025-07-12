@@ -17,6 +17,13 @@ nmap(";", ":")
 nmap("<Tab>", ":tabnext<CR>", { desc = "Switch to the next tab" })
 nmap("<S-Tab>", ":tabprev<CR>", { desc = "Switch to the next tab" })
 
+imap( "<>", "<><left>", { desc = "Enter into angled brackets" })
+imap( "()", "()<left>", { desc = "Enter into round brackets" })
+imap( "{}", "{}<left>", { desc = "Enter into curly brackets" })
+imap( "[]", "[]<left>", { desc = "Enter into square brackets" })
+imap( '""', '""<left>', { desc = "Enter into double quotes" })
+imap( "''", "''<left>", { desc = "Enter into single quotes" })
+imap( "``", "``<left>", { desc = "Enter into backticks" })
 -- bufffer mappings
 
 local previous_buffer = function()

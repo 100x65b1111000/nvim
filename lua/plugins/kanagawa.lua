@@ -33,6 +33,7 @@ P.config = function()
 				sumiInk0 = "#16161c",
 				sumiInk3 = "#1d1d26",
 				sumiInk5 = "#30303f",
+				sumiInk6 = "#434358"
 			},
 		},
 		---@param colors KanagawaColors Kanagwa colors

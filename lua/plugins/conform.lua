@@ -1,16 +1,18 @@
 local P = {
 	"stevearc/conform.nvim",
-    lazy = true
+	lazy = true,
 }
 
 P.opts = function()
 	return {
 		formatters_by_ft = {
 			lua = { "stylua" },
-            python = { 'ruff_format' },
-            cpp = { 'clang-format'},
-			css = { 'prettier' },
-			json = { 'prettier' }
+			python = { "ruff_format" },
+			cpp = { "clang-format" },
+			css = { "prettier" },
+			json = { "prettier" },
+			sh = { "shfmt" },
+			bash = { "shfmt" },
 		},
 		default_format_opts = {
 			lsp_format = "fallback",
