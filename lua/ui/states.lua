@@ -102,6 +102,7 @@ M.statusline_states.default_config = {
 			-- "ts-info",
 			"bufinfo",
 			"filetype",
+			"search-status",
 		},
 	},
 	middle = {
@@ -115,7 +116,6 @@ M.statusline_states.default_config = {
 	right = {
 		separator = { left = "", right = "" },
 		modules = {
-			"search-status",
 			"diagnostic",
 			"lsp-info",
 			"cursor-pos",
@@ -175,7 +175,7 @@ M.statusline_states.cache = {
 }
 M.statusline_states.Modes = {
 	["n"] = { name = "  NORMAL ", mode_name = "NormalMode" },
-	["no"] = { name = "  OPERATOR ", mode_name = "Mode" },
+	["no"] = { name = "  OPERATOR ", mode_name = "OperatorMode" },
 	["v"] = { name = "  VISUAL ", mode_name = "VisualMode" },
 	["V"] = { name = "  VISUAL LINE ", mode_name = "VisualMode" },
 	[""] = { name = "  VISUAL BLOCK ", mode_name = "VisualMode" },

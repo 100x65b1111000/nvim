@@ -1,7 +1,7 @@
 ---@diagnostic disable: missing-fields
-local P = {
+local P = { 
 	"folke/snacks.nvim",
-	enabled = true,
+	enabled  = true,
 	priority = 999,
 	lazy = false,
 }

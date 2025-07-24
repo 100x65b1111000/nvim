@@ -33,7 +33,8 @@ P.config = function()
 				sumiInk0 = "#16161c",
 				sumiInk3 = "#1d1d26",
 				sumiInk5 = "#30303f",
-				sumiInk6 = "#434358"
+				sumiInk6 = "#434358",
+				viol
 			},
 		},
 		---@param colors KanagawaColors Kanagwa colors
@@ -120,7 +121,7 @@ P.config = function()
 					bg = c.sumiInk0,
 				},
 				StatusLineOperatorMode = {
-					fg = c.oniViolet2,
+					fg = c.springViolet1,
 					bold = true,
 					reverse = true,
 					bg = c.sumiInk0,

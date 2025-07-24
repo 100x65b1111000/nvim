@@ -448,37 +448,34 @@ M.statusline_search_status = function()
 	end
 
 	local icon_hl =
-		generate_highlight("Identifier", "StatusLine", { reverse = true }, 0, 0, nil, nil, "StatusLineSearchStatusIcon")
+		generate_highlight("Identifier", "StatusLine", { }, 0, 0, nil, nil, "StatusLineSearchStatusIcon")
 
 	if search_count.incomplete == 1 then
-		return { icon = "   ", icon_hl = icon_hl, string = " [?/??] ", hl_group = "FoldEnd", reverse = true }
+		return { icon = "  ", icon_hl = icon_hl, string = " [?/??] ", hl_group = "FoldEnd" }
 	end
 
 	if search_count.incomplete == 2 then
 		if search_count.total > search_count.maxcount and search_count.current > search_count.maxcount then
 			return {
-				icon = "   ",
+				icon = "  ",
 				icon_hl = icon_hl,
 				string = string.format(" [>%d/>%d] ", search_count.current, search_count.total),
 				hl_group = "FoldEnd",
-				reverse = true,
 			}
 		end
 		if search_count.total > search_count.maxcount then
 			return {
-				icon = "   ",
+				icon = "  ",
 				icon_hl = icon_hl,
 				string = string.format(" [%d/>%d] ", search_count.current, search_count.total),
 				hl_group = "FoldEnd",
-				reverse = true,
 			}
 		end
 	end
 
 	return {
-		icon = "   ",
+		icon = "  ",
 		icon_hl = icon_hl,
-		reverse = true,
 		string = string.format(" [%d/%d] ", search_count.current, search_count.total),
 		hl_group = "FoldEnd",
 	}

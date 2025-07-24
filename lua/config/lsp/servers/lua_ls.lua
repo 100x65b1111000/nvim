@@ -46,7 +46,7 @@ vim.lsp.config("lua_ls",{
 				showWord = "Enable",
 			},
 			diagnostics = {
-				globals = { "vim" },
+				globals = { "vim", "scroll" },
 			},
 			doc = {
 				privateName = { "^_" },

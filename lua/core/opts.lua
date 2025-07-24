@@ -45,7 +45,7 @@ o.sidescrolloff = 10
 o.ignorecase = true
 o.smartcase = true
 o.laststatus = 3
-o.cmdheight = 0
+o.cmdheight = 1
 o.foldopen = "hor,insert,percent,search,undo"
 o.foldminlines = 2
 o.foldmethod = "manual"
@@ -75,23 +75,23 @@ api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
-local cmdlineToggleGroup = api.nvim_create_augroup("UserCmdlineToggle", { clear = true })
-
-api.nvim_create_autocmd("CmdlineEnter", {
-	group = cmdlineToggleGroup,
-	pattern = "*",
-	callback = function()
-		o.cmdheight = 1
-	end,
-})
-
-api.nvim_create_autocmd("CmdlineLeave", {
-	group = cmdlineToggleGroup,
-	pattern = "*",
-	callback = function()
-		o.cmdheight = 0
-	end,
-})
+-- local cmdlineToggleGroup = api.nvim_create_augroup("UserCmdlineToggle", { clear = true })
+--
+-- api.nvim_create_autocmd("CmdlineEnter", {
+-- 	group = cmdlineToggleGroup,
+-- 	pattern = "*",
+-- 	callback = function()
+-- 		o.cmdheight = 1
+-- 	end,
+-- })
+--
+-- api.nvim_create_autocmd("CmdlineLeave", {
+-- 	group = cmdlineToggleGroup,
+-- 	pattern = "*",
+-- 	callback = function()
+-- 		o.cmdheight = 0
+-- 	end,
+-- })
 
 -- local smart_help = function()
 --     if o.columns > 80 then

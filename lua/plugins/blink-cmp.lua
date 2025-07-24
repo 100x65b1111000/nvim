@@ -49,12 +49,6 @@ P.config = function()
 				"fallback",
 			},
 			["<s-tab>"] = { "snippet_backward", "fallback" },
-			-- term = {
-			-- 	["<tab>"] = { "select_next" },
-			-- 	["<m-j>"] = { "select_next" },
-			-- 	["<s-tab>"] = { "select_prev" },
-			-- 	["<m-k>"] = { "select_prev" },
-			-- },
 		},
 		snippets = {
 			preset = "luasnip",
@@ -368,7 +362,7 @@ P.config = function()
 					module = "blink.cmp.sources.lsp",
 					enabled = true,
 					score_offset = 0,
-					fallbacks = {  },
+					fallbacks = {},
 					override = {},
 				},
 				path = {
@@ -436,6 +430,8 @@ P.config = function()
 				["<m-j>"] = { "select_next" },
 				["<s-tab>"] = { "select_prev" },
 				["<m-k>"] = { "select_prev" },
+				["<m-l>"] = { "show_and_insert" },
+				["<m-h>"] = { "hide" },
 				["<left>"] = { "fallback" },
 				["<right>"] = { "fallback" },
 			},

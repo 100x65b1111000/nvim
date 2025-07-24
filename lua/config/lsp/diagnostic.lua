@@ -1,5 +1,12 @@
 local d_config = vim.diagnostic.config
 local severity = vim.diagnostic.severity
+
+local diagnostic_signs = {
+	[severity.ERROR] = " ",
+	[severity.WARN] = " ",
+	[severity.INFO] = " ",
+	[severity.HINT] = " ",
+}
 local augroup = vim.api.nvim_create_augroup("LspDiagnosticSetup", { clear = true })
 vim.api.nvim_create_autocmd({ "LspAttach" }, {
 	group = augroup,
@@ -30,7 +37,7 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 						min = severity.HINT,
 					},
 				},
-				virtual_text = {
+				virtual_text = false and {
 					severity = {
 						max = 1,
 						min = 4,
@@ -41,10 +48,20 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 					end,
 					source = "if_many",
 				},
-				virtual_lines = false,
+				virtual_lines = {
+					current_line = true,
+					format = function(diagnostic)
+						return string.format(
+							"%s %s [%s]",
+							diagnostic_signs[diagnostic.severity],
+							diagnostic.message,
+							diagnostic.code
+						)
+					end,
+				},
 				float = {
 					source = "if_many",
-					focusable = false,
+					focusable = true,
 					prefix = function(diagnostic, i, _)
 						local opts = {}
 						if diagnostic.severity == 1 then
@@ -57,6 +74,16 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 							opts = { i .. ". " .. "  ", "DiagnosticHint" }
 						end
 						return opts[1], opts[2]
+					end,
+					format = function(diagnostic)
+						return string.format(
+							"%s\n[%s-%s] -> [%s-%s]",
+							diagnostic.message,
+							diagnostic.col,
+							diagnostic.lnum,
+							diagnostic.end_col,
+							diagnostic.end_lnum
+						)
 					end,
 					scope = "line",
 					header = { " Diagnostics: ", "FloatTitle" },
@@ -73,19 +100,21 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 	end,
 })
 
-vim.api.nvim_create_augroup("FloatDiagnostic", { clear = true })
-vim.api.nvim_create_autocmd({ "CursorHold" }, {
-	group = "FloatDiagnostic",
-	callback = function()
-		local wins = vim.api.nvim_list_wins()
-		for _, i in ipairs(wins) do
-			local win = vim.api.nvim_win_get_config(i)
-			if win.zindex then
-				return
-			end
-		end
-		vim.schedule(function()
-			vim.diagnostic.open_float()
-		end)
-	end,
-})
+-- vim.api.nvim_create_augroup("FloatDiagnostic", { clear = true })
+-- vim.api.nvim_create_autocmd({ "CursorHold" }, {
+-- 	group = "FloatDiagnostic",
+-- 	callback = function()
+-- 		vim.schedule(function()
+-- 			local line = vim.api.nvim_win_get_cursor(vim.api.nvim_get_current_win())
+-- 			local diagnostics = vim.diagnostic.get(vim.api.nvim_get_current_buf(), { lnum = line[1] - 1 })
+-- 			if not next(diagnostics) then
+-- 				return
+-- 			end
+-- 			---@type vim.diagnostic.Opts.Float
+-- 			local win_opts = {
+-- 				scope = 'buffer',
+-- 			}
+-- 			vim.diagnostic.open_float()
+-- 		end)
+-- 	end,
+-- })

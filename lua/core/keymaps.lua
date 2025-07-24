@@ -12,10 +12,12 @@ end
 -- keymaps for normal mode
 nmap("<leader>a", "maggVG", { desc = "Select all" })
 nmap("<leader>ay", "maggVGy`a", { desc = "Select all and copy" })
-nmap("<Esc>", ":nohlsearch<CR>")
+nmap("<Esc>", function ()
+	vim.v.hlsearch = 0
+end)
 nmap(";", ":")
-nmap("<Tab>", ":tabnext<CR>", { desc = "Switch to the next tab" })
-nmap("<S-Tab>", ":tabprev<CR>", { desc = "Switch to the next tab" })
+nmap("<Tab>", "<cmd>tabnext<CR>", { desc = "Switch to the next tab" })
+nmap("<S-Tab>", "<cmd>tabprev<CR>", { desc = "Switch to the next tab" })
 
 imap( "<>", "<><left>", { desc = "Enter into angled brackets" })
 imap( "()", "()<left>", { desc = "Enter into round brackets" })
@@ -25,7 +27,6 @@ imap( '""', '""<left>', { desc = "Enter into double quotes" })
 imap( "''", "''<left>", { desc = "Enter into single quotes" })
 imap( "``", "``<left>", { desc = "Enter into backticks" })
 -- bufffer mappings
-
 local previous_buffer = function()
 	local states = require("ui.states").tabline_states
 	local utils = require("ui.utils")
@@ -87,7 +88,7 @@ nmap("<c-s-R>", ":restart<CR>", { desc = "Restart Neovim"})
 nmap("<c-j>", ":m .+1<CR>==")
 nmap("<c-k>", ":m .-2<CR>==")
 vmap("<c-j>", ":m '>+1<CR>gv=gv")
-vmap("<c-k>", ":m '<-2<CR>gv=gv ")
+vmap("<c-k>", ":m '<-2<CR>gv=gv")
 vmap(";", ":")
 
 imap("<c-k>", "<Esc>:m .-2<CR>==gi")
