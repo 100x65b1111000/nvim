@@ -15,6 +15,7 @@ M.setup = function(opts)
 		require("ui.tabline").setup(opts.tabline)
 	else
 		require("ui.statuscolumn").setup({ enabled = false })
+		---@diagnostic disable-next-line: missing-fields
 		require("ui.statusline").setup({ enabled = false })
 		require("ui.tabline").setup({ enabled = false })
 	end

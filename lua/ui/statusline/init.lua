@@ -1,7 +1,5 @@
 local M = {}
 
----@alias StatusLineConfig StatusLineDefaultConfig
-
 ---@param opts StatusLineConfig
 M.setup = function(opts)
 	opts = opts or {}

@@ -125,7 +125,7 @@ M.statusline_states.default_config = {
 }
 
 ---@type StatusLineConfig
-M.statusline_states.active_config = M.statusline_states.default_config
+M.statusline_states.active_config = nil
 
 ---@return StatusLineModuleFnTable
 local default_module_config = function()

@@ -12,22 +12,25 @@ end
 -- keymaps for normal mode
 nmap("<leader>a", "maggVG", { desc = "Select all" })
 nmap("<leader>ay", "maggVGy`a", { desc = "Select all and copy" })
-nmap("<Esc>", function ()
+nmap("<Esc>", function()
 	vim.v.hlsearch = 0
 end)
 nmap(";", ":")
 nmap("<Tab>", "<cmd>tabnext<CR>", { desc = "Switch to the next tab" })
 nmap("<S-Tab>", "<cmd>tabprev<CR>", { desc = "Switch to the next tab" })
 
-imap( "<>", "<><left>", { desc = "Enter into angled brackets" })
-imap( "()", "()<left>", { desc = "Enter into round brackets" })
-imap( "{}", "{}<left>", { desc = "Enter into curly brackets" })
-imap( "[]", "[]<left>", { desc = "Enter into square brackets" })
-imap( '""', '""<left>', { desc = "Enter into double quotes" })
-imap( "''", "''<left>", { desc = "Enter into single quotes" })
-imap( "``", "``<left>", { desc = "Enter into backticks" })
+imap("<>", "<><left>", { desc = "Enter into angled brackets" })
+imap("()", "()<left>", { desc = "Enter into round brackets" })
+imap("{}", "{}<left>", { desc = "Enter into curly brackets" })
+imap("[]", "[]<left>", { desc = "Enter into square brackets" })
+imap('""', '""<left>', { desc = "Enter into double quotes" })
+imap("''", "''<left>", { desc = "Enter into single quotes" })
+imap("``", "``<left>", { desc = "Enter into backticks" })
 -- bufffer mappings
 local previous_buffer = function()
+	if not vim.g.ui_tabline_enabled then
+		vim.cmd("bprev")
+	end
 	local states = require("ui.states").tabline_states
 	local utils = require("ui.utils")
 	local bufs = states.buffers_list
@@ -42,6 +45,9 @@ local previous_buffer = function()
 end
 
 local next_buffer = function()
+	if not vim.g.ui_tabline_enabled then
+		vim.cmd("bnext")
+	end
 	local states = require("ui.states").tabline_states
 	local utils = require("ui.utils")
 	local bufs = states.buffers_list
@@ -84,7 +90,7 @@ map({ "n", "v" }, "<leader>w=", ":wincmd =<CR>", { desc = "Equal height and widt
 
 nmap("<leader>hv", ":vert help ", { desc = "Open help (vertical split)" })
 nmap("<leader>hh", ":help ", { desc = "Open help (horizontal split)" })
-nmap("<c-s-R>", ":restart<CR>", { desc = "Restart Neovim"})
+nmap("<c-s-R>", ":restart<CR>", { desc = "Restart Neovim" })
 nmap("<c-j>", ":m .+1<CR>==")
 nmap("<c-k>", ":m .-2<CR>==")
 vmap("<c-j>", ":m '>+1<CR>gv=gv")

@@ -489,7 +489,7 @@ end
 --- Initialize all the things needed to set the statusline
 ---@param opts StatusLineConfig
 function M.initialize_stl(opts)
-	states.current_config = vim.tbl_deep_extend("force", states.default_config, opts or {})
+	states.current_config = states.current_config or vim.tbl_deep_extend("force", states.default_config, opts or {})
 
 	states.modules_map["mode"] = M.statusline_mode
 	states.modules_map["buf-status"] = M.buf_status
