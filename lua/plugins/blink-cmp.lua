@@ -139,7 +139,7 @@ P.config = function()
 						{ "label", "label_description", gap = 1 },
 						{ "kind", gap = 1 },
 					},
-
+					snippet_indicator = "~",
 					components = {
 						kind_icon = {
 							ellipsis = false,
