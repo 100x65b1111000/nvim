@@ -5,6 +5,19 @@ M.cache = { highlights = {} }
 --- *** Tabline Cache ***
 M.tabline_states = {}
 
+---@class TablineConfig
+---@field enabled boolean Enable bufferline/tabline.
+---@field hide_misc_buffers boolean Whether to show non-file type buffers in tabline or not
+
+---@type TablineConfig
+M.tabline_states.default_config = {
+	enabled = true,
+	hide_misc_buffers = true,
+}
+
+---@type TablineConfig
+M.tabline_states.active_config = nil
+
 M.tabline_states.BufferStates = {
 	ACTIVE = 1,
 	INACTIVE = 2,
@@ -23,7 +36,7 @@ M.tabline_states.cache = {
 }
 
 M.tabline_states.init_files = {
-	["init.lua"] = true
+	["init.lua"] = true,
 }
 
 ---@class Icons

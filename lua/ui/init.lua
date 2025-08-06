@@ -3,7 +3,7 @@ local M = {}
 local default_config = {
 	enabled = true,
 	statusline = { enabled = true },
-	tabline = { enabled = true },
+	tabline = { enabled = true, hide_misc_buffers = true },
 	statuscolumn = { enabled = true },
 }
 

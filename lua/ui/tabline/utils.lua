@@ -28,13 +28,12 @@ local M = {}
 ---@param bufnr integer The buffer number to check.
 ---@return boolean True if the buffer is valid, false otherwise.
 local function buf_is_valid(bufnr)
-	local listed = nvim_get_option_value("buflisted", { buf = bufnr }) or false
-
-	-- return nvim_buf_is_loaded(bufnr)
-	-- 	and nvim_buf_is_valid(bufnr)
-	-- 	and (nvim_get_option_value("buftype", { buf = bufnr }) == "")
-
-	return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 and nvim_buf_get_name(bufnr) ~= ""
+	local hide_misc = states.active_config.hide_misc_buffers
+	local listed = nvim_get_option_value("buflisted", { buf = bufnr })
+	if hide_misc then
+		return listed and isdirectory(nvim_buf_get_name(bufnr)) == 0 and nvim_buf_get_name(bufnr) ~= ""
+	end
+	return listed
 end
 
 ---Filters a list of buffer numbers, returning only the valid ones.
@@ -220,7 +219,9 @@ local calculate_buf_space = function(bufs) -- bufs is a list of bufnrs
 			-- For safety, let's log if this happens, or consider a default length.
 			-- vim.notify("Warning: Buffer spec not found for " .. bufnr .. " in calculate_buf_space", vim.log.levels.WARN)
 			local buf_info = get_buffer_info(bufnr) -- Ensure this doesn't cause issues if called mid-update
-			if buf_info then length = length + buf_info.length end
+			if buf_info then
+				length = length + buf_info.length
+			end
 		end
 	end
 	return length
@@ -403,7 +404,8 @@ local function update_tabline_buffer_string()
 	end)
 end
 
-M.initialize_tabline = function()
+M.initialize_tabline = function(opts)
+	states.active_config = states.active_config or vim.tbl_deep_extend("force", states.default_config, opts or {})
 	M.update_tabline_buffer_info()
 	M.update_tabline_buffer_string()
 end
@@ -518,7 +520,9 @@ M.update_tabline_buffer_info = function()
 					break
 				end
 			end
-			if not first_valid_buf then return end -- No valid buffers to show
+			if not first_valid_buf then
+				return
+			end -- No valid buffers to show
 			current_bufnr = first_valid_buf
 			-- It's possible that no buffer is current if e.g. only one tab page with a terminal is open.
 			-- The original code would return here. We allow proceeding if a valid buffer exists.
