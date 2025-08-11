@@ -22,8 +22,6 @@ local nvim_get_current_tabpage = api.nvim_get_current_tabpage
 local nvim_list_tabpages = api.nvim_list_tabpages
 local isdirectory = fn.isdirectory
 
-local JUMP_ALPHABETS="acefgijkmnopqrstuvwxyz"
-
 local M = {}
 
 ---Checks if a buffer is valid for display in the tabline.
@@ -362,15 +360,25 @@ end
 ---@param bufnr integer The buffer number.
 ---@return string The formatted buffer string.
 local function generate_buffer_string(bufnr)
-	local buf_spec = get_buffer_info(bufnr)
+	local buf_spec = states.buffers_spec[bufnr]
 	if not buf_spec then
 		return ""
 	end
+
 	local buf_hl = get_buffer_highlight(bufnr)
 	local left_padding, right_padding = buf_spec.left_padding, buf_spec.right_padding
+	local jump_char_hl =
+		generate_tabline_highlight("Title", states.BufferStates.ACTIVE, { bold = true }, "TabLineJumpChar")
+
+	local jump_char_str = ""
+	if states.show_jump_chars and buf_spec.jump_char then
+		jump_char_str = string.format("%%#%s#%s %%*", jump_char_hl, buf_spec.jump_char)
+	end
+
 	local buf_string = string.format(
-		"%%%d@v:lua.tabline_click_buffer_callback@%%#%s#%s%s%s%%#%s#%s%s%%X%s%%*",
+		"%%%d@v:lua.tabline_click_buffer_callback@%s%%#%s#%s%s%s%%#%s#%s%s%%X%s%%*",
 		bufnr,
+		jump_char_str,
 		buf_spec.icon_hl,
 		states.icons.separator,
 		left_padding,
@@ -383,6 +391,26 @@ local function generate_buffer_string(bufnr)
 	M.update_overflow_info()
 	return buf_string
 end
+
+local function update_tabline_buffer_string_sync()
+	states.timer_count = states.timer_count + 1
+	local parts = {}
+	for _, bufnr in ipairs(states.visible_buffers) do
+		table.insert(parts, generate_buffer_string(bufnr))
+	end
+	local tabline_content = table.concat(parts)
+
+	states.cache.tabline_string = string.format(
+		"%s%s%s%s%s",
+		states.left_overflow_str,
+		tabline_content,
+		states.right_overflow_str,
+		"%#TabLineFill#%=",
+		states.tabpages_str
+	)
+	vim.cmd([[redrawtabline]])
+end
+M.update_tabline_buffer_string_sync = update_tabline_buffer_string_sync
 
 ---Updates the global tabline buffer string.
 local function update_tabline_buffer_string()
@@ -566,6 +594,24 @@ M.update_tabline_buffer_info = function()
 		if states.left_overflow_idicator_length > 0 or states.right_overflow_idicator_length > 0 then
 			fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
 			M.update_overflow_info() -- Update overflow strings again if the visible range changed
+		end
+		-- Clear previous jump characters and map
+		for _, spec in pairs(states.buffers_spec) do
+			spec.jump_char = nil
+		end
+		states.jump_map = {}
+
+		-- Assign new jump characters
+		for i, bufnr_iter in ipairs(states.visible_buffers) do
+			local char = string.sub(states.jump_chars, i, i)
+			if char and char ~= "" then
+				states.jump_map[char] = bufnr_iter
+				if states.buffers_spec[bufnr_iter] then
+					states.buffers_spec[bufnr_iter].jump_char = char
+				end
+			else
+				break -- No more jump characters
+			end
 		end
 	end)
 end

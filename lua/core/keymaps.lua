@@ -61,6 +61,26 @@ local next_buffer = function()
 	vim.cmd(string.format("buffer %d", bufs[pos]))
 end
 
+local jump_to_buffer = function()
+	local states = require("ui.states").tabline_states
+	local tabline_utils = require("ui.tabline.utils")
+
+	-- Show jump characters
+	states.show_jump_chars = true
+	tabline_utils.update_tabline_buffer_string_sync()
+
+	local jump_char = vim.fn.getcharstr()
+
+	-- Hide jump characters
+	states.show_jump_chars = false
+	tabline_utils.update_tabline_buffer_string_sync()
+
+	if states.jump_map[jump_char] then
+		vim.cmd(string.format("buffer %d", states.jump_map[jump_char]))
+	end
+end
+
+map("n", "<leader>b", jump_to_buffer, { desc = "Jump to buffer" })
 map("n", "<leader>bh", previous_buffer, { desc = "Previous buffer" })
 map("n", "<leader>bl", next_buffer, { desc = "Next buffer" })
 
