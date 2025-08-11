@@ -286,10 +286,10 @@ P.config = function()
 					fg = c.surimiOrange
 				},
 				DashboardHeader = {
-					fg = c.crystalBlue
+					fg = c.springBlue
 				},
 				DashboardFooter = {
-					fg = c.springBlue
+					fg = c.oniViolet
 				},
 				SnacksPickerInputTitle = {
 					fg = c.sakuraPink,

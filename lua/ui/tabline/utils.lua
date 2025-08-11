@@ -22,6 +22,8 @@ local nvim_get_current_tabpage = api.nvim_get_current_tabpage
 local nvim_list_tabpages = api.nvim_list_tabpages
 local isdirectory = fn.isdirectory
 
+local JUMP_ALPHABETS="acefgijkmnopqrstuvwxyz"
+
 local M = {}
 
 ---Checks if a buffer is valid for display in the tabline.
