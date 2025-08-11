@@ -33,7 +33,8 @@ M.test = function(fn, iterations)
 end
 
 M.print_results = function()
-	print("time taken = %.6f sec", M.test(test2))
-	print("time taken = %.6f sec", M.test(test1))
+	print(string.format("time taken by test 1 = %0.6f sec", M.test(test1)))
+	print(string.format("time taken by test 2 = %0.6f sec", M.test(test2)))
 end
+
 return M

@@ -11,7 +11,7 @@ P.init = function()
 	local dashboard_footers = require("config.utils").dashboard_footers
 	local g = vim.g
 	math.randomseed(os.time())
-	g.dashboard_custom_header = dashboard_headers.neovim_4
+	g.dashboard_custom_header = dashboard_headers.neovim_3
 	local dashboard_footer_art = dashboard_footers.cat2
 	local dashboard_footer_text = " " .. dashboard_footers.lyrics[math.random(#dashboard_footers.lyrics)] .. "  "
 	table.insert(dashboard_footer_art, 1, dashboard_footer_text)

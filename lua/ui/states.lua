@@ -7,12 +7,12 @@ M.tabline_states = {}
 
 ---@class TablineConfig
 ---@field enabled boolean Enable bufferline/tabline.
----@field hide_misc_buffers boolean Whether to show non-file type buffers in tabline or not
+---@field hide_misc_buffers boolean Whether to show miscellaneous buffers(such as empty buffers, QF window etc.) in tabline or not
 
 ---@type TablineConfig
 M.tabline_states.default_config = {
 	enabled = true,
-	hide_misc_buffers = true,
+	hide_misc_buffers = false,
 }
 
 ---@type TablineConfig
