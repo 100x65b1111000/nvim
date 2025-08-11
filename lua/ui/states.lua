@@ -7,12 +7,12 @@ M.tabline_states = {}
 
 ---@class TablineConfig
 ---@field enabled boolean Enable bufferline/tabline.
----@field hide_misc_buffers boolean Whether to show miscellaneous buffers(such as empty buffers, QF window etc.) in tabline or not
+---@field hide_misc_buffers boolean Whether to show non-file type buffers in tabline or not
 
 ---@type TablineConfig
 M.tabline_states.default_config = {
 	enabled = true,
-	hide_misc_buffers = false,
+	hide_misc_buffers = true,
 }
 
 ---@type TablineConfig
@@ -50,6 +50,10 @@ M.tabline_states.icons = {
 	tabpage_status_icon_active = "  ",
 	tabpage_status_icon_inactive = "  ",
 }
+
+M.tabline_states.jump_chars = "abcdefghijklmnopqrstuvwxyz"
+M.tabline_states.jump_map = {}
+M.tabline_states.show_jump_chars = false
 
 M.tabline_states.end_idx = 1
 M.tabline_states.start_idx = 1
