@@ -51,10 +51,6 @@ M.tabline_states.icons = {
 	tabpage_status_icon_inactive = "  ",
 }
 
-M.tabline_states.jump_chars = "abcdefghijklmnopqrstuvwxyz"
-M.tabline_states.jump_map = {}
-M.tabline_states.show_jump_chars = false
-
 M.tabline_states.end_idx = 1
 M.tabline_states.start_idx = 1
 -- M.tabline_states.diff = 0 -- Unused
