@@ -545,7 +545,7 @@ M.update_tabline_buffer_string = update_tabline_buffer_string
 M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
 
-M.reset_jump_mode = function()
+M.reset_jump_chars = function()
 	for bufnr, spec in pairs(states.buffers_spec) do
 		spec.close_btn = get_close_button(bufnr)
 	end
@@ -583,7 +583,7 @@ M.jump_mode = function()
 	if bufnr then
 		vim.cmd(string.format("buffer %d", bufnr))
 	end
-	M.reset_jump_mode()
+	M.reset_jump_chars()
 end
 
 M.update_tabline_buffer_info = function()
