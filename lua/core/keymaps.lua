@@ -26,64 +26,6 @@ imap("[]", "[]<left>", { desc = "Enter into square brackets" })
 imap('""', '""<left>', { desc = "Enter into double quotes" })
 imap("''", "''<left>", { desc = "Enter into single quotes" })
 imap("``", "``<left>", { desc = "Enter into backticks" })
--- bufffer mappings
-local previous_buffer = function()
-	if not vim.g.ui_tabline_enabled then
-		vim.cmd("bprev")
-	end
-	local states = require("ui.states").tabline_states
-	local utils = require("ui.utils")
-	local bufs = states.buffers_list
-	local buf = vim.api.nvim_get_current_buf()
-	local pos = utils.find_index(bufs, buf)
-	if pos - 1 >= 1 then
-		pos = pos - 1
-	else
-		pos = #bufs
-	end
-	vim.cmd(string.format("buffer %d", bufs[pos]))
-end
-
-local next_buffer = function()
-	if not vim.g.ui_tabline_enabled then
-		vim.cmd("bnext")
-	end
-	local states = require("ui.states").tabline_states
-	local utils = require("ui.utils")
-	local bufs = states.buffers_list
-	local buf = vim.api.nvim_get_current_buf()
-	local pos = utils.find_index(bufs, buf)
-	if pos + 1 <= #bufs then
-		pos = pos + 1
-	else
-		pos = 1
-	end
-	vim.cmd(string.format("buffer %d", bufs[pos]))
-end
-
-local jump_to_buffer = function()
-	local states = require("ui.states").tabline_states
-	local tabline_utils = require("ui.tabline.utils")
-
-	-- Show jump characters
-	states.show_jump_chars = true
-	tabline_utils.update_tabline_buffer_string_sync()
-
-	local jump_char = vim.fn.getcharstr()
-
-	-- Hide jump characters
-	states.show_jump_chars = false
-	tabline_utils.update_tabline_buffer_string_sync()
-
-	if states.jump_map[jump_char] then
-		vim.cmd(string.format("buffer %d", states.jump_map[jump_char]))
-	end
-end
-
-map("n", "<leader>b", jump_to_buffer, { desc = "Jump to buffer" })
-map("n", "<leader>bh", previous_buffer, { desc = "Previous buffer" })
-map("n", "<leader>bl", next_buffer, { desc = "Next buffer" })
-
 map({ "n", "v" }, "<leader>bd", ":bdelete<CR>", { desc = "Delete buffer" })
 map({ "n", "v" }, "<leader>bb", ":b#<CR>", { desc = "Switch with previous buffer" })
 map({ "n", "v" }, "<leader>bp", ":buffers<CR>", { desc = "List buffers" })

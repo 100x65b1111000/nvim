@@ -90,6 +90,11 @@ P.config = function()
 					fg = c.surimiOrange,
 					bg = c.waveBlue1,
 				},
+				TabLineJumpChar = {
+					fg = c.sumiInk0,
+					bg = c.peachRed,
+					bold = true
+				},
 				Pmenu = {
 					bg = "none",
 				},

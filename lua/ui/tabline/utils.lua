@@ -241,7 +241,7 @@ M.update_overflow_info = function()
 	states.right_overflow_idicator_length = 0
 	if left_dist > 0 then
 		states.left_overflow_str = string.format(
-			"%s%s%s %d % ",
+			"%s%s%s %d %%* ",
 			"%#TabLineOverflowIndicator#",
 			states.icons.left_overflow_indicator,
 			"%#TabLineOverflowCount#",
@@ -252,7 +252,7 @@ M.update_overflow_info = function()
 	end
 	if right_dist > 0 then
 		states.right_overflow_str = string.format(
-			" %s %d %s%s%",
+			" %s %d %s%s%%*",
 			"%#TabLineOverflowCount#",
 			right_dist,
 			"%#TabLineOverflowIndicator#",
@@ -405,8 +405,50 @@ local function update_tabline_buffer_string()
 	end)
 end
 
+M.previous_buffer = function()
+	if not vim.g.ui_tabline_enabled then
+		vim.cmd("bprev")
+	end
+	local bufs = states.buffers_list
+	local buf = vim.api.nvim_get_current_buf()
+	local pos = utils.find_index(bufs, buf)
+	if pos - 1 >= 1 then
+		pos = pos - 1
+	else
+		pos = #bufs
+	end
+	if bufs[pos] then
+		vim.cmd(string.format("buffer %d", bufs[pos]))
+	end
+end
+
+M.next_buffer = function()
+	if not vim.g.ui_tabline_enabled then
+		vim.cmd("bnext")
+	end
+	local bufs = states.buffers_list
+	local buf = vim.api.nvim_get_current_buf()
+	local pos = utils.find_index(bufs, buf)
+	if pos + 1 <= #bufs then
+		pos = pos + 1
+	else
+		pos = 1
+	end
+	if bufs[pos] then
+		vim.cmd(string.format("buffer %d", bufs[pos]))
+	end
+end
+
+M.set_keymaps = function()
+	-- bufffer mappings
+	vim.keymap.set("n", "<leader>bh", M.previous_buffer, { desc = "Previous buffer" })
+	vim.keymap.set("n", "<leader>bl", M.next_buffer, { desc = "Next buffer" })
+	vim.keymap.set("n", "<leader>bj", M.jump_mode, { desc = "Toggle Jump Mode" })
+end
+
 M.initialize_tabline = function(opts)
 	states.active_config = states.active_config or vim.tbl_deep_extend("force", states.default_config, opts or {})
+	M.set_keymaps()
 	M.update_tabline_buffer_info()
 	M.update_tabline_buffer_string()
 end
@@ -464,7 +506,7 @@ M.update_tabline_string = function(tabs)
 		)
 	end
 	states.tabpages_str = string.format(
-		" %s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T% %s",
+		" %s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T%%* %s",
 		"%#TabLineTabPageIcon#",
 		states.icons.tabpage_icon,
 		str
@@ -503,18 +545,19 @@ M.update_tabline_buffer_string = update_tabline_buffer_string
 M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
 
-M.reset_close_btn = function()
+M.reset_jump_mode = function()
 	for bufnr, spec in pairs(states.buffers_spec) do
 		spec.close_btn = get_close_button(bufnr)
-		M.update_tabline_buffer_string()
 	end
+	M.update_tabline_buffer_string()
 	states.jump_mode_enabled = false
 end
 
-M.jump_mode_func = function()
+M.toggle_jump_chars = function()
 	-- if tbline_state.jump_mode_enabled then
 	-- Clear previous jump chars
 	states.jump_char_map = {}
+
 	states.jump_mode_enabled = true
 
 	-- Assign jump chars to visible buffers for jump mode
@@ -523,7 +566,7 @@ M.jump_mode_func = function()
 		if jump_char or jump_char ~= "" then
 			states.jump_char_map[jump_char] = buf
 			if states.buffers_spec[buf] then
-				states.buffers_spec[buf].close_btn = string.format("%%#Constant#%s%s%s", "[", jump_char, "]%%* ")
+				states.buffers_spec[buf].close_btn = string.format("%%#TabLineJumpChar#%s%s%s", " ", jump_char, " %*")
 			end
 		else
 			break
@@ -531,6 +574,16 @@ M.jump_mode_func = function()
 	end
 
 	M.update_tabline_buffer_string()
+end
+
+M.jump_mode = function()
+	M.toggle_jump_chars()
+	local char = vim.fn.getcharstr()
+	local bufnr = states.jump_char_map[char]
+	if bufnr then
+		vim.cmd(string.format("buffer %d", bufnr))
+	end
+	M.reset_jump_mode()
 end
 
 M.update_tabline_buffer_info = function()
