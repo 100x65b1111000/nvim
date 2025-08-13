@@ -5,6 +5,11 @@ M.cache = { highlights = {} }
 --- *** Tabline Cache ***
 M.tabline_states = {}
 
+
+M.tabline_states.jump_chars = "abcdefgijkmnopqrstuvwxyz"
+M.tabline_states.jump_char_map = {}
+M.tabline_states.jump_mode_enabled = false
+
 ---@class TablineConfig
 ---@field enabled boolean Enable bufferline/tabline.
 ---@field hide_misc_buffers boolean Whether to show non-file type buffers in tabline or not

@@ -127,6 +127,11 @@ end
 ---Gets the close button string.
 ---@param bufnr integer The buffer number.
 local function get_close_button(bufnr)
+	if states.buffers_spec[bufnr] and states.jump_mode_enabled then
+		if states.buffers_spec[bufnr].close_btn then
+			return states.buffers_spec[bufnr].close_btn
+		end
+	end
 	local close_button_str = "%%%d@v:lua.tabline_close_button_callback@%%#%s#%s%%X"
 	local close_btn_inactive_hl =
 		generate_tabline_highlight("PreProc", states.BufferStates.INACTIVE, {}, "TabLineCloseButtonInactive")
@@ -173,7 +178,6 @@ local function get_buffer_info(bufnr)
 	icon = icon .. " "
 	icon_hl = generate_tabline_highlight(icon_hl, state, {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
-	-- buf_name = truncate_string(buf_name, #buf_name, states.tabline_buf_str_max_width)
 	local length = nvim_strwidth(buf_name)
 		+ nvim_strwidth(icon)
 		+ nvim_strwidth(left_padding)
@@ -237,7 +241,7 @@ M.update_overflow_info = function()
 	states.right_overflow_idicator_length = 0
 	if left_dist > 0 then
 		states.left_overflow_str = string.format(
-			"%s%s%s %d %%* ",
+			"%s%s%s %d % ",
 			"%#TabLineOverflowIndicator#",
 			states.icons.left_overflow_indicator,
 			"%#TabLineOverflowCount#",
@@ -248,7 +252,7 @@ M.update_overflow_info = function()
 	end
 	if right_dist > 0 then
 		states.right_overflow_str = string.format(
-			" %s %d %s%s%%*",
+			" %s %d %s%s%",
 			"%#TabLineOverflowCount#",
 			right_dist,
 			"%#TabLineOverflowIndicator#",
@@ -277,7 +281,6 @@ local fetch_visible_buffers = function(bufnr, bufs, buf_specs)
 
 	local visible_buf_space = calculate_buf_space(states.visible_buffers)
 	if visible_buf_space <= available_space then
-		vim.notify("not doing shit")
 		return
 	end
 	local current_buf_index = find_index(bufs, bufnr)
@@ -378,7 +381,6 @@ local function generate_buffer_string(bufnr)
 		right_padding,
 		buf_spec.close_btn
 	)
-	M.update_overflow_info()
 	return buf_string
 end
 
@@ -386,11 +388,10 @@ end
 local function update_tabline_buffer_string()
 	states.tabline_update_buffer_string_timer = timer_fn(states.tabline_update_buffer_string_timer, 50, function()
 		states.timer_count = states.timer_count + 1
-		local parts = {}
+		local tabline_content = ""
 		for _, bufnr in ipairs(states.visible_buffers) do
-			table.insert(parts, generate_buffer_string(bufnr))
+			tabline_content = string.format("%s%s", tabline_content, generate_buffer_string(bufnr))
 		end
-		local tabline_content = table.concat(parts)
 
 		states.cache.tabline_string = string.format(
 			"%s%s%s%s%s",
@@ -463,7 +464,7 @@ M.update_tabline_string = function(tabs)
 		)
 	end
 	states.tabpages_str = string.format(
-		" %s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T%%* %s",
+		" %s%%@v:lua.tabline_click_tabpage_icon_callback@ %s %%T% %s",
 		"%#TabLineTabPageIcon#",
 		states.icons.tabpage_icon,
 		str
@@ -502,70 +503,105 @@ M.update_tabline_buffer_string = update_tabline_buffer_string
 M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
 
+M.reset_close_btn = function()
+	for bufnr, spec in pairs(states.buffers_spec) do
+		spec.close_btn = get_close_button(bufnr)
+		M.update_tabline_buffer_string()
+	end
+	states.jump_mode_enabled = false
+end
+
+M.jump_mode_func = function()
+	-- if tbline_state.jump_mode_enabled then
+	-- Clear previous jump chars
+	states.jump_char_map = {}
+	states.jump_mode_enabled = true
+
+	-- Assign jump chars to visible buffers for jump mode
+	for i, buf in ipairs(states.visible_buffers) do
+		local jump_char = string.sub(states.jump_chars, i, i)
+		if jump_char or jump_char ~= "" then
+			states.jump_char_map[jump_char] = buf
+			if states.buffers_spec[buf] then
+				states.buffers_spec[buf].close_btn = string.format("%%#Constant#%s%s%s", "[", jump_char, "]%%* ")
+			end
+		else
+			break
+		end
+	end
+
+	M.update_tabline_buffer_string()
+end
+
 M.update_tabline_buffer_info = function()
-	states.tabline_update_buffer_info_timer = timer_fn(states.tabline_update_buffer_info_timer, 50, function()
-		local current_bufnr = nvim_get_current_buf()
-		if not buf_is_valid(current_bufnr) then
-			-- If current buffer is not valid (e.g. terminal, help page),
-			-- we might still want to update tabline if other valid buffers exist or tabpages changed.
-			-- However, fetch_visible_buffers requires a valid current_bufnr to center around.
-			-- For now, if current buffer is invalid, we might not have a good reference point.
-			-- This part might need more nuanced handling if we want to display tabs even with an invalid current buffer.
-			-- A simple approach: if current is invalid, try to find the first valid buffer to use as reference.
-			local bufs = states.buffers_list
-			local first_valid_buf = nil
-			for _, b in ipairs(bufs) do
-				if buf_is_valid(b) then
-					first_valid_buf = b
-					break
+	states.tabline_update_buffer_info_timer = timer_fn(
+		states.tabline_update_buffer_info_timer,
+		50,
+		function()
+			local current_bufnr = nvim_get_current_buf()
+			if not buf_is_valid(current_bufnr) then
+				-- If current buffer is not valid (e.g. terminal, help page),
+				-- we might still want to update tabline if other valid buffers exist or tabpages changed.
+				-- However, fetch_visible_buffers requires a valid current_bufnr to center around.
+				-- For now, if current buffer is invalid, we might not have a good reference point.
+				-- This part might need more nuanced handling if we want to display tabs even with an invalid current buffer.
+				-- A simple approach: if current is invalid, try to find the first valid buffer to use as reference.
+				local bufs = states.buffers_list
+				local first_valid_buf = nil
+				for _, b in ipairs(bufs) do
+					if buf_is_valid(b) then
+						first_valid_buf = b
+						break
+					end
+				end
+				if not first_valid_buf then
+					return
+				end -- No valid buffers to show
+				current_bufnr = first_valid_buf
+				-- It's possible that no buffer is current if e.g. only one tab page with a terminal is open.
+				-- The original code would return here. We allow proceeding if a valid buffer exists.
+			end
+
+			states.timer_count = states.timer_count + 1
+			states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
+
+			-- Cache duplicate buffer names once per refresh
+			local bufnames_temp = {}
+			states.duplicate_buf_names = {} -- Clear previous
+			for _, bufnr_iter in ipairs(states.buffers_list) do -- Iterate over already filtered valid buffers
+				local buf_path = nvim_buf_get_name(bufnr_iter)
+				local buf_name_short = fnamemodify(buf_path, ":t")
+				if bufnames_temp[buf_name_short] then
+					states.duplicate_buf_names[buf_name_short] = true
+				else
+					bufnames_temp[buf_name_short] = true
 				end
 			end
-			if not first_valid_buf then
-				return
-			end -- No valid buffers to show
-			current_bufnr = first_valid_buf
-			-- It's possible that no buffer is current if e.g. only one tab page with a terminal is open.
-			-- The original code would return here. We allow proceeding if a valid buffer exists.
-		end
 
-		states.timer_count = states.timer_count + 1
-		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
+			states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 
-		-- Cache duplicate buffer names once per refresh
-		local bufnames_temp = {}
-		states.duplicate_buf_names = {} -- Clear previous
-		for _, bufnr_iter in ipairs(states.buffers_list) do -- Iterate over already filtered valid buffers
-			local buf_path = nvim_buf_get_name(bufnr_iter)
-			local buf_name_short = fnamemodify(buf_path, ":t")
-			if bufnames_temp[buf_name_short] then
-				states.duplicate_buf_names[buf_name_short] = true
-			else
-				bufnames_temp[buf_name_short] = true
+			-- Reset overflow indicators before first fetch_visible_buffers
+			states.left_overflow_str = ""
+			states.right_overflow_str = ""
+			states.left_overflow_idicator_length = 0
+			states.right_overflow_idicator_length = 0
+
+			-- First pass: Determine visible buffers without considering overflow indicators yet
+			fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
+
+			-- Now, based on the outcome of the first fetch, determine if overflow indicators are needed
+			M.update_overflow_info() -- This will set overflow string lengths if needed
+
+			-- Second pass: Recalculate visible buffers, now accounting for the space taken by overflow indicators
+			-- This is only strictly necessary if update_overflow_info actually set any overflow indicators
+			-- which would change the available space.
+			if states.left_overflow_idicator_length > 0 or states.right_overflow_idicator_length > 0 then
+				fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
+				M.update_overflow_info() -- Update overflow strings again if the visible range changed
 			end
 		end
-
-		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
-
-		-- Reset overflow indicators before first fetch_visible_buffers
-		states.left_overflow_str = ""
-		states.right_overflow_str = ""
-		states.left_overflow_idicator_length = 0
-		states.right_overflow_idicator_length = 0
-
-		-- First pass: Determine visible buffers without considering overflow indicators yet
-		fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
-
-		-- Now, based on the outcome of the first fetch, determine if overflow indicators are needed
-		M.update_overflow_info() -- This will set overflow string lengths if needed
-
-		-- Second pass: Recalculate visible buffers, now accounting for the space taken by overflow indicators
-		-- This is only strictly necessary if update_overflow_info actually set any overflow indicators
-		-- which would change the available space.
-		if states.left_overflow_idicator_length > 0 or states.right_overflow_idicator_length > 0 then
-			fetch_visible_buffers(current_bufnr, states.buffers_list, states.buffers_spec)
-			M.update_overflow_info() -- Update overflow strings again if the visible range changed
-		end
-	end)
+		-- end
+	)
 end
 
 return M
