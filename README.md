@@ -699,12 +699,6 @@ This section outlines the keybindings configured in this neovim setup.
     </table>
 </details>
 
-# Planned features
-- [ ] better error handling for statusline/tabline/statuscolumn.
-- [x] luasnip snippets.
-- [x] document existing keybindings.
-- [x] lsp configuration for more lsp servers.
-
 # Contributing
 
 Contributions are highly welcome! whether it's reporting a bug, suggesting an enhancement, or submitting a pull request.
