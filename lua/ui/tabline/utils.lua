@@ -179,11 +179,11 @@ local function get_buffer_info(bufnr)
 	icon_hl = generate_tabline_highlight(icon_hl, state, {}, nil)
 	local left_padding, right_padding = get_lr_padding(buf_name)
 	local length = nvim_strwidth(buf_name)
+		+ nvim_strwidth(states.icons.separator)
 		+ nvim_strwidth(icon)
 		+ nvim_strwidth(left_padding)
 		+ nvim_strwidth(right_padding)
 		+ nvim_strwidth(states.icons.close)
-		+ nvim_strwidth(states.icons.separator)
 	local close_btn = get_close_button(bufnr)
 	return {
 		buf_name = buf_name,
@@ -559,9 +559,11 @@ M.toggle_jump_chars = function()
 	states.jump_char_map = {}
 
 	states.jump_mode_enabled = true
-
 	-- Assign jump chars to visible buffers for jump mode
 	for i, buf in ipairs(states.visible_buffers) do
+		if buf == nvim_get_current_buf() then
+			goto continue
+		end
 		local jump_char = string.sub(states.jump_chars, i, i)
 		if jump_char or jump_char ~= "" then
 			states.jump_char_map[jump_char] = buf
@@ -571,6 +573,7 @@ M.toggle_jump_chars = function()
 		else
 			break
 		end
+		::continue::
 	end
 
 	M.update_tabline_buffer_string()
@@ -578,6 +581,11 @@ end
 
 M.jump_mode = function()
 	M.toggle_jump_chars()
+
+	if #states.visible_buffers == 1 then
+		return
+	end
+
 	local char = vim.fn.getcharstr()
 	local bufnr = states.jump_char_map[char]
 	if bufnr then
