@@ -564,7 +564,7 @@ M.toggle_jump_chars = function()
 		if buf == nvim_get_current_buf() then
 			goto continue
 		end
-		local jump_char = string.sub(states.jump_chars, i, i)
+		local jump_char = string.sub(states.active_config.jump_chars, i, i)
 		if jump_char or jump_char ~= "" then
 			states.jump_char_map[jump_char] = buf
 			if states.buffers_spec[buf] then

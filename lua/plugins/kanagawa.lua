@@ -92,7 +92,7 @@ P.config = function()
 				},
 				TabLineJumpChar = {
 					fg = c.sumiInk0,
-					bg = c.peachRed,
+					bg = c.waveRed,
 					bold = true
 				},
 				Pmenu = {

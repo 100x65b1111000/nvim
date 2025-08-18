@@ -6,18 +6,21 @@ M.cache = { highlights = {} }
 M.tabline_states = {}
 
 
-M.tabline_states.jump_chars = "abcdefgijkmnopqrstuvwxyz"
 M.tabline_states.jump_char_map = {}
 M.tabline_states.jump_mode_enabled = false
 
 ---@class TablineConfig
 ---@field enabled boolean Enable bufferline/tabline.
 ---@field hide_misc_buffers boolean Whether to show non-file type buffers in tabline or not
+---@field jump_chars string String containing jump_chars
+---@field randomize_jump_chars boolean Whether to randomize the jump chars or not
 
 ---@type TablineConfig
 M.tabline_states.default_config = {
 	enabled = true,
 	hide_misc_buffers = true,
+	jump_chars = "abcdefghijklmnopqrstuvwxyz",
+	randomize_jump_chars = false
 }
 
 ---@type TablineConfig

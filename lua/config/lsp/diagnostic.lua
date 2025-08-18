@@ -37,14 +37,14 @@ vim.api.nvim_create_autocmd({ "LspAttach" }, {
 						min = severity.HINT,
 					},
 				},
-				virtual_text = false and {
+				virtual_text = {
 					severity = {
 						max = 1,
 						min = 4,
 					},
 					prefix = "󰹞",
 					format = function(diagnostic)
-						return diagnostic.message
+						return tostring(diagnostic.code)
 					end,
 					source = "if_many",
 				},

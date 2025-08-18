@@ -27,7 +27,7 @@ o.smartindent = true
 o.smarttab = true
 o.wildignore =
 	"*.docx,*.png,*.jpg,*.jpeg,*.gif,*.pdf,*.svg,*.mp4,*.mkv,*.avi,*.mp3,*.wav,*.ogg,*.zip,*.tar.gz,*.tar.bz2,*.tar.xz,*.tar.zst,*.rar,*.7z,*.exe,*.msi,*.apk,*.iso,*.img,*.bin,*.db,*.sqlite,*.db3,*.sql,*.dbf,*.mdb,*.log,*.cache,*.tmp,*.temp,*.o,*.obj,*.dll,*.class,*.pyc,*.pyo,*.rbc,*.jar,*.war,*.ear,*.sar"
-o.splitright = true -- Vertical splits will automatically be to the right
+o.splitright = true
 o.background = "dark" -- tell vim what the background color looks like
 o.wrap = false
 o.title = true
@@ -38,7 +38,7 @@ o.cursorcolumn = false
 -- o.completeopt = "menu,menuone,preview,popup,fuzzy"
 
 o.list = true
-o.listchars = "tab:  ,eol:,space: ,extends:"
+o.listchars = "tab:  ,eol:↵,space: ,extends:…"
 
 o.scrolloff = 10
 o.sidescrolloff = 10

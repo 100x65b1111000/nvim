@@ -435,20 +435,24 @@ M.fetch_diagnostics = function()
 	end)
 end
 
+-- Error in statusline module 'search-status': Vim:E54: Unmatched \(
 ---@return StatusLineModuleFnTable
 M.statusline_search_status = function()
 	if vim.v.hlsearch == 0 then
 		return { string = "" }
 	end
 
-	local search_count = fn.searchcount({ maxcount = 999, recompute = 1 })
+	local ok, search_count = pcall(fn.searchcount, { maxcount = 999, recompute = 1 })
+
+	if not ok then
+		return { string = "" }
+	end
 
 	if search_count.total < 1 then
 		return { string = "" }
 	end
 
-	local icon_hl =
-		generate_highlight("Identifier", "StatusLine", { }, 0, 0, nil, nil, "StatusLineSearchStatusIcon")
+	local icon_hl = generate_highlight("Identifier", "StatusLine", {}, 0, 0, nil, nil, "StatusLineSearchStatusIcon")
 
 	if search_count.incomplete == 1 then
 		return { icon = "  ", icon_hl = icon_hl, string = " [?/??] ", hl_group = "FoldEnd" }
