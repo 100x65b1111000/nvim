@@ -1,14 +1,14 @@
 # Neovim Config
 A clean, blazingly fast and heavily tweaked neovim setup focused on productivity and performance.
 
+> ⚡ **Startup time:** \~20ms
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3231a689-8020-4112-8402-c45dcc42c52e" />
+
 > [!note]
 > This neovim setup is heavily modified to my liking and my workflow. However, everything is pretty straightforward and clean, so you won't be having any trouble in tinkering with the setup to suit it to your needs.
 > The setup's being actively developed and functional. While I strive for stability, some areas might undergo rapid changes or refactoring as improvements are made.
 > If you encounter any problems or bugs, please raise an issue; I'll try to fix them as soon as possible. PR's are more than welcome!
-
-> ⚡ **Startup time:** \~20ms
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3231a689-8020-4112-8402-c45dcc42c52e" />
 
 
 ## Table of contents
