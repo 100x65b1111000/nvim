@@ -2,12 +2,15 @@ local P = {
 	"Saghen/blink.cmp",
 	cond = true,
 	event = { "InsertEnter" },
-	build = "cargo build --release",
+	build = function()
+		require("blink.cmp").build():wait(60000)
+	end,
 }
 
 P.dependencies = {
 	"rafamadriz/friendly-snippets",
 	"L3MON4D3/LuaSnip",
+	"saghen/blink.lib",
 	"echasnovski/mini.icons",
 	-- { "Saghen/blink.compat", opts = { impersonate_nvim_cmp = true } },
 }
@@ -81,7 +84,7 @@ P.config = function()
 				show_on_accept_on_trigger_character = true,
 				show_on_insert_on_trigger_character = true,
 				show_on_blocked_trigger_characters = {},
-				show_on_x_blocked_trigger_characters = { "(", "'", '"' },
+				show_on_x_blocked_trigger_characters = { "(", "'", '"', "{", "[" },
 				show_on_backspace = false,
 				show_on_backspace_after_accept = true,
 				show_on_backspace_after_insert_enter = true,
@@ -92,7 +95,7 @@ P.config = function()
 				max_items = 200,
 				selection = {
 					preselect = true,
-					auto_insert = false,
+					auto_insert = true,
 				},
 				cycle = {
 					from_bottom = true,
@@ -100,7 +103,9 @@ P.config = function()
 				},
 			},
 			accept = {
+				dot_repeat = true,
 				create_undo_point = true,
+				resolve_timeout_ms = 100,
 				auto_brackets = {
 					enabled = vim.bo.buftype ~= "prompt",
 					default_brackets = { "(", ")", "{", "}" },
@@ -121,16 +126,17 @@ P.config = function()
 			menu = {
 				enabled = true,
 				min_width = 15,
-				max_height = 20,
-				border = "single",
+				max_height = 10,
+				border = "none",
 				winblend = 0,
 				winhighlight = "Normal:BlinkCmpMenu,FloatBorder:BlinkCmpMenuBorder,CursorLine:BlinkCmpMenuSelection,Search:None",
 				scrollbar = true,
 				scrolloff = 2,
 				direction_priority = { "s", "n" },
 				auto_show = true,
+				auto_show_delay_ms = 10,
 				draw = {
-					align_to = "cursor",
+					align_to = "label",
 					padding = 1,
 					gap = 1,
 					treesitter = { "lsp" },
@@ -218,10 +224,10 @@ P.config = function()
 						},
 					},
 				},
-				order = {
-					n = "bottom_up",
-					s = "top_down",
-				},
+				-- order = {
+				-- 	n = "bottom_up",
+				-- 	s = "top_down",
+				-- },
 			},
 			documentation = {
 				auto_show = true,
@@ -277,8 +283,8 @@ P.config = function()
 			},
 		},
 		fuzzy = {
-			implementation = "rust",
-			use_frecency = false,
+			-- implementation = "rust",
+			-- use_frecency = false,
 			use_proximity = false,
 			-- sorts = {
 			-- 	"exact",
@@ -289,9 +295,9 @@ P.config = function()
 			max_typos = function()
 				return 1
 			end,
-			prebuilt_binaries = {
-				download = false,
-			},
+			-- prebuilt_binaries = {
+			-- 	download = false,
+			-- },
 		},
 		sources = {
 			-- Stolen from https://github.com/saecki/dotfiles/blob/d384c5ba4b023253669a121c27a9749ab4a0b916/.config/nvim/lua/config/blink.lua#L30-L53
@@ -415,15 +421,16 @@ P.config = function()
 			},
 		},
 		cmdline = {
-			sources = function()
-				local type = vim.fn.getcmdtype()
-				if type == "/" or type == "?" then
-					return { "buffer", "path" }
-				elseif type == ":" or type == "@" then
-					return { "cmdline", "path" }
-				end
-				return {}
-			end,
+			-- sources = function()
+			-- 	local type = vim.fn.getcmdtype()
+			-- 	if type == "/" or type == "?" then
+			-- 		return { "buffer", "path" }
+			-- 	elseif type == ":" or type == "@" then
+			-- 		return { "cmdline", "path" }
+			-- 	end
+			-- 	return {}
+			-- end,
+			enabled = true,
 			keymap = {
 				preset = "none",
 				["<tab>"] = { "show_and_insert", "select_next" },
@@ -435,7 +442,6 @@ P.config = function()
 				["<left>"] = { "fallback" },
 				["<right>"] = { "fallback" },
 			},
-			enabled = true,
 			completion = {
 				list = {
 					selection = {
@@ -458,32 +464,32 @@ P.config = function()
 				},
 			},
 		},
-		term = {
-			enabled = false,
-			sources = {
-				"buffer",
-				"path",
-			},
-			completion = {
-				list = {
-					selection = {
-						preselect = true,
-						auto_insert = true,
-					},
-				},
-				menu = {
-					auto_show = true,
-					draw = {
-						columns = {
-							{ "kind_icon" },
-							{ "label", "label_description", gap = 1 },
-							{ "kind" },
-						},
-					},
-				},
-				ghost_text = { enabled = true },
-			},
-		},
+		-- term = {
+		-- 	enabled = false,
+		-- 	sources = {
+		-- 		"buffer",
+		-- 		"path",
+		-- 	},
+		-- 	completion = {
+		-- 		list = {
+		-- 			selection = {
+		-- 				preselect = true,
+		-- 				auto_insert = true,
+		-- 			},
+		-- 		},
+		-- 		menu = {
+		-- 			auto_show = true,
+		-- 			draw = {
+		-- 				columns = {
+		-- 					{ "kind_icon" },
+		-- 					{ "label", "label_description", gap = 1 },
+		-- 					{ "kind" },
+		-- 				},
+		-- 			},
+		-- 		},
+		-- 		ghost_text = { enabled = true },
+		-- 	},
+		-- },
 		appearance = {
 			highlight_ns = vim.api.nvim_create_namespace("blink_cmp"),
 			use_nvim_cmp_as_default = false,

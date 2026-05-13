@@ -1,6 +1,6 @@
 local P = {
 	"OXY2DEV/markview.nvim",
-	lazy = true,
+	lazy = false,
 	ft = { "markdown", "yaml", "html", "latex" },
 	dependencies = {
 		"nvim-treesitter/nvim-treesitter",
