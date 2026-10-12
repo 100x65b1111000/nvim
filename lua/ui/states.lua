@@ -7,7 +7,7 @@ M.tabline_states = {}
 
 
 M.tabline_states.jump_char_map = {}
-M.tabline_states.jump_mode_enabled = false
+M.tabline_states.jump_mode_enabled = true
 
 ---@class TablineConfig
 ---@field enabled boolean Enable bufferline/tabline.

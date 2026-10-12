@@ -435,7 +435,6 @@ M.fetch_diagnostics = function()
 	end)
 end
 
--- Error in statusline module 'search-status': Vim:E54: Unmatched \(
 ---@return StatusLineModuleFnTable
 M.statusline_search_status = function()
 	if vim.v.hlsearch == 0 then
@@ -448,7 +447,7 @@ M.statusline_search_status = function()
 		return { string = "" }
 	end
 
-	if search_count.total < 1 then
+	if search_count.total == nil or search_count.total < 1 then
 		return { string = "" }
 	end
 
