@@ -4,17 +4,6 @@ vim.lsp.config("lua_ls",{
 		"lua-language-server"
 	},
 	filetypes = { "lua" },
-	on_init = function(client)
-		-- Check for config files
-		if client.workspace_folders then
-			local path = client.workspace_folders[1].name
-			-- Don't load default config if .luarc.json exists
-			if vim.uv.fs_stat(path .. "/.luarc.json") or vim.uv.fs_stat(path .. "/.luarc.jsonc") then
-				return
-			end
-		end
-	end,
-	-- cmd_cwd = utils.find_root({ ".git", "luarc.json", ".luarc.json", ".luarc.jsonc", ".stylua.toml" }),
 	settings = {
 		Lua = {
 			runtime = {
@@ -29,11 +18,10 @@ vim.lsp.config("lua_ls",{
 					vim.fn.expand "$VIMRUNTIME/lua/vim/provider",
 					vim.fn.expand "$VIMRUNTIME/lua/vim/filetype",
 					vim.fn.expand "$VIMRUNTIME/lua/vim/func",
-					vim.fn.expand "VIMRUNTIME/lua/vim/deprecated",
-					vim.fn.expand "VIMRUNTIME/lua/vim/health",
+					vim.fn.expand "$VIMRUNTIME/lua/vim/deprecated",
+					vim.fn.expand "$VIMRUNTIME/lua/vim/health",
 					vim.fn.stdpath("data") .. "/lazy/lazy.nvim/lua/lazy",
 					"${3rd}/luv/library"
-					-- "home/dex/.config/nvim/"
 				}
 			},
 			completion = {

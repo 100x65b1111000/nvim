@@ -1,6 +1,6 @@
 local P = {
 	"Bekaboo/dropbar.nvim",
-	event = { 'BufNewFile' },
+	event = { "BufReadPost", "BufNewFile" },
 	dependencies = {
 		-- 'nvim-telescope/telescope-fzf-native.nvim',
 	},

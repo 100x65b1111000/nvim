@@ -140,8 +140,7 @@ local function get_close_button(bufnr)
 		local close_btn_insert_mode_hl =
 			generate_tabline_highlight("String", states.BufferStates.ACTIVE, {}, "TabLineDotActive")
 		return string.format(close_button_str, bufnr, close_btn_insert_mode_hl, states.icons.active_dot)
-	end
-	if nvim_get_option_value("modified", { buf = bufnr }) and bufnr == nvim_get_current_buf() then
+	elseif nvim_get_option_value("modified", { buf = bufnr }) and bufnr == nvim_get_current_buf() then
 		local close_btn_modified_hl =
 			generate_tabline_highlight("Constant", states.BufferStates.ACTIVE, {}, "TabLineModifiedActive")
 		return string.format(close_button_str, bufnr, close_btn_modified_hl, states.icons.active_dot)
@@ -338,19 +337,26 @@ local function get_buffer_highlight(bufnr) -- changed from get_buf_hl
 end
 
 _G.tabline_close_button_callback = function(bufnr)
-	-- states.close_button_click_timer = timer_fn(states.close_button_click_timer, 50, function()
 	if not buf_is_valid(bufnr) and nvim_get_option_value("buflisted", { buf = bufnr }) then
 		return
 	end
+	local force = true
 	if nvim_get_option_value("modified", { buf = bufnr }) then
 		local choice = vim.fn.confirm("This buffer's been modified!! Wanna save first before closing?", "&Yes\n&No", 2)
 		if choice == 1 then
-			vim.cmd([[ silent! w ]])
+			local ok, err = pcall(api.nvim_buf_call, bufnr, function()
+				vim.cmd("w")
+			end)
+			if not ok then
+				vim.notify("Save failed: " .. tostring(err), vim.log.levels.ERROR)
+				return
+			end
+			force = false
 		end
 	end
 	schedule(function()
 		vim.lsp.inlay_hint.enable(false, { bufnr = bufnr }) -- disable inlay hints prior deleting the buffer
-		nvim_buf_delete(bufnr, { force = false })
+		nvim_buf_delete(bufnr, { force = force })
 		states.buffers_list = get_tabline_buffers_list(nvim_list_bufs())
 		states.buffers_spec = get_buffers_with_specs(states.buffers_list)
 		local bufs = states.buffers_list
@@ -407,7 +413,7 @@ end
 
 M.previous_buffer = function()
 	if not vim.g.ui_tabline_enabled then
-		vim.cmd("bprev")
+		return vim.cmd("bprev")
 	end
 	local bufs = states.buffers_list
 	local buf = vim.api.nvim_get_current_buf()
@@ -424,7 +430,7 @@ end
 
 M.next_buffer = function()
 	if not vim.g.ui_tabline_enabled then
-		vim.cmd("bnext")
+		return vim.cmd("bnext")
 	end
 	local bufs = states.buffers_list
 	local buf = vim.api.nvim_get_current_buf()
@@ -455,11 +461,6 @@ end
 
 M.get_tabline = function()
 	return states.cache.tabline_string
-end
-
-M.tab_info = function()
-	states.tabs = api.nvim_list_tabpages()
-	states.current_tab = api.nvim_get_current_tabpage()
 end
 
 local get_tabpage_hl = function(tab)
@@ -496,13 +497,13 @@ M.update_tabline_string = function(tabs)
 	for idx, tab in ipairs(tabs) do
 		local hl, close_hl, close_icon = get_tabpage_hl(tab)
 		str = string.format(
-			"%s%%%d@v:lua.tabline_click_tabpage_callback@%s%%T %s %d %s",
+			"%s%s%%%d@v:lua.tabline_click_tabpage_callback@%s%%T %s %d ",
+			str,
 			close_hl,
 			idx,
 			close_icon,
 			hl,
-			idx,
-			str
+			idx
 		)
 	end
 	states.tabpages_str = string.format(
@@ -546,11 +547,11 @@ M.get_buffers_with_specs = get_buffers_with_specs
 M.generate_buffer_string = generate_buffer_string
 
 M.reset_jump_chars = function()
+	states.jump_mode_enabled = false
 	for bufnr, spec in pairs(states.buffers_spec) do
 		spec.close_btn = get_close_button(bufnr)
 	end
 	M.update_tabline_buffer_string()
-	states.jump_mode_enabled = false
 end
 
 M.toggle_jump_chars = function()
@@ -565,7 +566,7 @@ M.toggle_jump_chars = function()
 			goto continue
 		end
 		local jump_char = string.sub(states.active_config.jump_chars, i, i)
-		if jump_char or jump_char ~= "" then
+		if jump_char ~= "" then
 			states.jump_char_map[jump_char] = buf
 			if states.buffers_spec[buf] then
 				states.buffers_spec[buf].close_btn = string.format("%%#TabLineJumpChar#%s%s%s", " ", jump_char, " %*")

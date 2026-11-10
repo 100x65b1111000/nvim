@@ -7,7 +7,7 @@ M.tabline_states = {}
 
 
 M.tabline_states.jump_char_map = {}
-M.tabline_states.jump_mode_enabled = true
+M.tabline_states.jump_mode_enabled = false
 
 ---@class TablineConfig
 ---@field enabled boolean Enable bufferline/tabline.
@@ -226,7 +226,6 @@ M.statusline_states.Modes = {
 	["ntT"] = { name = "  TERMINAL ", mode_name = "TerminalMode" },
 }
 
-M.statusline_states.git_cmd = "git --no-pager --no-optional-locks --literal-pathspecs -c gc.auto= -C "
 M.statusline_states.timer_count = 0
 
 return M

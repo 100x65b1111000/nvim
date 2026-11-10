@@ -20,8 +20,6 @@ P.config = function()
 
         }
     })
-
-    vim.keymap.set('n', '<leader>M', ':Mason<CR>', { desc = 'launch Mason' })
 end
 
 return P

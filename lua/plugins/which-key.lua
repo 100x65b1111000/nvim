@@ -1,6 +1,6 @@
 local P = {
 	"folke/which-key.nvim",
-	lazy = true,
+	event = "VeryLazy",
 }
 P.config = function()
 	local wk = require("which-key")
@@ -42,17 +42,5 @@ P.config = function()
 		},
 	})
 end
-
-P.keys = {
-	"<leader>",
-	"g",
-	"v",
-	"y",
-	'"',
-	"'",
-	"d",
-	"w",
-	"<C-w>",
-}
 
 return P

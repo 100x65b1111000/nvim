@@ -81,7 +81,7 @@ P.config = function()
 					bg = c.sumiInk1,
 					reverse = true,
 				},
-				TabLineOverFlowIndicator = {
+				TabLineOverflowIndicator = {
 					fg = c.surimiOrange,
 					bg = c.sumiInk1,
 					reverse = true,

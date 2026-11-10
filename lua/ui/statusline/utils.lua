@@ -41,9 +41,9 @@ end
 --- Display the current mode
 ---@return StatusLineModuleFnTable
 function M.statusline_mode()
-	local mode = nvim_get_mode().mode or "n"
-	local mode_string = states.Modes[mode or "n"].name or ""
-	local mode_name = states.Modes[mode or "n"].mode_name or ""
+	local mode = states.Modes[nvim_get_mode().mode] or states.Modes["n"]
+	local mode_string = mode.name or ""
+	local mode_name = mode.mode_name or ""
 	local hl_string = "StatusLine" .. mode_name
 	local sephl = generate_highlight(hl_string, "StatusLine", {}, 25, 0, "", "", "StatusLineModeSep" .. mode_name)
 	return {
@@ -161,26 +161,38 @@ local deletions = function(del)
 	return ""
 end
 
+--- Builds a git argv table (no shell, so filenames with metacharacters are safe)
+---@param parent string repo directory
+---@param args string[] git subcommand and flags
+local function git_argv(parent, args)
+	local argv = { "git", "--no-pager", "--no-optional-locks", "--literal-pathspecs", "-c", "gc.auto=", "-C", parent }
+	for _, a in ipairs(args) do
+		argv[#argv + 1] = a
+	end
+	return argv
+end
+
+--- Stores git output on the buffer that requested it, then redraws
+local function set_buf_obj(bufnr, name, out)
+	schedule(function()
+		if api.nvim_buf_is_valid(bufnr) then
+			nvim_buf_set_var(bufnr, name, { code = out.code, stdout = out.stdout, stderr = out.stderr })
+		end
+		cmd([[redrawstatus]])
+	end)
+end
+
 --- Fetch the git file status info about the current file
 M.fetch_git_file_stat = function()
 	states.git_stat_debounce_timer = timer_fn(states.git_stat_debounce_timer, 50, function()
+		local bufnr = nvim_get_current_buf()
 		local file_path = expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
 			return
 		end
-
-		local git_stat_cmd =
-			string.format("%s%s%s%s", states.git_cmd, parent, " status --short --porcelain ", file_path)
-		vim.system({ "bash", "-c", git_stat_cmd }, { text = true }, function(out)
-			schedule(function()
-				nvim_buf_set_var(
-					0,
-					"statusline_git_stat_obj",
-					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
-				)
-				cmd([[redrawstatus]])
-			end)
+		vim.system(git_argv(parent, { "status", "--short", "--porcelain", "--", file_path }), { text = true }, function(out)
+			set_buf_obj(bufnr, "statusline_git_stat_obj", out)
 		end)
 	end)
 end
@@ -188,22 +200,14 @@ end
 --- Fetch the git diff status info about the current file
 M.fetch_git_file_diff = function()
 	states.git_diff_debounce_timer = timer_fn(states.git_diff_debounce_timer, 50, function()
+		local bufnr = nvim_get_current_buf()
 		local file_path = expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
 			return
 		end
-
-		local git_diff_cmd = string.format("%s%s%s%s", states.git_cmd, parent, " diff --numstat ", file_path)
-		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-			schedule(function()
-				nvim_buf_set_var(
-					0,
-					"statusline_git_diff_obj",
-					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
-				)
-				cmd([[redrawstatus]])
-			end)
+		vim.system(git_argv(parent, { "diff", "--numstat", "--", file_path }), { text = true }, function(out)
+			set_buf_obj(bufnr, "statusline_git_diff_obj", out)
 		end)
 	end)
 end
@@ -256,26 +260,17 @@ M.statusline_git_file_status = function()
 	return { hl_group = "", string = git_status .. git_diff }
 end
 
---- Fetch the gir branch of the current file (if inside a git repo)
+--- Fetch the git branch of the current file (if inside a git repo)
 M.fetch_git_branch = function()
 	states.statusline_git_branch_timer = timer_fn(states.statusline_git_branch_timer, 50, function()
+		local bufnr = nvim_get_current_buf()
 		local file_path = expand("%:p")
 		local parent = find_parent(file_path)
 		if not parent then
-			-- nvim_buf_set_var(0, "statusline_git_branch_obj", nil)
 			return
 		end
-
-		local git_diff_cmd = string.format("%s%s%s", states.git_cmd, parent, " branch --show-current ")
-		vim.system({ "bash", "-c", git_diff_cmd }, { text = true }, function(out)
-			schedule(function()
-				nvim_buf_set_var(
-					0,
-					"statusline_git_branch_obj",
-					{ code = out.code, stdout = out.stdout, stderr = out.stderr }
-				)
-				cmd("redrawstatus")
-			end)
+		vim.system(git_argv(parent, { "branch", "--show-current" }), { text = true }, function(out)
+			set_buf_obj(bufnr, "statusline_git_branch_obj", out)
 		end)
 	end)
 end
@@ -284,7 +279,7 @@ end
 ---@return StatusLineModuleFnTable
 M.statusline_root_dir = function()
 	local parent = fnamemodify(find_parent(expand("%:p")) or "", ":~")
-	if parent then
+	if parent ~= "" then
 		return { hl_group = "StatusLine", string = parent, icon_hl = "StatusLineCwdIcon", icon = "  " }
 	end
 	return { hl_group = "StatusLine", string = vim.uv.cwd(), icon_hl = "StatusLineCwdIcon", icon = "  " }
@@ -298,47 +293,12 @@ M.statusline_git_branch = function()
 		return {}
 	end
 
-	local git_branch = git_branch_obj.stdout:gsub("([^%s]+)[\r\n]", "(%1)")
+	local git_branch = vim.trim(git_branch_obj.stdout)
 	return {
 		hl_group = "StatusLine",
 		string = git_branch .. " ",
 		icon_hl = "StatusLineGitBranchIcon",
 		icon = "  ",
-	}
-end
-
---- Display an indicator whether treesitter is enabled for the current file or not
----@return StatusLineModuleFnTable
-M.statusline_ts_info = function()
-	local ts_info = vim.treesitter.highlighter.active[nvim_get_current_buf()]
-	local hl_group = generate_highlight(
-		"Character",
-		"StatusLineNormalMode",
-		{ reverse = false },
-		-75,
-		0,
-		"",
-		"",
-		"StatusLineTSInfoActive",
-		{ use_fg_for_bg = true }
-	)
-	if not ts_info then
-		hl_group = generate_highlight(
-			"Comment",
-			"StatusLineNormalMode",
-			{ reverse = false },
-			-75,
-			0,
-			"",
-			"",
-			"StatusLineTSInfoInactive",
-			{ use_fg_for_bg = true }
-		)
-	end
-
-	return {
-		hl_group = hl_group,
-		string = "  ",
 	}
 end
 
@@ -413,11 +373,12 @@ end
 M.fetch_diagnostics = function()
 	states.diagnostic_debounce_timer = timer_fn(states.diagnostic_debounce_timer, 100, function()
 		local bufnr = nvim_get_current_buf()
+		local counts = vim.diagnostic.count(bufnr)
 		states.cache.severity_map = {
-			["ERROR"] = { hl = "%#DiagnosticError#", icon = "  ", count = vim.diagnostic.count(bufnr)[1] or 0 },
-			["WARN"] = { hl = "%#DiagnosticWarn#", icon = "  ", count = vim.diagnostic.count(bufnr)[2] or 0 },
-			["INFO"] = { hl = "%#DiagnosticInfo#", icon = "  ", count = vim.diagnostic.count(bufnr)[3] or 0 },
-			["HINT"] = { hl = "%#DiagnosticHint#", icon = "  ", count = vim.diagnostic.count(bufnr)[4] or 0 },
+			["ERROR"] = { hl = "%#DiagnosticError#", icon = "  ", count = counts[1] or 0 },
+			["WARN"] = { hl = "%#DiagnosticWarn#", icon = "  ", count = counts[2] or 0 },
+			["INFO"] = { hl = "%#DiagnosticInfo#", icon = "  ", count = counts[3] or 0 },
+			["HINT"] = { hl = "%#DiagnosticHint#", icon = "  ", count = counts[4] or 0 },
 		}
 
 		local diagnostic_str = string.format(
@@ -501,7 +462,6 @@ function M.initialize_stl(opts)
 	states.modules_map["git-branch"] = M.statusline_git_branch
 	states.modules_map["root-dir"] = M.statusline_root_dir
 	states.modules_map["filetype"] = M.statusline_filetype_info
-	-- states.modules_map["ts-info"] = M.statusline_ts_info
 	states.modules_map["lsp-info"] = M.statusline_lsp_info
 	states.modules_map["cursor-pos"] = M.statusline_cursor_pos
 	states.modules_map["file-percent"] = M.statusline_file_percent

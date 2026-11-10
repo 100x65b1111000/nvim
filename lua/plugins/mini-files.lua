@@ -123,9 +123,8 @@ P.config = function()
 	vim.api.nvim_create_autocmd("User", {
 		pattern = "MiniFilesBufferCreate",
 		callback = function(args)
-			local buf_id = args.data.bufid
+			local buf_id = args.data.buf_id
 			vim.keymap.set("n", "g.", toggle_dotfiles, { desc = "Toggle hidden files", buffer = buf_id })
-			-- vim.wo[args.data.win_id].number = true
 		end,
 	})
 

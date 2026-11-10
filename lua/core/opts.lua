@@ -75,34 +75,6 @@ api.nvim_create_autocmd("TextYankPost", {
 	end,
 })
 
--- local cmdlineToggleGroup = api.nvim_create_augroup("UserCmdlineToggle", { clear = true })
---
--- api.nvim_create_autocmd("CmdlineEnter", {
--- 	group = cmdlineToggleGroup,
--- 	pattern = "*",
--- 	callback = function()
--- 		o.cmdheight = 1
--- 	end,
--- })
---
--- api.nvim_create_autocmd("CmdlineLeave", {
--- 	group = cmdlineToggleGroup,
--- 	pattern = "*",
--- 	callback = function()
--- 		o.cmdheight = 0
--- 	end,
--- })
-
--- local smart_help = function()
---     if o.columns > 80 then
---         vim.cmd [[ vert help ]]
---     else
---         vim.cmd[[ help ]]
---     end
--- end
---
-_G.init_files = { "init.lua", "main.c", "main.cpp", "init.py", "__init__.py" }
-
 local function fold_virt_text(result, s, lnum, coloff)
 	if not coloff then
 		coloff = 0
@@ -111,8 +83,9 @@ local function fold_virt_text(result, s, lnum, coloff)
 	local hl
 	for i = 1, #s do
 		local char = s:sub(i, i)
-		local hls = vim.treesitter.get_captures_at_pos(0, lnum, coloff + i - 1)
-		local _hl = hls[#hls]
+		-- no parser installed for this filetype until treesitter is set up
+		local ok, hls = pcall(vim.treesitter.get_captures_at_pos, 0, lnum, coloff + i - 1)
+		local _hl = ok and hls[#hls] or nil
 		if _hl then
 			local new_hl = "@" .. _hl.capture
 			if new_hl ~= hl then
@@ -142,16 +115,6 @@ end
 
 opt.fillchars = "fold: "
 opt.foldtext = "v:lua.custom_foldtext()"
-
--- api.nvim_create_user_command("TabNew", function()
--- 	local bufnr = api.nvim_get_current_buf()
--- 	if bufnr == -1 then
--- 		vim.cmd("tabnew")
--- 	else
--- 		vim.cmd("tab split")
--- 	end
--- end, {})
---
 
 for _, plugin in pairs({
 	"netrwFileHandlers",

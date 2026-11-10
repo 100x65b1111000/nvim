@@ -55,8 +55,8 @@ P.config = function()
 					desc = " Config",
 					group = "@attribute.builtin",
 					key = "c",
-					action = function(path)
-						Snacks.picker.files({ cwd = path })
+					action = function()
+						Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
 					end,
 				},
 				{ desc = " Recents", group = "Keyword", key = "r", action = "lua Snacks.picker.recent()" },

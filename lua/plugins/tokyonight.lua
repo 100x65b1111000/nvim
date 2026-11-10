@@ -9,7 +9,7 @@ local P = {
 P.config = function()
 	require("tokyonight").setup({
 		style = "moon",
-		light_stype = "storm",
+		light_style = "storm",
 		transparent = false,
 		undercurl = false,
 		terminal_colors = true,
